@@ -1,0 +1,55 @@
+<router-outlet></router-outlet>
+
+<div *ngIf="auth.isAdmin()">
+  <h1>Welcome {{ name }}... probably</h1>
+  <ul>
+    <li *ngFor="let question of questions$ | async"
+        (click)=deleteQuestion(question.id)>
+      <span>{{ question.roomNumber }}</span>
+      <span *ngIf="isDatePresent(question)"> - {{ question.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</span>
+    </li>
+  </ul>
+
+  <h2>Write a post for the front page!</h2>
+  <form (ngSubmit)="submitPost()">
+    <div class="form-group">
+      <label>
+        Post
+        <input type="textarea"
+               class="form-control"
+               required
+               name="post"
+               [(ngModel)]="postContent"
+               #post="ngModel">
+      </label>
+    </div>
+
+    <button [disabled]="post.invalid" type="submit" class="btn btn-success">Submit</button>
+  </form>
+
+</div>
+
+<h3>Enter your room number to get help!</h3>
+<form (ngSubmit)="submitQuestion()">
+  <div class="form-group">
+    <label>
+      Room number
+      <input type="text"
+             class="form-control"
+             required
+             name="room"
+             [(ngModel)]="roomNumber"
+             #room="ngModel">
+    </label>
+  </div>
+
+  <button [disabled]="room.invalid" type="submit" class="btn btn-success">Submit</button>
+</form>
+
+<h1>Frequently Asked Questions</h1>
+<ul>
+  <li *ngFor="let post of posts$ | async"
+      (click)=editPost(post.id)>
+    <p>{{ post.content }}</p>
+  </li>
+</ul>
