@@ -3,6 +3,7 @@ export class User {
   email: string;
   imageURL: string;
   name: string;
+  messagingTokens: string[];
   admin: boolean;
 
   constructor(authData) {
@@ -10,6 +11,7 @@ export class User {
     this.email = authData.email;
     this.imageURL = authData.photoURL;
     this.name = '';
+    this.messagingTokens = [];
     this.admin = false;
   }
 }

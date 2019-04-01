@@ -5,16 +5,18 @@ import {AngularFirestore} from '@angular/fire/firestore';
 import {User} from '../user';
 import {switchMap} from 'rxjs/operators';
 import * as firebase from 'firebase/app';
+import {AngularFireMessaging} from '@angular/fire/messaging';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private user$: Observable<User>;
+  public user$: Observable<User>;
   public user: User;
 
   constructor(private fireAuth: AngularFireAuth,
-              private db: AngularFirestore) {
+              private db: AngularFirestore,
+              private afMessaging: AngularFireMessaging) {
 
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
@@ -60,6 +62,17 @@ export class AuthService {
       })
       .then(() => {
         return userData;
+      });
+  }
+
+  public addMessagingToken(token: string): Promise<any> {
+    const ref = this.db.firestore.collection('users').doc(this.user.uid);
+
+    return ref.get()
+      .then((doc) => {
+        if (doc.exists) {
+          ref.update('messagingTokens', firebase.firestore.FieldValue.arrayUnion(token));
+        }
       });
   }
 

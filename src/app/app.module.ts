@@ -8,6 +8,7 @@ import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AppRoutingModule} from './app-routing.module';
 import {FormsModule} from '@angular/forms';
+import {AngularFireMessagingModule} from '@angular/fire/messaging';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import {FormsModule} from '@angular/forms';
     FormsModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
+    AngularFireMessagingModule,
     AngularFirestoreModule,
     AngularFireAuthModule
   ],

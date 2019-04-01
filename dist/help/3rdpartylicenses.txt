@@ -38,6 +38,9 @@ MIT
 @angular/fire/firestore
 MIT
 
+@angular/fire/messaging
+MIT
+
 @angular/forms
 MIT
 
@@ -314,6 +317,8 @@ firebase/app
 firebase/auth
 
 firebase/firestore
+
+firebase/messaging
 
 promise-polyfill
 MIT

@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from './services/auth.service';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Question} from './question';
 import {Post} from './post';
+import {AngularFireMessaging} from '@angular/fire/messaging';
 
 
 @Component({
@@ -12,7 +13,7 @@ import {Post} from './post';
   templateUrl: './app.component.html',
   styles: []
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public name: string;
   public questions$: Observable<Question[]>;
   public posts$: Observable<Post[]>;
@@ -23,12 +24,12 @@ export class AppComponent {
   public postContent: string;
 
   constructor(public auth: AuthService,
-              private db: AngularFirestore) {
+              private db: AngularFirestore,
+              private afMessaging: AngularFireMessaging) {
 
     this.postId = '';
-    this.name = Math.random() > 0.5 ? 'Anton' : 'Henrik';
 
-    this.questions$ = this.db.collection<Question>('questions').snapshotChanges().pipe(
+    this.questions$ = this.db.collection<Question>('questions', ref => ref.orderBy('created')).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -37,7 +38,7 @@ export class AppComponent {
         });
       }));
 
-    this.posts$ = this.db.collection<Post>('posts').snapshotChanges().pipe(
+    this.posts$ = this.db.collection<Post>('posts', ref => ref.orderBy('created')).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -45,6 +46,28 @@ export class AppComponent {
           return {id, ...data};
         });
       }));
+
+    this.afMessaging.messages
+      .subscribe((message) => {
+        console.log(message);
+      });
+  }
+
+  ngOnInit(): void {
+    const sub = this.auth.user$
+      .subscribe(() => {
+        this.afMessaging.requestToken
+          .subscribe((token) => {
+              sub.unsubscribe();
+              this.auth.addMessagingToken(token);
+            },
+            (error) => {
+              sub.unsubscribe();
+              console.error(error);
+            }
+          );
+        }
+    );
   }
 
   submitPost() {
