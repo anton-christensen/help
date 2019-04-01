@@ -3,24 +3,24 @@ import * as admin from 'firebase-admin';
 admin.initializeApp();
 
 export const onNewMessagingToken = functions.firestore
-  .document('users/{id}').onUpdate((snap, context) => {
-    console.log('Someone new wants notifications!');
+  .document('users/{id}').onUpdate((snap) => {
     const data = snap.after.data();
-    return admin.messaging().subscribeToTopic(data['messagingTokens'], 'questions');
+
+    if (data.messagingTokens && data.messagingTokens.length) {
+      return admin.messaging().subscribeToTopic(data.messagingTokens, 'questions');
+    } else {
+      return null;
+    }
+
   });
 
 export const onHelpRequest = functions.firestore
-  .document('questions/{id}').onWrite((snap, context) => {
-    console.log('Question posted!', snap.after.data());
-
+  .document('questions/{id}').onWrite((snap) => {
+    const roomNumber = snap.after.data().roomNumber;
     const message = {
-      data: {
-        title: 'test',
-        body: 'more test'
-      },
       notification: {
-        title: 'test 123',
-        body: 'more test 123'
+        title: 'Someone needs help!',
+        body: `Room no. ${roomNumber}`
       }
     };
 
