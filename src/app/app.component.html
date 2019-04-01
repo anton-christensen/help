@@ -1,55 +1,63 @@
-<router-outlet></router-outlet>
+<div class="container">
+  <!-- -------------------- ADMIN ------------------------ -->
+  <div *ngIf="auth.isAdmin()">
+    <h1>Welcome {{ auth.user.name }}</h1>
+    <ul>
+      <li *ngFor="let question of questions$ | async">
+        <span>{{ question.roomNumber }}</span>
+        <span *ngIf="isDatePresent(question)"> - {{ question.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</span>
+        <span (click)=deleteQuestion(question.id)>Delete</span>
+      </li>
+    </ul>
 
-<div *ngIf="auth.isAdmin()">
-  <h1>Welcome {{ name }}... probably</h1>
-  <ul>
-    <li *ngFor="let question of questions$ | async"
-        (click)=deleteQuestion(question.id)>
-      <span>{{ question.roomNumber }}</span>
-      <span *ngIf="isDatePresent(question)"> - {{ question.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</span>
-    </li>
-  </ul>
+    <h2>Write a post for the front page!</h2>
+    <form (ngSubmit)="submitPost()">
+      <div class="form-group">
+        <label>
+          Post
+          <input type="textarea"
+                 class="form-control"
+                 required
+                 name="post"
+                 [(ngModel)]="postContent"
+                 #post="ngModel">
+        </label>
+      </div>
 
-  <h2>Write a post for the front page!</h2>
-  <form (ngSubmit)="submitPost()">
+      <button [disabled]="post.invalid" type="submit" class="btn btn-success">Submit</button>
+    </form>
+  </div>
+
+
+  <!-- -------------------- USERS ----------------------- -->
+  <h3>Enter your room number to get help!</h3>
+  <form (ngSubmit)="submitQuestion()">
     <div class="form-group">
       <label>
-        Post
-        <input type="textarea"
+        Room number
+        <input type="text"
                class="form-control"
                required
-               name="post"
-               [(ngModel)]="postContent"
-               #post="ngModel">
+               name="room"
+               [(ngModel)]="roomNumber"
+               #room="ngModel">
       </label>
     </div>
 
-    <button [disabled]="post.invalid" type="submit" class="btn btn-success">Submit</button>
+    <button [disabled]="room.invalid" type="submit" class="btn btn-success">Submit</button>
   </form>
+
+  <h1>Frequently Asked Questions</h1>
+  <ul>
+    <li *ngFor="let post of posts$ | async">
+      <p>{{ post.content }}</p>
+      <button *ngIf="auth.isAdmin()" (click)="editPost(post.id)">Edit</button>
+      <button *ngIf="auth.isAdmin()" (click)="deletePost(post.id)">Delete</button>
+    </li>
+  </ul>
 
 </div>
 
-<h3>Enter your room number to get help!</h3>
-<form (ngSubmit)="submitQuestion()">
-  <div class="form-group">
-    <label>
-      Room number
-      <input type="text"
-             class="form-control"
-             required
-             name="room"
-             [(ngModel)]="roomNumber"
-             #room="ngModel">
-    </label>
-  </div>
-
-  <button [disabled]="room.invalid" type="submit" class="btn btn-success">Submit</button>
-</form>
-
-<h1>Frequently Asked Questions</h1>
-<ul>
-  <li *ngFor="let post of posts$ | async"
-      (click)=editPost(post.id)>
-    <p>{{ post.content }}</p>
-  </li>
-</ul>
+<footer>
+  <p>Are you a TA? <span (click)="auth.login()">log in</span> to access more options</p>
+</footer>
