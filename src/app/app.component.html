@@ -2,62 +2,72 @@
   <!-- -------------------- ADMIN ------------------------ -->
   <div *ngIf="auth.isAdmin()">
     <h1>Welcome {{ auth.user.name }}</h1>
-    <ul>
-      <li *ngFor="let question of questions$ | async">
-        <span>{{ question.roomNumber }}</span>
-        <span *ngIf="isDatePresent(question)"> - {{ question.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</span>
-        <span (click)=deleteQuestion(question.id)>Delete</span>
-      </li>
-    </ul>
+    <table class="questions">
+      <tr><th>Room number</th><th>time</th><th></th></tr>
+      <tr *ngFor="let question of questions$ | async" class="question">
+        <td class="room">{{ question.roomNumber }}</td>
+        <td *ngIf="isDatePresent(question)" class="created">{{ timeConverter(question.created) | date : 'HH:mm:ss dd/MM' }}</td>
+        <td (click)=deleteQuestion(question.id) class="delete">Delete</td>
+      </tr>
+    </table>
 
     <h2>Write a post for the front page!</h2>
     <form (ngSubmit)="submitPost()">
       <div class="form-group">
-        <label>
+        <label for="post">
           Post
-          <input type="textarea"
-                 class="form-control"
-                 required
-                 name="post"
-                 [(ngModel)]="postContent"
-                 #post="ngModel">
         </label>
+        <textarea
+               class="form-control"
+               required
+               name="post"
+               [(ngModel)]="postContent"
+               #post="ngModel"></textarea>
+        <button [disabled]="post.invalid" type="submit" class="btn btn-success mybutton">Submit</button>
       </div>
 
-      <button [disabled]="post.invalid" type="submit" class="btn btn-success">Submit</button>
     </form>
   </div>
 
 
   <!-- -------------------- USERS ----------------------- -->
-  <h3>Enter your room number to get help!</h3>
-  <form (ngSubmit)="submitQuestion()">
-    <div class="form-group">
-      <label>
-        Room number
+  <div *ngIf="!auth.isAdmin()">
+    <h3>Enter your room number to get help!</h3>
+    <form (ngSubmit)="submitQuestion()">
+      <div class="form-group">
+        <label for="room">
+          Room number
+        </label>
         <input type="text"
                class="form-control"
                required
                name="room"
+               placeholder="Room number"
                [(ngModel)]="roomNumber"
                #room="ngModel">
-      </label>
-    </div>
+        <button [disabled]="room.invalid" type="submit" class="btn btn-success mybutton">Submit</button>
+      </div>
 
-    <button [disabled]="room.invalid" type="submit" class="btn btn-success">Submit</button>
-  </form>
+    </form>
+  </div>
 
   <h1>Frequently Asked Questions</h1>
-  <ul>
-    <li *ngFor="let post of posts$ | async">
-      <p>{{ post.content }}</p>
-      <button *ngIf="auth.isAdmin()" (click)="editPost(post.id)">Edit</button>
-      <button *ngIf="auth.isAdmin()" (click)="deletePost(post.id)">Delete</button>
-    </li>
-  </ul>
+  <div class="posts">
+    <div class="post" *ngFor="let post of posts$ | async">
+      <div class="created">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
+      <div class="content">
+        <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
+      </div>
+      <div class="actions" *ngIf="auth.isAdmin()">
+        <button class="mybutton" (click)="editPost(post.id)">Edit</button>
+        <button class="mybutton" (click)="deletePost(post.id)">Delete</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <footer>
-  <p>Are you a TA? <span (click)="auth.login()">log in</span> to access more options</p>
+  <p *ngIf="auth.isAdmin()">Are you not a TA? <span (click)="auth.logout()">log out</span> to access less options</p>
+  <p *ngIf="!auth.isAdmin()">Are you a TA? <span (click)="auth.login()">log in</span> to access more options</p>
 </footer>

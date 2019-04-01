@@ -60,6 +60,7 @@ export class AppComponent {
       .then(() => {
         this.postId = '';
         this.postContent = '';
+        console.log("RESET!");
       });
   }
 
@@ -102,6 +103,12 @@ export class AppComponent {
 
   public isDatePresent(question: Question): boolean {
     return question && question.created && question.created['seconds'];
+  }
+
+  public timeConverter(timestamp) {
+    // var time = (Date.now()-1000*60*60) - question.created.toMillis();
+    var time = timestamp.toMillis();
+    return time;
   }
 
 }
