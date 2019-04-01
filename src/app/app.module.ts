@@ -9,6 +9,7 @@ import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AppRoutingModule} from './app-routing.module';
 import {FormsModule} from '@angular/forms';
 import {AngularFireMessagingModule} from '@angular/fire/messaging';
+import {MarkdownModule} from 'ngx-markdown';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import {AngularFireMessagingModule} from '@angular/fire/messaging';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
     AngularFirestoreModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    MarkdownModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
