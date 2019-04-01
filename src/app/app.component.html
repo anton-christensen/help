@@ -1,3 +1,12 @@
+<div class="toasts" *ngIf="toastService.toasts.length">
+  <div class="toast"
+       *ngFor="let toast of toastService.toasts"
+       [ngStyle]="{animation: 'show-hide ' + toast.time + 'ms ease-in-out'}"
+       (click)="toastService.removeById(toast.id)">
+    {{ toast.message }}
+  </div>
+</div>
+
 <div class="container">
   <!-- -------------------- ADMIN ------------------------ -->
   <div *ngIf="auth.isAdmin()">
@@ -16,6 +25,7 @@
       <div class="form-group">
         <label for="post">Post</label>
         <textarea
+               id="post"
                class="form-control"
                required
                name="post"
@@ -29,14 +39,15 @@
 
 
   <!-- -------------------- USERS ----------------------- -->
-  <div *ngIf="!auth.isAdmin()">
-    <h3>Enter your room number to get help!</h3>
+  <div class="get-help" *ngIf="!auth.isAdmin()">
+    <h2>Enter your room number to get help</h2>
     <form (ngSubmit)="submitQuestion()">
       <div class="form-group">
         <label for="room">
           Room number
         </label>
         <input type="text"
+               id="room"
                class="form-control"
                required
                name="room"
@@ -45,19 +56,18 @@
                #room="ngModel">
         <button [disabled]="room.invalid" type="submit" class="btn btn-success mybutton">Submit</button>
       </div>
-
     </form>
   </div>
 
-  <h1>Frequently Asked Questions</h1>
-  <div class="posts">
-    <div class="post" *ngFor="let post of posts$ | async">
+  <div class="posts" *ngIf="posts$ | async as posts">
+    <h1>Frequently Asked Questions</h1>
+    <div class="post" *ngFor="let post of posts">
       <div class="created" *ngIf="isDatePresent(post)">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
       <div class="content">
         <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
       </div>
       <div class="actions" *ngIf="auth.isAdmin()">
-        <button class="mybutton" (click)="editPost(post.id)">Edit</button>
+        <button class="mybutton" (click)="editPost(post)">Edit</button>
         <button class="mybutton" (click)="deletePost(post.id)">Delete</button>
       </div>
     </div>

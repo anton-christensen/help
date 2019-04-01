@@ -13,7 +13,7 @@ import {MarkdownModule} from 'ngx-markdown';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

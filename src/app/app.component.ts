@@ -6,6 +6,7 @@ import {map} from 'rxjs/operators';
 import {Question} from './question';
 import {Post} from './post';
 import {AngularFireMessaging} from '@angular/fire/messaging';
+import {ToastService} from './services/toasts.service';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit {
   public postContent: string;
 
   constructor(public auth: AuthService,
+              public toastService: ToastService,
               private db: AngularFirestore,
               private afMessaging: AngularFireMessaging) {
 
@@ -55,7 +57,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     const sub = this.auth.user$
-      .subscribe(() => {
+      .subscribe((user) => {
+        if (!user || !user.admin) {
+          return;
+        }
+
         this.afMessaging.requestToken
           .subscribe((token) => {
               sub.unsubscribe();
@@ -74,14 +80,14 @@ export class AppComponent implements OnInit {
     const id = this.postId ? this.postId : this.db.collection('posts').ref.doc().id;
     const ref = this.db.firestore.collection('posts').doc(id);
 
-    console.log(id);
-
     ref.get()
       .then(doc => {
-        if(doc.exists)
+        if (doc.exists) {
           return ref.update('content', this.postContent);
-        else
+
+        } else {
           return ref.set(Object.assign({}, new Post(id, this.postContent)));
+        }
       })
       .then(() => {
         this.postId = '';
@@ -95,9 +101,10 @@ export class AppComponent implements OnInit {
 
     ref.get()
       .then(doc => {
-          ref.set(Object.assign({}, new Question(id, this.roomNumber)));
+        return ref.set(Object.assign({}, new Question(id, this.roomNumber)));
       })
       .then(() => {
+        this.toastService.add('Help is on the way!');
         this.roomNumber = '';
       });
   }
@@ -106,7 +113,7 @@ export class AppComponent implements OnInit {
     const ref = this.db.firestore.collection('questions').doc(id);
     return ref.get()
       .then(() => {
-        ref.delete();
+        return ref.delete();
       });
   }
 
@@ -118,12 +125,9 @@ export class AppComponent implements OnInit {
       });
   }
 
-  editPost(id: string) {
-    return this.db.doc<Post>(`posts/${id}`).valueChanges()
-      .subscribe((post) => {
-        this.postId = id;
-        this.postContent = post.content;
-      });
+  editPost(post: Post) {
+      this.postId = post.id;
+      this.postContent = post.content;
   }
 
   public isDatePresent(question: Question): boolean {
@@ -132,8 +136,7 @@ export class AppComponent implements OnInit {
 
   public timeConverter(timestamp) {
     // var time = (Date.now()-1000*60*60) - question.created.toMillis();
-    var time = timestamp.toMillis();
-    return time;
+    return timestamp.toMillis();
   }
 
 }
