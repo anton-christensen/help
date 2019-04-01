@@ -14,9 +14,7 @@
     <h2>Write a post for the front page!</h2>
     <form (ngSubmit)="submitPost()">
       <div class="form-group">
-        <label for="post">
-          Post
-        </label>
+        <label for="post">Post</label>
         <textarea
                class="form-control"
                required
@@ -54,7 +52,7 @@
   <h1>Frequently Asked Questions</h1>
   <div class="posts">
     <div class="post" *ngFor="let post of posts$ | async">
-      <div class="created">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
+      <div class="created" *ngIf="isDatePresent(post)">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
       <div class="content">
         <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
       </div>

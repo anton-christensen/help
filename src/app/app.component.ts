@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
         });
       }));
 
-    this.posts$ = this.db.collection<Post>('posts', ref => ref.orderBy('created')).snapshotChanges().pipe(
+    this.posts$ = this.db.collection<Post>('posts', ref => ref.orderBy('created', 'desc')).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -78,12 +78,14 @@ export class AppComponent implements OnInit {
 
     ref.get()
       .then(doc => {
-        ref.set(Object.assign({}, new Post(id, this.postContent)));
+        if(doc.exists)
+          return ref.update('content', this.postContent);
+        else
+          return ref.set(Object.assign({}, new Post(id, this.postContent)));
       })
       .then(() => {
         this.postId = '';
         this.postContent = '';
-        console.log("RESET!");
       });
   }
 

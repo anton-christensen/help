@@ -41,6 +41,12 @@ footer {
   transition: border .2s, background .2s, color .2s, height .5s;
 }
 
+.mybutton:hover {
+    color: white;
+    border: 1px solid #666666;
+    background: #666666;
+}
+
 input[type="text"] {
     padding:0;
     margin:0;
@@ -62,26 +68,8 @@ input[type="text"]:focus {
     outline: 0;
 }
 
-input[type="text"] + button[type="submit"] {
-    cursor: pointer;
-    border: 0;
-    padding: 0 1em;
-    margin: 0;
-    height: 2.3rem;
-    border: 1px solid #f4f4f4;
-    background: #f4f4f4;
-    transition: border .2s, background .2s, color .2s, height .5s;
-}
-
-
 input[type="text"]:focus + button[type="submit"] {
     height: 3.3rem;
-}
-
-input[type="text"] + button[type="submit"]:hover {
-    color: white;
-    border: 1px solid #666666;
-    background: #666666;
 }
 
 ul {
@@ -168,4 +156,22 @@ tr.question:hover {
     position: absolute;
     right: 0;
     top: 0;
+}
+
+
+markdown h1 {
+    font-size: 1.5em;
+}
+
+markdown h2 {
+    font-size: 1.17em;
+}
+
+markdown h3 {
+    font-size: 1em;
+}
+
+markdown pre {
+    background: whitesmoke;
+    padding: 0.25rem 0.5rem;
 }
