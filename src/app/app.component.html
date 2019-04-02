@@ -11,18 +11,21 @@
   <!-- -------------------- ADMIN ------------------------ -->
   <div *ngIf="auth.isAdmin()">
     <h1>Welcome {{ auth.user.name }}</h1>
-    <table class="questions" *ngIf="(questions$ | async)?.length > 0">
-      <tr><th>Room number</th><th>time</th><th></th></tr>
-      <tr *ngFor="let question of questions$ | async" class="question">
-        <td class="room">{{ question.roomNumber }}</td>
-        <td *ngIf="isDatePresent(question)" class="created">{{ timeConverter(question.created) | date : 'HH:mm:ss dd/MM' }}</td>
-        <td (click)=deleteQuestion(question.id) class="delete">Delete</td>
-      </tr>
-    </table>
-    <div *ngIf="(questions$ | async)?.length==0">
-      <b>Turn out no one needs you</b>
-      <p>Kick back for a minute. We will notify you when something happens.</p>
-    </div>
+
+    <ng-container *ngIf="questions$ | async;let questions">
+      <table class="questions" *ngIf="questions.length > 0" >
+        <tr><th>Room number</th><th>time</th><th></th></tr>
+        <tr *ngFor="let question of questions" class="question">
+          <td class="room">{{ question.roomNumber }}</td>
+          <td *ngIf="isDatePresent(question)" class="created">{{ timeConverter(question.created) | date : 'HH:mm:ss dd/MM' }}</td>
+          <td (click)=deleteQuestion(question.id) class="delete">Delete</td>
+        </tr>
+      </table>
+      <div *ngIf="questions.length==0">
+        <b>Turn out no one needs you</b>
+        <p>Kick back for a minute. We will notify you when something happens.</p>
+      </div>
+    </ng-container>
 
     <h1>Write a post for the front page!</h1>
     <form (ngSubmit)="submitPost()">
