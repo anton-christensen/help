@@ -54,6 +54,15 @@ app-footer, footer {
   border-radius: 0.2rem;
 }
 
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+ul > li::before {
+  content: "-";
+  padding-right: 0.5rem;
+}
+
 .btn {
   cursor: pointer;
   outline: 0;
@@ -95,19 +104,12 @@ input[type="text"].ng-invalid:focus {
     box-shadow: rgba(200, 0, 0, 0.2) 0 1px 8px -2px;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 label {display: none;}
 label.visible {display: inline-block;}
 
 .get-help {
   margin-bottom: 64px;
 }
-
 .post {
   border-bottom: 1px solid #ebebeb;
   padding-top: 1rem;
@@ -133,29 +135,29 @@ label.visible {display: inline-block;}
 
 /* ADMIN */
 .form-group {
-    position: relative;
+  position: relative;
 }
 
 textarea {
-    outline: 0;
-    width: 100%;
-    min-height: 10rem;
-    resize: vertical;
-    border: 1px solid #f4f4f4;
-    padding: 0.4rem 1rem;
-    box-sizing: border-box;
+  outline: 0;
+  width: 100%;
+  min-height: 10rem;
+  resize: vertical;
+  border: 1px solid #f4f4f4;
+  padding: 0.4rem 1rem;
+  box-sizing: border-box;
 }
 
 textarea + button {
-    position: absolute;
-    right: -1px;
-    top: 0;
+  position: absolute;
+  right: -1px;
+  top: 0;
 }
 
 textarea + button[type="submit"]:hover {
-    color: white;
-    border: 1px solid #666666;
-    background: #666666;
+  color: white;
+  border: 1px solid #666666;
+  background: #666666;
 }
 
 table.trash-cans {
@@ -164,8 +166,8 @@ table.trash-cans {
 }
 
 th,td {
-    text-align: left;
-    padding: 0.5rem 1rem;
+  text-align: left;
+  padding: 0.5rem 1rem;
 }
 
 .trash-cans tr:first-child {
@@ -173,8 +175,8 @@ th,td {
 }
 
 tr {
-    border-top: 1px solid #e3e3e3;
-    border-bottom: 1px solid #e3e3e3;
+  border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
 }
 
 tr.trash-can:nth-child(even) {background-color: #f2f2f2;}
@@ -184,28 +186,28 @@ tr.trash-can:hover {
 }
 
 .post .actions {
-    position: absolute;
-    right: 0;
-    top: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 /********** MARKDOWN POSTS *************/
 
 markdown h1 {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
 
 markdown h2 {
-    font-size: 1.17em;
+  font-size: 1.17em;
 }
 
 markdown h3 {
-    font-size: 1em;
+  font-size: 1em;
 }
 
 markdown pre {
-    background: whitesmoke;
-    padding: 0.25rem 0.5rem;
+  background: whitesmoke;
+  padding: 0.25rem 0.5rem;
 }
 
 /*************** Checkbox toggles ****************/
