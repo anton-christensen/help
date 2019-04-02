@@ -11,7 +11,7 @@
   <!-- -------------------- ADMIN ------------------------ -->
   <div *ngIf="auth.isAdmin()">
     <h1>Welcome {{ auth.user.name }}</h1>
-    <table class="questions">
+    <table class="questions" *ngIf="(questions$ | async)?.length > 0">
       <tr><th>Room number</th><th>time</th><th></th></tr>
       <tr *ngFor="let question of questions$ | async" class="question">
         <td class="room">{{ question.roomNumber }}</td>
@@ -19,8 +19,12 @@
         <td (click)=deleteQuestion(question.id) class="delete">Delete</td>
       </tr>
     </table>
+    <div *ngIf="(questions$ | async)?.length==0">
+      <b>Turn out no one needs you</b>
+      <p>Kick back for a minute. We will notify you when something happens.</p>
+    </div>
 
-    <h2>Write a post for the front page!</h2>
+    <h1>Write a post for the front page!</h1>
     <form (ngSubmit)="submitPost()">
       <div class="form-group">
         <label for="post">Post</label>

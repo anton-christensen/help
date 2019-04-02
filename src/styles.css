@@ -1,37 +1,51 @@
 body,html {
-    margin: 0;
-    padding: 0;
-    background-color: #f9fbff;
-    color: #626262;
-    font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9fbff;
+  color: #626262;
+  font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+  margin-block-end: 0;
 }
 
 .container {
-    position: relative;
-    z-index: 2;
-    width: 90%;
-    max-width:50rem;
-    margin: 1rem auto;
-    padding: 1rem;
-    background-color: white;
-    box-shadow: black 0px 15px 41px -36px;
-    border-radius: 0 0 5px 5px;
-    margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width:50rem;
+  margin: 1rem auto;
+  padding: 1rem;
+  background-color: white;
+  box-shadow: black 0px 15px 41px -36px;
+  border-radius: 0 0 5px 5px;
+  margin-bottom: 3rem;
 }
 
 footer {
-    color: white;
-    font-size: .7rem;
-    background-color: #626262;
-    position: fixed;
-    left: 0; right: 0;
-    bottom: 0;
-    height: 2rem;
-    text-align:center;
-    padding: 0 1rem;
+  color: white;
+  font-size: .7rem;
+  background-color: #626262;
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  height: 2rem;
+  text-align:center;
+  padding: 0 1rem;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+ul > li::before {
+  content: "-";
+  padding-right: 0.5rem;
 }
 
 .mybutton {
+  color: #626262;
   cursor: pointer;
   padding: 0 1rem;
   margin: 0;
@@ -42,40 +56,34 @@ footer {
 }
 
 .mybutton:hover {
-    color: white;
-    border: 1px solid #666666;
-    background: #666666;
+  color: white;
+  border: 1px solid #666666;
+  background: #666666;
 }
 
 input[type="text"] {
-    padding:0;
-    margin:0;
-    padding-left: 1em;
-    font-weight: bold;
-    border: 1px solid #f4f4f4;
-    height: 2.3rem;
-    outline: 0;
-    transition: height .5s;
+  padding:0;
+  margin:0;
+  padding-left: 1em;
+  font-weight: bold;
+  border: 1px solid #f4f4f4;
+  height: 2.3rem;
+  outline: 0;
+  transition: height .5s;
 }
 
 input[type="text"]:focus {
-    padding:0;
-    margin:0;
-    padding-left: 1em;
-    font-weight: bold;
-    border: 1px solid #f4f4f4;
-    height: 3.3rem;
-    outline: 0;
+  padding:0;
+  margin:0;
+  padding-left: 1em;
+  font-weight: bold;
+  border: 1px solid #f4f4f4;
+  height: 3.3rem;
+  outline: 0;
 }
 
 input[type="text"]:focus + button[type="submit"] {
-    height: 3.3rem;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  height: 3.3rem;
 }
 
 label {display: none;}
@@ -83,7 +91,6 @@ label {display: none;}
 .get-help {
   margin-bottom: 64px;
 }
-
 .post {
   border-bottom: 1px solid #ebebeb;
   padding-top: 1rem;
@@ -105,39 +112,39 @@ label {display: none;}
 
 /* ADMIN */
 .form-group {
-    position: relative;
+  position: relative;
 }
 
 textarea {
-    outline: 0;
-    width: 100%;
-    min-height: 10rem;
-    resize: vertical;
-    border: 1px solid #f4f4f4;
-    padding: 0.4rem 1rem;
-    box-sizing: border-box;
+  outline: 0;
+  width: 100%;
+  min-height: 10rem;
+  resize: vertical;
+  border: 1px solid #f4f4f4;
+  padding: 0.4rem 1rem;
+  box-sizing: border-box;
 }
 
 textarea + button {
-    position: absolute;
-    right: -1px;
-    top: 0;
+  position: absolute;
+  right: -1px;
+  top: 0;
 }
 
 textarea + button[type="submit"]:hover {
-    color: white;
-    border: 1px solid #666666;
-    background: #666666;
+  color: white;
+  border: 1px solid #666666;
+  background: #666666;
 }
 
 table.questions {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th,td {
-    text-align: left;
-    padding: 0.5rem 1rem;
+  text-align: left;
+  padding: 0.5rem 1rem;
 }
 
 .questions tr:first-child {
@@ -145,38 +152,38 @@ th,td {
 }
 
 tr {
-    border-top: 1px solid #e3e3e3;
-    border-bottom: 1px solid #e3e3e3;
+  border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
 }
 
 tr.question:nth-child(even) {background-color: #f2f2f2;}
 tr.question:hover {
-    background-color: #e3e3e3;
-    cursor: pointer;
+  background-color: #e3e3e3;
+  cursor: pointer;
 }
 
 .post .actions {
-    position: absolute;
-    right: 0;
-    top: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 
 markdown h1 {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
 
 markdown h2 {
-    font-size: 1.17em;
+  font-size: 1.17em;
 }
 
 markdown h3 {
-    font-size: 1em;
+  font-size: 1em;
 }
 
 markdown pre {
-    background: whitesmoke;
-    padding: 0.25rem 0.5rem;
+  background: whitesmoke;
+  padding: 0.25rem 0.5rem;
 }
 
 .toasts {
