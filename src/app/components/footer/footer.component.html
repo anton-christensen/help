@@ -1,0 +1,4 @@
+<footer>
+  <p *ngIf="auth.loggedIn()">Are you not a TA? <span (click)="auth.logout()">log out</span> to access less options</p>
+  <p *ngIf="!auth.loggedIn()">Are you a TA? <span (click)="auth.login()">log in</span> to access more options</p>
+</footer>

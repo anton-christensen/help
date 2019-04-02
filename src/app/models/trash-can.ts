@@ -1,13 +1,15 @@
 import * as firebase from 'firebase';
 
-export class Question {
+export class TrashCan {
   public id: string;
-  public roomNumber: string;
+  public course: string;
+  public room: string;
   public created: string | object;
 
-  constructor(id: string, roomNumber: string) {
+  constructor(id: string, course: string, room: string) {
     this.id = id;
-    this.roomNumber = roomNumber;
+    this.course = course;
+    this.room = room;
     this.created = firebase.firestore.FieldValue.serverTimestamp();
   }
 }

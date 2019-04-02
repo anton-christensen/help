@@ -1,0 +1,44 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin;
+    }
+    
+		function isTA(courseSlug) {
+      return courseSlug in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.courses;
+    }
+    
+    match /courses/{documentId} {
+      allow read;
+      allow update: if isTA(request.resource.data.slug) || isAdmin();
+    }
+          
+    match /trash-cans/{documentId} {
+      allow read, create;
+      allow delete, update: if isTA(request.resource.data.course) || isAdmin();
+    }
+    
+    match /posts/{documentId} {
+      allow read;
+      allow create, update, delete: if isTA(request.resource.data.course) || isAdmin();
+    }
+    
+    match /users/{userId} {      
+      function requestDoesNotChangeAdmin() {
+      	return request.resource.data.admin == false;
+      }
+      
+      function requestDoesNotChangeCourses() {
+      	return request.resource.data.admin == false;
+      }
+          
+      function requestChangesRoles() {
+      	return !roleEqual('moderator') || !roleEqual('admin');
+      }
+
+      allow read, delete: if request.auth.uid == userId || isAdmin();
+      allow create: if requestDoesNotChangeAdmin() && requestDoesNotChangeCourses();
+      allow update: if isAdmin() || (request.auth.uid == userId && requestDoesNotChangeAdmin() && requestDoesNotChangeCourses());
+    }
+  }
+}

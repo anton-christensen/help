@@ -1,0 +1,16 @@
+<h1>Course not found...</h1>
+<ng-container *ngIf="enabledCourses$ | async; let enabledCourses">
+  <ng-container *ngIf="enabledCourses.length">
+    <h2>Is it one of these?</h2>
+    <ul>
+      <li *ngFor="let course of enabledCourses">
+        <a [routerLink]="['/', course.slug]">
+          {{ course.title }} ({{ course.slug }})
+        </a>
+      </li>
+    </ul>
+  </ng-container>
+  <ng-container *ngIf="enabledCourses.length == 0">
+      <h2>There are no exercise sessions... in session</h2>
+    </ng-container>
+</ng-container>

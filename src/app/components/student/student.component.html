@@ -1,0 +1,26 @@
+<div class="get-help">
+  <div *ngIf="course.enabled">
+    <h2>Enter your room number to get help</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="room">
+        Room number
+      </label>
+      <input type="text"
+             id="room"
+             class="form-control"
+             required
+             formControlName="room"
+             placeholder="Room number">
+      <button [disabled]="form.invalid" type="submit" class="btn">Submit</button>
+      <div *ngIf="form.invalid && (form.touched || form.dirty)" class="error">
+        That is an odd room number... (must be between 3 and 15 alphanumeric characters)
+      </div>
+    </div>
+  </form>
+  </div>
+
+  <div class="course-notice danger" *ngIf="!course.enabled">
+      <h3>Course is currently disabled</h3>
+  </div>
+</div>

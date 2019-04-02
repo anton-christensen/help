@@ -1,0 +1,21 @@
+<div class="fr">
+  <label for="enabled">Enable exercise session</label>
+  <div class="switch tooltip" (click)="toggleCourseEnabled()">
+    <span class="tooltiptext">{{course.enabled ? "Disable" : "Enable"}} exercise session</span> 
+    <input name="enabled" type="checkbox" [checked]="course.enabled"/>
+    <span class="slider"></span>
+  </div>
+</div>
+<h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
+<ng-container *ngIf="trashCans$ | async; let trashCans">
+  <div *ngIf="trashCans.length > 0">
+    <table class="trash-cans">
+      <tr><th>Room number</th><th>Posted at</th><th></th></tr>
+      <tr *ngFor="let trashCan of trashCans" class="trash-can">
+        <td class="room">{{ trashCan.room }}</td>
+        <td *ngIf="common.documentIsCreatedDatePresent(trashCan)" class="created">{{ trashCan.created.seconds * 1000 | date : 'EEEE d. LLL - HH:mm:ss' }}</td>
+        <td (click)=deleteTrashCan(trashCan) class="delete">Delete</td>
+      </tr>
+    </table>
+  </div>
+</ng-container>

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {Observable, of} from 'rxjs';
 import {AngularFirestore} from '@angular/fire/firestore';
-import {User} from '../user';
 import {switchMap} from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import {AngularFireMessaging} from '@angular/fire/messaging';
+import { User } from '../models/user';
+import { Course } from '../models/course';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,10 @@ export class AuthService {
     return this.user && this.user.admin;
   }
 
+  public isTA(course: Course): boolean {
+    return this.user && (this.user.admin || this.user.courses.includes(course.slug));
+  }
+
   private createUser(authData): Promise<any> {
     let userData;
     const ref = this.db.firestore.collection('users').doc(authData.uid);
@@ -78,5 +83,10 @@ export class AuthService {
 
   loggedIn(): boolean {
     return !!this.user;
+  }
+
+  public isActualCourse(courseSlug: string): Promise<boolean> {
+    return this.db.collection<Course>('courses', ref => ref.where('slug', '==', courseSlug)).get().toPromise()
+      .then(val => !val.empty);
   }
 }

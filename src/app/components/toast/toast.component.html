@@ -1,0 +1,8 @@
+<div class="toasts" *ngIf="toastService.toasts.length">
+  <div class="toast"
+       *ngFor="let toast of toastService.toasts"
+       [ngStyle]="{animation: 'show-hide ' + toast.time + 'ms ease-in-out'}"
+       (click)="toastService.removeById(toast.id)">
+    {{ toast.message }}
+  </div>
+</div>

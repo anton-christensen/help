@@ -1,0 +1,31 @@
+<div *ngIf="auth.isTA(course)">
+  <h3>Write a post for the front page</h3>
+  <form [formGroup]="form" (ngSubmit)="submitPost()">
+    <div class="form-group">
+      <label for="post">Post</label>
+      <textarea
+        id="post"
+        class="form-control"
+        required
+        formControlName="content"></textarea>
+      <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
+    </div>
+  </form>
+</div>
+
+
+<ng-container *ngIf="posts$ | async; let posts">
+  <div class="posts" *ngIf="posts.length">
+    <h2>Frequently Asked Questions</h2>
+    <div class="post" *ngFor="let post of posts">
+      <div class="created" *ngIf="common.documentIsCreatedDatePresent(post)">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
+      <div class="content">
+        <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
+      </div>
+      <div class="actions" *ngIf="auth.isTA(course)">
+        <button class="btn" (click)="editPost(post)">Edit</button>
+        <button class="btn" (click)="deletePost(post)">Delete</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

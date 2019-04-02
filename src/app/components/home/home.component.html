@@ -1,0 +1,9 @@
+<ng-container *ngIf="course$ | async as course">
+    <h1 class="course-title">{{ course.title }}</h1>
+
+    <app-student *ngIf="!auth.isTA(course)" [course]="course"></app-student>
+    
+    <app-admin *ngIf="auth.isTA(course)" [course]="course"></app-admin>
+    
+    <app-posts [course]="course"></app-posts>
+</ng-container>

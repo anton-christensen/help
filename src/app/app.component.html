@@ -1,81 +1,8 @@
-<div class="toasts" *ngIf="toastService.toasts.length">
-  <div class="toast"
-       *ngFor="let toast of toastService.toasts"
-       [ngStyle]="{animation: 'show-hide ' + toast.time + 'ms ease-in-out'}"
-       (click)="toastService.removeById(toast.id)">
-    {{ toast.message }}
+<app-toast></app-toast>
+
+<div class="page">
+  <div class="container">
+    <router-outlet></router-outlet>
   </div>
+  <app-footer></app-footer>
 </div>
-
-<div class="container">
-  <!-- -------------------- ADMIN ------------------------ -->
-  <div *ngIf="auth.isAdmin()">
-    <h1>Welcome {{ auth.user.name }}</h1>
-    <table class="questions">
-      <tr><th>Room number</th><th>time</th><th></th></tr>
-      <tr *ngFor="let question of questions$ | async" class="question">
-        <td class="room">{{ question.roomNumber }}</td>
-        <td *ngIf="isDatePresent(question)" class="created">{{ timeConverter(question.created) | date : 'HH:mm:ss dd/MM' }}</td>
-        <td (click)=deleteQuestion(question.id) class="delete">Delete</td>
-      </tr>
-    </table>
-
-    <h2>Write a post for the front page!</h2>
-    <form (ngSubmit)="submitPost()">
-      <div class="form-group">
-        <label for="post">Post</label>
-        <textarea
-               id="post"
-               class="form-control"
-               required
-               name="post"
-               [(ngModel)]="postContent"
-               #post="ngModel"></textarea>
-        <button [disabled]="post.invalid" type="submit" class="btn btn-success mybutton">Submit</button>
-      </div>
-
-    </form>
-  </div>
-
-
-  <!-- -------------------- USERS ----------------------- -->
-  <div class="get-help" *ngIf="!auth.isAdmin()">
-    <h2>Enter your room number to get help</h2>
-    <form (ngSubmit)="submitQuestion()">
-      <div class="form-group">
-        <label for="room">
-          Room number
-        </label>
-        <input type="text"
-               id="room"
-               class="form-control"
-               required
-               name="room"
-               placeholder="Room number"
-               [(ngModel)]="roomNumber"
-               #room="ngModel">
-        <button [disabled]="room.invalid" type="submit" class="btn btn-success mybutton">Submit</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="posts" *ngIf="posts$ | async as posts">
-    <h1>Frequently Asked Questions</h1>
-    <div class="post" *ngFor="let post of posts">
-      <div class="created" *ngIf="isDatePresent(post)">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
-      <div class="content">
-        <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
-      </div>
-      <div class="actions" *ngIf="auth.isAdmin()">
-        <button class="mybutton" (click)="editPost(post)">Edit</button>
-        <button class="mybutton" (click)="deletePost(post.id)">Delete</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<footer>
-  <p *ngIf="auth.isAdmin()">Are you not a TA? <span (click)="auth.logout()">log out</span> to access less options</p>
-  <p *ngIf="!auth.isAdmin()">Are you a TA? <span (click)="auth.login()">log in</span> to access more options</p>
-</footer>

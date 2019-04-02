@@ -5,6 +5,7 @@ export class User {
   name: string;
   messagingTokens: string[];
   admin: boolean;
+  courses: string[];
 
   constructor(authData) {
     this.uid = authData.uid;
@@ -13,5 +14,6 @@ export class User {
     this.name = '';
     this.messagingTokens = [];
     this.admin = false;
+    this.courses = [];
   }
 }
