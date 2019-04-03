@@ -1,11 +1,12 @@
 <div class="fr">
-  <label for="enabled">Enable exercise session</label>
+  <label for="enabled">{{course.enabled ? "Disable" : "Enable"}} exercise session</label>
   <div class="switch tooltip" (click)="toggleCourseEnabled()">
     <span class="tooltiptext">{{course.enabled ? "Disable" : "Enable"}} exercise session</span> 
     <input id="enabled" name="enabled" type="checkbox" [checked]="course.enabled"/>
     <span class="slider"></span>
   </div>
 </div>
+
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
 <ng-container *ngIf="trashCans$ | async; let trashCans">
   <div *ngIf="trashCans.length > 0">

@@ -42,6 +42,34 @@ app-footer, footer {
 .fl {
   float: left; }
 
+.btn {
+  margin: 0;
+  padding: 0 1rem;
+  height: 2.5rem;
+  cursor: pointer;
+  outline: none;
+  color: white;
+  background-color: #2979ff;
+  transition: all 300ms ease-out; }
+  .btn:disabled {
+    cursor: default;
+    color: #3d3d3d;
+    background-color: #aaa; }
+  .btn:hover {
+    background-color: #448aff; }
+  .btn:active {
+    background-color: #1976d2; }
+
+ul {
+  list-style: none;
+  padding-left: 0; }
+
+label {
+  display: none; }
+
+label.visible {
+  display: inline-block; }
+
 .course-title {
   text-align: center; }
 
@@ -58,7 +86,7 @@ app-footer, footer {
   text-align: center; }
 .request-help-container form {
   width: 300px;
-  height: 8rem;
+  height: 5rem;
   margin: 0 auto; }
   .request-help-container form input, .request-help-container form button {
     position: relative;
@@ -90,42 +118,11 @@ app-footer, footer {
     text-align: center;
     z-index: 5;
     animation: glide-down 300ms ease-out; }
-
 @keyframes glide-down {
   0% {
     transform: translateY(-1.3rem); }
   100% {
     transform: translateY(0); } }
-.btn {
-  padding: 0 1rem;
-  margin: 0;
-  cursor: pointer;
-  outline: none;
-  height: 2.5rem;
-  border: 1px solid #f4f4f4;
-  background: #f4f4f4;
-  transition: all 300ms; }
-  .btn:disabled {
-    cursor: default;
-    color: #aaa;
-    background-color: #888; }
-
-ul {
-  list-style: none;
-  padding-left: 0; }
-  ul > li::before {
-    content: "-";
-    padding-right: 0.5rem; }
-
-label {
-  display: none; }
-
-label.visible {
-  display: inline-block; }
-
-.get-help {
-  margin-bottom: 64px; }
-
 .post {
   border-bottom: 1px solid #ebebeb;
   padding-top: 1rem;
@@ -257,7 +254,7 @@ input:checked + .slider:before {
   -ms-transform: translateX(16px);
   transform: translateX(16px); }
 
-/*************** TOASTS *****************/
+/*************** TOOLTIPS *****************/
 .tooltip {
   position: relative;
   display: inline-block; }
@@ -308,8 +305,7 @@ input:checked + .slider:before {
   text-transform: uppercase;
   font-weight: 700;
   overflow: hidden;
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), 0 12px 12px rgba(0, 0, 0, 0.22);
-  color: #2e7d32; }
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), 0 12px 12px rgba(0, 0, 0, 0.22); }
 
 @keyframes show-hide {
   0% {

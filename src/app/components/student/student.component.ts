@@ -30,12 +30,14 @@ export class StudentComponent implements OnInit, OnDestroy {
     this.trashCanId = localStorage.getItem('trashCan');
 
     if (this.trashCanId) {
-      this.subscribeToTrachCan(this.trashCanId);
+      this.subscribeToTrashCan(this.trashCanId);
     }
   }
 
   ngOnDestroy(): void {
-    this.trashCanSubscription.unsubscribe();
+    if (this.trashCanId) {
+      this.trashCanSubscription.unsubscribe();
+    }
   }
 
   public onSubmit(): void {
@@ -46,15 +48,14 @@ export class StudentComponent implements OnInit, OnDestroy {
 
     this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
       .then((trashCan) => {
-        this.setTrashCanId(trashCan.id);
+        this.trashCanSet(trashCan.id);
         this.form.reset();
       })
   }
 
-  private subscribeToTrachCan(id: string): void {
+  private subscribeToTrashCan(id: string): void {
     this.trashCanSubscription = this.trashCanService.getTrashById(id)
       .subscribe((trashCan) => {
-        console.log(trashCan);
         if (!trashCan) {
           this.clearTrashCanId();
           this.trashCanSubscription.unsubscribe();
@@ -62,10 +63,10 @@ export class StudentComponent implements OnInit, OnDestroy {
       })
   }
 
-  private setTrashCanId(id: string): void {
+  private trashCanSet(id: string): void {
     localStorage.setItem('trashCan', id);
     this.trashCanId = id;
-    this.subscribeToTrachCan(id);
+    this.subscribeToTrashCan(id);
   }
 
   private clearTrashCanId(): void {
