@@ -10,8 +10,11 @@ import { ToastService } from './toasts.service';
 })
 export class TrashCanService {
 
-  constructor(private db: AngularFirestore,
-              private toastService: ToastService) {}
+  constructor(private db: AngularFirestore) {}
+
+  public getTrashById(id: String): Observable<TrashCan> {
+    return this.db.doc<TrashCan>(`trash-cans/${id}`).valueChanges();
+  }
 
   public getTrashCans(course: String): Observable<TrashCan[]> {
     return this.db.collection<TrashCan>('trash-cans', (ref) => {
@@ -26,11 +29,15 @@ export class TrashCanService {
       }));
   }
 
-  public addTrashCan(course: string, room): Promise<any> {
+  public addTrashCan(course: string, room): Promise<TrashCan> {
     const id = this.db.collection<TrashCan>('trash-cans').ref.doc().id;
     const ref = this.db.collection<TrashCan>('trash-cans').doc(id);
+    const trashCan = new TrashCan(id, course, room);
     
-    return ref.set(Object.assign({}, new TrashCan(id, course, room)));
+    return ref.set(Object.assign({}, trashCan))
+      .then(() => {
+        return trashCan;
+      });
   }
 
   public deleteTrashCan(can: TrashCan): Promise<any> {

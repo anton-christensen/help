@@ -1,46 +1,76 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { TrashCanService } from 'src/app/services/trash-can.service';
-import { FormGroup, FormControl, ValidationErrors, Validators, AbstractControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { ToastService } from 'src/app/services/toasts.service';
-import { CourseService } from 'src/app/services/course.service';
-import { Observable } from 'rxjs';
-import { Course } from 'src/app/models/course';
+import {Component, OnInit, Input, OnDestroy} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
+import {TrashCanService} from 'src/app/services/trash-can.service';
+import {Course} from 'src/app/models/course';
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-student',
   templateUrl: './student.component.html',
   styles: []
 })
-export class StudentComponent implements OnInit {
+export class StudentComponent implements OnInit, OnDestroy {
   @Input() public course: Course;
+  public trashCanId: string;
+  private trashCanSubscription: Subscription;
 
   public form = new FormGroup({
     room: new FormControl('', [
-      Validators.required, 
-      Validators.minLength(3), 
+      Validators.required,
       Validators.maxLength(15), 
       this.roomValidator.bind(this)]),
   });
 
   constructor(private route: ActivatedRoute,
-              private trashCanService: TrashCanService,
-              private courseService: CourseService,
-              private toastService: ToastService) {
+              private trashCanService: TrashCanService) {
   }
 
-  ngOnInit() {} 
+  ngOnInit() {
+    this.trashCanId = localStorage.getItem('trashCan');
+
+    if (this.trashCanId) {
+      this.subscribeToTrachCan(this.trashCanId);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.trashCanSubscription.unsubscribe();
+  }
 
   public onSubmit(): void {
-    if (this.form.valid) {
-      this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
-        .then(() => {
-          this.form.reset();
-          this.toastService.add("Help is on the way!", 5000);
-        })
-    } else {
-      console.error('You saved something invalid... How??')
+    if (this.form.invalid) {
+      console.error('You tried to save something invalid...');
+      return;
     }
+
+    this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
+      .then((trashCan) => {
+        this.setTrashCanId(trashCan.id);
+        this.form.reset();
+      })
+  }
+
+  private subscribeToTrachCan(id: string): void {
+    this.trashCanSubscription = this.trashCanService.getTrashById(id)
+      .subscribe((trashCan) => {
+        console.log(trashCan);
+        if (!trashCan) {
+          this.clearTrashCanId();
+          this.trashCanSubscription.unsubscribe();
+        }
+      })
+  }
+
+  private setTrashCanId(id: string): void {
+    localStorage.setItem('trashCan', id);
+    this.trashCanId = id;
+    this.subscribeToTrachCan(id);
+  }
+
+  private clearTrashCanId(): void {
+    localStorage.removeItem('trashCan');
+    this.trashCanId = null;
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

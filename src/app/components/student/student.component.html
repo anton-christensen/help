@@ -1,26 +1,32 @@
 <div class="request-help-container">
   <ng-container *ngIf="course.enabled">
-    <h2>Enter your room number to get help</h2>
+    <ng-container *ngIf="!trashCanId">
+      <h2>Enter your room number to get help</h2>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <label for="room">
-        Room number
-      </label>
-      <input type="text"
-             id="room"
-             required
-             formControlName="room"
-             placeholder="Room number">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <label for="room">
+          Room number
+        </label>
+        <input type="text"
+               id="room"
+               required
+               formControlName="room"
+               placeholder="Room number">
 
-      <button [disabled]="form.invalid"
-              type="submit"
-              class="btn">
-        Submit
-      </button>
-      <div *ngIf="form.invalid && (form.touched || form.dirty)" class="error">
-        That is an odd room number...
-      </div>
-    </form>
+        <button [disabled]="form.invalid"
+                type="submit"
+                class="btn">
+          Submit
+        </button>
+        <div *ngIf="form.invalid && (form.touched || form.dirty) && form.value.room" class="error">
+          That is an odd room number...
+        </div>
+      </form>
+    </ng-container>
+
+    <ng-container *ngIf="trashCanId">
+      <h2>Your trash can is out, help is on the way</h2>
+    </ng-container>
   </ng-container>
 
   <ng-container *ngIf="!course.enabled">

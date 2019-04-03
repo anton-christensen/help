@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {Observable, of} from 'rxjs';
 import {AngularFirestore} from '@angular/fire/firestore';
-import {switchMap} from 'rxjs/operators';
-import * as firebase from 'firebase/app';
 import {AngularFireMessaging} from '@angular/fire/messaging';
-import { User } from '../models/user';
-import { Course } from '../models/course';
+import * as firebase from 'firebase/app';
+import {Observable, of} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {User} from '../models/user';
+import {Course} from '../models/course';
 
 @Injectable({
   providedIn: 'root'
