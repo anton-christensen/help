@@ -6,22 +6,20 @@ import { Course } from 'src/app/models/course';
 import { CourseService } from 'src/app/services/course.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
+  selector: 'app-course',
+  templateUrl: './course.component.html',
   styles: []
 })
-export class HomeComponent implements OnInit {
-  public courseSlug: string;
+export class CourseComponent implements OnInit {
   public course$: Observable<Course>;
-  public courseEnabled: boolean; 
 
   constructor(public auth: AuthService,
               private courseService: CourseService,
               private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.courseSlug = this.route.snapshot.paramMap.get('course');
-    this.course$ = this.courseService.getCourseBySlug(this.courseSlug);
+    const courseSlug = this.route.snapshot.paramMap.get('course');
+    this.course$ = this.courseService.getCourseBySlug(courseSlug);
   }
 
 }

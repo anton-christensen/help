@@ -22,10 +22,21 @@ export class CourseService {
       mergeMap((result) => {
           return result.length ? result : [null];
       })
-    )
+    );
   }
 
-  getEnabledCourses(): Observable<Course[]> {
+  public getAllCourses(): Observable<Course[]> {
+    return this.db.collection<Course>('courses').snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return {id, ...data};
+        });
+      }));
+  }
+
+  public getEnabledCourses(): Observable<Course[]> {
     return this.db.collection<Course>('courses', ref => ref.where('enabled', '==', true)).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {

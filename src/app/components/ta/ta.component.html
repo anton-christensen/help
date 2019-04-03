@@ -2,7 +2,7 @@
   <label for="enabled">Enable exercise session</label>
   <div class="switch tooltip" (click)="toggleCourseEnabled()">
     <span class="tooltiptext">{{course.enabled ? "Disable" : "Enable"}} exercise session</span> 
-    <input name="enabled" type="checkbox" [checked]="course.enabled"/>
+    <input id="enabled" name="enabled" type="checkbox" [checked]="course.enabled"/>
     <span class="slider"></span>
   </div>
 </div>

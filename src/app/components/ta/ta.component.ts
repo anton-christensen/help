@@ -9,11 +9,11 @@ import { Course } from 'src/app/models/course';
 import { CourseService } from 'src/app/services/course.service';
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
+  selector: 'app-ta',
+  templateUrl: './ta.component.html',
   styles: []
 })
-export class AdminComponent implements OnInit {
+export class TaComponent implements OnInit {
   @Input() public course: Course;
   trashCans$ : Observable<TrashCan[]>
 

@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { CourseExistsGuard } from './guards/course-exists.guard';
-import { MissingCourseComponent } from './components/missing-course/missing-course.component';
+import {CourseListComponent} from './components/course-list/course-list.component';
+import {CourseExistsGuard} from './guards/course-exists.guard';
+import {CourseComponent} from './components/course/course.component';
 
 const routes: Routes = [
-  { path: 'course-not-found', component: MissingCourseComponent},
-  { path: ':course', component: HomeComponent, canActivate: [CourseExistsGuard] },
-  { path: '**', redirectTo: 'course-not-found' },
+  { path: 'courses', component: CourseListComponent},
+  { path: 'course/:course', component: CourseComponent, canActivate: [CourseExistsGuard] },
+  { path: '**', redirectTo: 'courses' },
 ];
 
 @NgModule({

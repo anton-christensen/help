@@ -1,4 +1,4 @@
-<div *ngIf="auth.isTA(course)">
+<div *ngIf="auth.isTAInCourse(course)">
   <h3>Write a post for the front page</h3>
   <form [formGroup]="form" (ngSubmit)="submitPost()">
     <div class="form-group">
@@ -22,7 +22,7 @@
       <div class="content">
         <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
       </div>
-      <div class="actions" *ngIf="auth.isTA(course)">
+      <div class="actions" *ngIf="auth.isTAInCourse(course)">
         <button class="btn" (click)="editPost(post)">Edit</button>
         <button class="btn" (click)="deletePost(post)">Delete</button>
       </div>

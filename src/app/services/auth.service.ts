@@ -50,7 +50,11 @@ export class AuthService {
     return this.user && this.user.admin;
   }
 
-  public isTA(course: Course): boolean {
+  public isTA(): boolean {
+    return this.user && (this.user.admin || this.user.courses.length > 0);
+  }
+
+  public isTAInCourse(course: Course): boolean {
     return this.user && (this.user.admin || this.user.courses.includes(course.slug));
   }
 
@@ -87,6 +91,8 @@ export class AuthService {
 
   public isActualCourse(courseSlug: string): Promise<boolean> {
     return this.db.collection<Course>('courses', ref => ref.where('slug', '==', courseSlug)).get().toPromise()
-      .then(val => !val.empty);
+      .then((val) => {
+        return !val.empty;
+      });
   }
 }
