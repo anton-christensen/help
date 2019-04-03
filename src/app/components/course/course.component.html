@@ -1,9 +1,10 @@
 <ng-container *ngIf="course$ | async as course">
-    <h1 class="course-title">{{ course.title }}</h1>
+  <h1 class="course-title">{{ course.title }}</h1>
+  <hr>
 
-    <app-student *ngIf="!auth.isTAInCourse(course)" [course]="course"></app-student>
-    
-    <app-ta *ngIf="auth.isTAInCourse(course)" [course]="course"></app-ta>
-    
-    <app-posts [course]="course"></app-posts>
+  <app-student *ngIf="!auth.isTAInCourse(course)" [course]="course"></app-student>
+
+  <app-ta *ngIf="auth.isTAInCourse(course)" [course]="course"></app-ta>
+
+  <app-posts [course]="course"></app-posts>
 </ng-container>

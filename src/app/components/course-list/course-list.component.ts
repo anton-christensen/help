@@ -12,7 +12,7 @@ import {AuthService} from '../../services/auth.service';
 export class CourseListComponent implements OnInit {
   public courses$: Observable<Course[]>;
 
-  constructor(private auth: AuthService,
+  constructor(public auth: AuthService,
               private courseService: CourseService) {}
 
   ngOnInit() {

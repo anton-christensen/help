@@ -1,10 +1,13 @@
+$bg-grey: #f5f5f5;
+
+
 body, html {
   width: 100%;
   margin: 0;
   padding: 0;
   background-color: #ffffff;
   color: #626262;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .page {
@@ -19,7 +22,7 @@ body, html {
 .container {
   position: relative;
   width: 90%;
-  max-width: 50rem;
+  max-width:50rem;
   padding: 1rem;
   background-color: white;
   box-shadow: black 0px 15px 41px -36px;
@@ -29,24 +32,17 @@ body, html {
 
 app-footer, footer {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 0; right: 0; bottom: 0;
   color: white;
-  font-size: 0.7rem;
+  font-size: .7rem;
   background-color: #626262;
   height: 2rem;
-  text-align: center;
+  text-align:center;
   padding: 0 1rem;
 }
 
-.fr {
-  float: right;
-}
-
-.fl {
-  float: left;
-}
+.fr {float: right;}
+.fl {float: left;}
 
 .course-title {
   text-align: center;
@@ -55,67 +51,80 @@ app-footer, footer {
 .course-notice {
   padding: 0.5rem;
   border-radius: 0.2rem;
-}
-.course-notice.danger {
-  background-color: salmon;
-  color: white;
+
+  &.danger {
+    background-color: salmon;
+    color: white;
+  }
 }
 
 .request-help-container {
   height: 8rem;
-}
-.request-help-container h2 {
-  margin-top: 3rem;
-  font-size: 1.3rem;
-  text-align: center;
-}
-.request-help-container form {
-  width: 300px;
-  margin: 0 auto;
-}
-.request-help-container form input, .request-help-container form button {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  height: 2.5rem;
-  border: none;
-  outline: none;
-  text-align: center;
-  z-index: 10;
-}
-.request-help-container form input {
-  width: 200px;
-  background-color: #f5f5f5;
-}
-.request-help-container form button {
-  width: 100px;
-}
-.request-help-container form .error {
-  width: 300px;
-  color: tomato;
-  font-size: 0.8rem;
-  font-weight: bold;
-  padding: 0.5rem;
-  text-align: center;
-  z-index: 5;
-  animation: glide-down 300ms ease-out;
+
+  h2 {
+    margin-top: 3rem;
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  form {
+    width: 300px;
+    margin: 0 auto;
+
+    input, button {
+      position: relative;
+      padding: 0;
+      margin: 0;
+      height: 2.5rem;
+      border: none;
+      outline: none;
+      text-align: center;
+      z-index: 10;
+    }
+
+    input {
+      width: 200px;
+      background-color: $bg-grey;
+    }
+
+    button {
+      width: 100px;
+    }
+
+    .error {
+      width: 300px;
+      color: tomato;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0.5rem;
+      text-align: center;
+      z-index: 5;
+
+      animation: glide-down 300ms ease-out;
+    }
+  }
 }
 
 @keyframes glide-down {
   0% {
     transform: translateY(-1.3rem);
   }
+
   100% {
     transform: translateY(0);
   }
 }
+
+
+
 ul {
   list-style: none;
   padding-left: 0;
-}
-ul > li::before {
-  content: "-";
-  padding-right: 0.5rem;
+
+  & > li::before {
+    content: "-";
+    padding-right: 0.5rem;
+  }
 }
 
 .btn {
@@ -126,26 +135,25 @@ ul > li::before {
   height: 2.3rem;
   border: 1px solid #f4f4f4;
   background: #f4f4f4;
-  transition: border 0.2s, background 0.2s, color 0.2s, height 0.5s;
-}
-.btn:hover {
-  color: white;
-  border: 1px solid #666666;
-  background: #666666;
+  transition: border .2s, background .2s, color .2s, height .5s;
+
+  &:hover {
+    color: white;
+    border: 1px solid #666666;
+    background: #666666;
+  }
 }
 
-label {
-  display: none;
-}
 
-label.visible {
-  display: inline-block;
-}
+
+
+
+label {display: none;}
+label.visible {display: inline-block;}
 
 .get-help {
   margin-bottom: 64px;
 }
-
 .post {
   border-bottom: 1px solid #ebebeb;
   padding-top: 1rem;
@@ -190,7 +198,7 @@ textarea + button {
   top: 0;
 }
 
-textarea + button[type=submit]:hover {
+textarea + button[type="submit"]:hover {
   color: white;
   border: 1px solid #666666;
   background: #666666;
@@ -201,7 +209,7 @@ table.trash-cans {
   border-collapse: collapse;
 }
 
-th, td {
+th,td {
   text-align: left;
   padding: 0.5rem 1rem;
 }
@@ -215,10 +223,7 @@ tr {
   border-bottom: 1px solid #e3e3e3;
 }
 
-tr.trash-can:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
+tr.trash-can:nth-child(even) {background-color: #f2f2f2;}
 tr.trash-can:hover {
   background-color: #e3e3e3;
   cursor: pointer;
@@ -231,6 +236,7 @@ tr.trash-can:hover {
 }
 
 /********** MARKDOWN POSTS *************/
+
 markdown h1 {
   font-size: 1.5em;
 }
@@ -249,6 +255,7 @@ markdown pre {
 }
 
 /*************** Checkbox toggles ****************/
+
 .switch {
   position: relative;
   display: inline-block;
@@ -272,8 +279,8 @@ markdown pre {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
+  -webkit-transition: .4s;
+  transition: .4s;
   border-radius: 34px;
 }
 
@@ -285,8 +292,8 @@ markdown pre {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
+  -webkit-transition: .4s;
+  transition: .4s;
   border-radius: 50%;
 }
 
@@ -305,6 +312,7 @@ input:checked + .slider:before {
 }
 
 /*************** TOASTS *****************/
+
 .tooltip {
   position: relative;
   display: inline-block;
@@ -323,7 +331,7 @@ input:checked + .slider:before {
   left: -50%;
   margin-left: -60px;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity .2s;
 }
 
 .tooltip .tooltiptext::after {
@@ -342,6 +350,7 @@ input:checked + .slider:before {
 }
 
 /*************** TOASTS *****************/
+
 .toasts {
   position: fixed;
   z-index: 900;
@@ -360,7 +369,7 @@ input:checked + .slider:before {
   text-transform: uppercase;
   font-weight: 700;
   overflow: hidden;
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), 0 12px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 16px 38px rgba(0,0,0,0.50), 0 12px 12px rgba(0,0,0,0.22);
   color: #2e7d32;
 }
 
@@ -369,18 +378,19 @@ input:checked + .slider:before {
     transform: translateY(-200px);
     opacity: 0;
   }
+
   2% {
     transform: translateY(0px);
-    opacity: 1;
+    opacity: 1
   }
+
   80% {
     transform: translateY(0px);
-    opacity: 1;
+    opacity: 1
   }
+
   100% {
     transform: translateX(0px);
-    opacity: 0;
+    opacity: 0
   }
 }
-
-/*# sourceMappingURL=styles.css.map */
