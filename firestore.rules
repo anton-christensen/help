@@ -10,34 +10,36 @@ service cloud.firestore {
     
     match /courses/{documentId} {
       allow read;
-      allow update: if isTA(request.resource.data.slug) || isAdmin();
+      allow update: if isAdmin() || (isTA(request.resource.data.slug) && isTA(resource.data.slug));
     }
-          
+
     match /trash-cans/{documentId} {
-      allow read, create;
-      allow delete, update: if isTA(request.resource.data.course) || isAdmin();
+      allow read, create, delete;
+      allow update: if isAdmin() || (isTA(request.resource.data.course) && isTA(resource.data.course));
     }
-    
+
     match /posts/{documentId} {
       allow read;
-      allow create, update, delete: if isTA(request.resource.data.course) || isAdmin();
+      allow create: if isAdmin() || isTA(request.resource.data.course)
+      allow update: if isAdmin() || (isTA(request.resource.data.course) && isTA(resource.data.course));
+      allow delete: if isAdmin() || isTA(resource.data.course);
     }
-    
-    match /users/{userId} {      
+
+    match /users/{userId} {
       function requestDoesNotChangeAdmin() {
       	return request.resource.data.admin == false;
       }
-      
+
       function requestDoesNotChangeCourses() {
-      	return request.resource.data.admin == false;
+      	return request.resource.data.courses == resource.data.courses;
       }
-          
+
       function requestChangesRoles() {
       	return !roleEqual('moderator') || !roleEqual('admin');
       }
 
       allow read, delete: if request.auth.uid == userId || isAdmin();
-      allow create: if requestDoesNotChangeAdmin() && requestDoesNotChangeCourses();
+      allow create: if requestDoesNotChangeAdmin() && request.resource.data.courses == [];
       allow update: if isAdmin() || (request.auth.uid == userId && requestDoesNotChangeAdmin() && requestDoesNotChangeCourses());
     }
   }

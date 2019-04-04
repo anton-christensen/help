@@ -40,7 +40,7 @@ export class TrashCanService {
       });
   }
 
-  public deleteTrashCan(can: TrashCan): Promise<any> {
-    return this.db.collection<TrashCan>('trash-cans').doc(can.id).delete();
-    }
+  public deleteTrashCan(trashCan: TrashCan): Promise<any> {
+    return this.db.collection<TrashCan>('trash-cans').doc(trashCan.id).delete();
+  }
 }

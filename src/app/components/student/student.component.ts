@@ -4,6 +4,7 @@ import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} f
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
 import {Subscription} from "rxjs";
+import {TrashCan} from '../../models/trash-can';
 
 @Component({
   selector: 'app-student',
@@ -12,13 +13,13 @@ import {Subscription} from "rxjs";
 })
 export class StudentComponent implements OnInit, OnDestroy {
   @Input() public course: Course;
-  public trashCanId: string;
+  public trashCan: TrashCan;
   private trashCanSubscription: Subscription;
 
   public form = new FormGroup({
     room: new FormControl('', [
       Validators.required,
-      Validators.maxLength(15), 
+      Validators.maxLength(10),
       this.roomValidator.bind(this)]),
   });
 
@@ -27,15 +28,17 @@ export class StudentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.trashCanId = localStorage.getItem('trashCan');
+    this.trashCan = JSON.parse(localStorage.getItem(`trashCan-${this.course.slug}`));
 
-    if (this.trashCanId) {
-      this.subscribeToTrashCan(this.trashCanId);
+    console.log(this.trashCan);
+
+    if (this.trashCan) {
+      this.subscribeToTrashCan(this.trashCan);
     }
   }
 
   ngOnDestroy(): void {
-    if (this.trashCanId) {
+    if (this.trashCan) {
       this.trashCanSubscription.unsubscribe();
     }
   }
@@ -48,30 +51,34 @@ export class StudentComponent implements OnInit, OnDestroy {
 
     this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
       .then((trashCan) => {
-        this.trashCanSet(trashCan.id);
+        this.trashCanSet(trashCan);
         this.form.reset();
-      })
+      });
   }
 
-  private subscribeToTrashCan(id: string): void {
-    this.trashCanSubscription = this.trashCanService.getTrashById(id)
-      .subscribe((trashCan) => {
-        if (!trashCan) {
+  public retractTrashCan(): void {
+    this.trashCanService.deleteTrashCan(this.trashCan);
+  }
+
+  private subscribeToTrashCan(trashCan: TrashCan): void {
+    this.trashCanSubscription = this.trashCanService.getTrashById(trashCan.id)
+      .subscribe((tc) => {
+        if (!tc) {
           this.clearTrashCanId();
           this.trashCanSubscription.unsubscribe();
         }
-      })
+      });
   }
 
-  private trashCanSet(id: string): void {
-    localStorage.setItem('trashCan', id);
-    this.trashCanId = id;
-    this.subscribeToTrashCan(id);
+  private trashCanSet(trashCan: TrashCan): void {
+    localStorage.setItem(`trashCan-${this.course.slug}`, JSON.stringify(trashCan));
+    this.trashCan = trashCan;
+    this.subscribeToTrashCan(trashCan);
   }
 
   private clearTrashCanId(): void {
-    localStorage.removeItem('trashCan');
-    this.trashCanId = null;
+    localStorage.removeItem(`trashCan-${this.course.slug}`);
+    this.trashCan = null;
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

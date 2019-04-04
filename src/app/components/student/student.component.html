@@ -1,6 +1,6 @@
 <div class="request-help-container">
   <ng-container *ngIf="course.enabled">
-    <ng-container *ngIf="!trashCanId">
+    <ng-container *ngIf="!trashCan">
       <h2>Enter your room number to get help</h2>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -24,8 +24,11 @@
       </form>
     </ng-container>
 
-    <ng-container *ngIf="trashCanId">
+    <ng-container *ngIf="trashCan">
       <h2>Your trash can is out, help is on the way</h2>
+      <div class="retract-trash-can">
+        <button (click)="retractTrashCan()" class="btn">Retract trash can</button>
+      </div>
     </ng-container>
   </ng-container>
 

@@ -2,9 +2,19 @@ $pri-col: #2979ff;
 $pri-col-hover: #448aff;
 $pri-col-active: #1976d2;
 
-$bg-grey: #f5f5f5;
-$bg-grey-hover: #f1f1f1;
-$bg-grey-focus: #eeeeee;
+$bg-grey-light: #f5f5f5;
+$bg-grey-light-hover: #f1f1f1;
+$bg-grey-light-focus: #eeeeee;
+
+$bg-grey-dark: #37474F;
+$bg-grey-dark-hover: #455A64;
+$bg-grey-dark-focus: #546E7A;
+
+$txt-link: #607D8B;
+$txt-link-hover: #78909C;
+$txt-link-active: #546E7A;
+
+$txt-dark: #616161;
 
 $disabled: #aaa;
 $disabled-text: #3d3d3d;
@@ -13,8 +23,8 @@ body, html {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: #ffffff;
-  color: #626262;
+  background-color: white;
+  color: $txt-dark;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -33,7 +43,7 @@ body, html {
   max-width:50rem;
   padding: 1rem;
   background-color: white;
-  box-shadow: black 0px 15px 41px -36px;
+  box-shadow: black 0 15px 41px -36px;
   border-radius: 0 0 5px 5px;
   margin: 1rem auto 3rem;
 }
@@ -43,7 +53,7 @@ app-footer, footer {
   left: 0; right: 0; bottom: 0;
   color: white;
   font-size: .7rem;
-  background-color: #626262;
+  background-color: $bg-grey-dark-hover;
   height: 2rem;
   text-align:center;
   padding: 0 1rem;
@@ -56,10 +66,13 @@ app-footer, footer {
   margin: 0;
   padding: 0 1rem;
   height: 2.5rem;
-  cursor: pointer;
+  border: none;
   outline: none;
+  cursor: pointer;
   color: white;
   background-color: $pri-col;
+  box-sizing: border-box;
+  font-size: 1rem;
 
   transition: all 300ms ease-out;
 
@@ -81,6 +94,13 @@ app-footer, footer {
 ul {
   list-style: none;
   padding-left: 0;
+}
+
+input {
+  height: 2.5rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
 }
 
 label {
@@ -121,24 +141,20 @@ label.visible {
       position: relative;
       padding: 0;
       margin: 0;
-      height: 2.5rem;
-      border: none;
-      outline: none;
       text-align: center;
-      font-size: 1rem;
       z-index: 10;
     }
 
     input {
       width: 200px;
-      background-color: $bg-grey;
+      background-color: $bg-grey-light;
 
       &:hover {
-        background-color: $bg-grey-hover;
+        background-color: $bg-grey-light-hover;
       }
 
       &:focus {
-        background-color: $bg-grey-focus;
+        background-color: $bg-grey-light-focus;
       }
 
       &::placeholder {
@@ -170,6 +186,15 @@ label.visible {
           transform: translateY(0);
         }
       }
+    }
+  }
+
+  .retract-trash-can {
+    width: 100%;
+
+    .btn {
+      margin: 0 auto;
+      display: block;
     }
   }
 }
