@@ -11,7 +11,7 @@ import {AppComponent} from "./app.component";
 import {AppRoutingModule} from "./app-routing.module";
 import {environment} from "../environments/environment";
 
-import {ToastComponent} from "./components/toast/toast.component";
+import {ToastsComponent} from "./components/toasts/toasts.component";
 import {FooterComponent} from "./components/footer/footer.component";
 import {CourseListComponent} from "./components/course-list/course-list.component";
 import {CourseComponent} from "./components/course/course.component";
@@ -22,7 +22,7 @@ import {PostsComponent} from "./components/posts/posts.component";
 @NgModule({
   declarations: [
     AppComponent,
-    ToastComponent,
+    ToastsComponent,
     FooterComponent,
     CourseListComponent,
     CourseComponent,

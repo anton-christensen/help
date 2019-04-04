@@ -3,7 +3,6 @@ import {Observable} from 'rxjs';
 import {Post} from 'src/app/models/post';
 import { AuthService } from 'src/app/services/auth.service';
 import { PostService } from 'src/app/services/post.service';
-import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Course } from 'src/app/models/course';
 import { CommonService } from 'src/app/services/common.service';
@@ -11,7 +10,7 @@ import { CommonService } from 'src/app/services/common.service';
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
-  styles: []
+  styleUrls: ['./posts.component.scss']
 })
 export class PostsComponent implements OnInit {
   @Input() public course: Course;
@@ -54,6 +53,7 @@ export class PostsComponent implements OnInit {
   }
   
   public deletePost(post: Post) {
+    this.editPost(post);
     this.postalService.deletePost(post);
   }
 }

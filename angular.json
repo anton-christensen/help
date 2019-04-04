@@ -19,13 +19,13 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
-              "src/favicon.ico",
               "src/assets",
+              "src/favicon.ico",
               "src/manifest.json",
               "src/firebase-messaging-sw.js"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": [
               "node_modules/marked/lib/marked.js"
@@ -136,5 +136,10 @@
       }
     }
   },
-  "defaultProject": "help"
+  "defaultProject": "help",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "scss"
+    }
+  }
 }

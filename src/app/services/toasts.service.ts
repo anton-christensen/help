@@ -24,7 +24,7 @@ export class ToastService {
       // Brand new message: show it
       this.toasts.push(toast);
     } else {
-      // Message already exists: replace it with new toast
+      // Message already exists: replace it with new toasts
       this.toasts[sameMessageIndex] = toast;
     }
 

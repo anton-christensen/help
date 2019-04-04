@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ToastService } from 'src/app/services/toasts.service';
 
 @Component({
-  selector: 'app-toast',
-  templateUrl: './toast.component.html',
-  styles: []
+  selector: 'app-toasts',
+  templateUrl: './toasts.component.html',
+  styleUrls: ['./toasts.component.scss']
 })
-export class ToastComponent implements OnInit {
+export class ToastsComponent implements OnInit {
 
   constructor(public toastService: ToastService) { }
 

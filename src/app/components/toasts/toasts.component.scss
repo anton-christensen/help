@@ -1,0 +1,44 @@
+@import '~src/sass/variables';
+
+.toasts {
+  position: fixed;
+  z-index: 900;
+  top: 0;
+  right: 0;
+}
+
+.toast {
+  display: block;
+  background-color: white;
+  margin: 10px;
+  padding: 20px;
+  border-radius: 10px 0 10px 10px;
+  max-width: 300px;
+  font-size: 0.875em;
+  text-transform: uppercase;
+  font-weight: 700;
+  overflow: hidden;
+  box-shadow: 0 16px 38px rgba(0,0,0,0.50), 0 12px 12px rgba(0,0,0,0.22);
+}
+
+@keyframes show-hide {
+  0% {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+
+  2% {
+    transform: translateY(0px);
+    opacity: 1
+  }
+
+  80% {
+    transform: translateY(0px);
+    opacity: 1
+  }
+
+  100% {
+    transform: translateX(0px);
+    opacity: 0
+  }
+}

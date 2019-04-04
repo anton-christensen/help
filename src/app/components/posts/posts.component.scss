@@ -1,0 +1,75 @@
+@import '~src/sass/variables';
+
+.post-edit {
+  form {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 10rem;
+    padding: 0.5rem;
+    outline: none;
+    resize: vertical;
+    border: none;
+    box-sizing: border-box;
+    background-color: $bg-grey-light;
+
+    &:hover {
+      background-color: $bg-grey-light-hover;
+    }
+
+    &:focus {
+      background-color: $bg-grey-light-focus;
+    }
+  }
+
+  .btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+.post {
+  margin-bottom: 4rem;
+  position: relative;
+
+  .created {
+    margin-bottom: -0.6rem;
+    font-size: 0.6rem;
+    color: $txt-dark-hover;
+  }
+
+  .content {
+    overflow: hidden;
+  }
+
+  .actions {
+    position: absolute;
+    right: 0;
+    top: -0.6rem;
+  }
+}
+
+markdown {
+  h1 {
+    font-size: $font-size-h3;
+  }
+
+  h2 {
+    font-size: $font-size-h4;
+
+  }
+
+  h3 {
+    font-size: $font-size-h5;
+
+  }
+
+  pre {
+    background: whitesmoke;
+    padding: 0.25rem 0.5rem;
+  }
+}
+

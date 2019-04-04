@@ -1,7 +1,7 @@
-<div *ngIf="auth.isTAInCourse(course)">
-  <h3>Write a post for the front page</h3>
-  <form [formGroup]="form" (ngSubmit)="submitPost()">
-    <div class="form-group">
+<ng-container *ngIf="auth.isTAInCourse(course)">
+  <div class="post-edit">
+    <h3>Write a post for the front page</h3>
+    <form [formGroup]="form" (ngSubmit)="submitPost()">
       <label for="post">Post</label>
       <textarea
         id="post"
@@ -9,23 +9,24 @@
         required
         formControlName="content"></textarea>
       <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
-    </div>
-  </form>
-</div>
+    </form>
+  </div>
+</ng-container>
 
-
-<ng-container *ngIf="posts$ | async; let posts">
+<ng-container *ngIf="posts$ | async as posts">
   <div class="posts" *ngIf="posts.length">
     <h2>Frequently Asked Questions</h2>
+
     <div class="post" *ngFor="let post of posts">
-      <div class="created" *ngIf="common.documentIsCreatedDatePresent(post)">{{ post.created.seconds * 1000 | date : 'HH:mm dd/MM' }}</div>
-      <div class="content">
-        <markdown ngPreserveWhitespaces>{{ post.content }}</markdown>
-      </div>
+      <div class="created" *ngIf="common.documentIsCreatedDatePresent(post)">Posted at {{ post.created.seconds * 1000 | date : 'HH:mm on MMMM d, yyyy' }}</div>
       <div class="actions" *ngIf="auth.isTAInCourse(course)">
-        <button class="btn" (click)="editPost(post)">Edit</button>
-        <button class="btn" (click)="deletePost(post)">Delete</button>
+        <i class="material-icons clickable" (click)="editPost(post)">edit</i>
+        <i class="material-icons clickable" (click)="deletePost(post)">delete_forever</i>
       </div>
+      <article class="content">
+        <markdown>{{ post.content }}</markdown>
+      </article>
     </div>
+
   </div>
 </ng-container>

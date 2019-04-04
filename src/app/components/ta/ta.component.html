@@ -8,14 +8,24 @@
 </div>
 
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
-<ng-container *ngIf="trashCans$ | async; let trashCans">
+<ng-container *ngIf="trashCans$ | async as trashCans">
   <div *ngIf="trashCans.length > 0">
     <table class="trash-cans">
-      <tr><th>Room number</th><th>Posted at</th><th></th></tr>
+      <tr>
+        <th>Room number</th>
+        <th>Posted at</th>
+        <th>Resolve</th>
+      </tr>
       <tr *ngFor="let trashCan of trashCans" class="trash-can">
-        <td class="room">{{ trashCan.room }}</td>
-        <td *ngIf="common.documentIsCreatedDatePresent(trashCan)" class="created">{{ trashCan.created.seconds * 1000 | date : 'EEEE d. LLL - HH:mm:ss' }}</td>
-        <td (click)=deleteTrashCan(trashCan) class="delete">Delete</td>
+        <td class="room">
+          {{ trashCan.room }}
+        </td>
+        <td *ngIf="common.documentIsCreatedDatePresent(trashCan)" class="created">
+          {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d, yyyy' }}
+        </td>
+        <td (click)=deleteTrashCan(trashCan) class="delete">
+          <i class="material-icons clickable">delete_forever</i>
+        </td>
       </tr>
     </table>
   </div>

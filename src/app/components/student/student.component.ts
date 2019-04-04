@@ -9,7 +9,7 @@ import {TrashCan} from '../../models/trash-can';
 @Component({
   selector: 'app-student',
   templateUrl: './student.component.html',
-  styles: []
+  styleUrls: ['./student.component.scss']
 })
 export class StudentComponent implements OnInit, OnDestroy {
   @Input() public course: Course;

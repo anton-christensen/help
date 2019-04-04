@@ -7,7 +7,7 @@ import {AuthService} from '../../services/auth.service';
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',
-  styles: []
+  styleUrls: ['./course-list.component.scss']
 })
 export class CourseListComponent implements OnInit {
   public courses$: Observable<Course[]>;
