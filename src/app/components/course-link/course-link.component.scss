@@ -1,0 +1,16 @@
+@import '~src/sass/variables';
+
+.course-link {
+    text-decoration: none;
+    color: $txt-dark;
+    font-weight: bold;
+    padding: 1rem;
+    background-color: $bg-grey-light;
+    margin-bottom: 1rem;
+    border-radius: 0.2rem;
+    display:block;
+
+    &:hover {
+        background-color: $bg-grey-light-hover;
+    }
+}

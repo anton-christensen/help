@@ -18,6 +18,7 @@ import {CourseComponent} from "./components/course/course.component";
 import {StudentComponent} from "./components/student/student.component";
 import {TaComponent} from "./components/ta/ta.component";
 import {PostsComponent} from "./components/posts/posts.component";
+import { CourseLinkComponent } from './components/course-link/course-link.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {PostsComponent} from "./components/posts/posts.component";
     StudentComponent,
     TaComponent,
     PostsComponent,
+    CourseLinkComponent,
   ],
   imports: [
     BrowserModule,

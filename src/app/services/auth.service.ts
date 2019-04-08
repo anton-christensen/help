@@ -73,23 +73,6 @@ export class AuthService {
       });
   }
 
-  public addNotificationToken(course: Course, token: string): Promise<boolean> {
-    let tokenExists: boolean;
-    const ref = this.db.firestore.collection('users').doc(this.user.uid);
-
-    return ref.get()
-      .then((doc) => {
-        tokenExists = false;
-        if (doc.exists) {
-          tokenExists = doc.data().notificationTokens[course.slug] && doc.data().notificationTokens[course.slug].includes(token);
-          return ref.update(`notificationTokens.${course.slug}`, firebase.firestore.FieldValue.arrayUnion(token));
-        }
-      })
-      .then(() => {
-        return tokenExists;
-      });
-  }
-
   loggedIn(): boolean {
     return !!this.user;
   }

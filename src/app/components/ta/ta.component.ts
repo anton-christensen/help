@@ -9,6 +9,8 @@ import { Course } from 'src/app/models/course';
 import { CourseService } from 'src/app/services/course.service';
 import {ToastService} from '../../services/toasts.service';
 import {tap} from 'rxjs/operators';
+import { NotificationService } from 'src/app/services/notification.service';
+import { NotificationToken } from 'src/app/models/notification-token';
 
 @Component({
   selector: 'app-ta',
@@ -18,9 +20,11 @@ import {tap} from 'rxjs/operators';
 export class TaComponent implements OnInit {
   @Input() public course: Course;
   trashCans$: Observable<TrashCan[]>;
+  public notificationToken: NotificationToken;
+  //public notificationsEnabled = false;
 
   constructor(public auth: AuthService,
-              private toastService: ToastService,
+              private notificationService: NotificationService,
               private afMessaging: AngularFireMessaging,
               private garbageCollector: TrashCanService,
               private courseService: CourseService,
@@ -33,6 +37,13 @@ export class TaComponent implements OnInit {
     .subscribe((message) => {
       console.log(message);
     });
+
+    this.notificationService.getToken(this.course)
+      .subscribe((token) => {
+        console.log(token);
+        //this.notificationsEnabled = true;
+        this.notificationToken = token;
+      });
   }
 
   public deleteTrashCan(can: TrashCan) {
@@ -45,14 +56,11 @@ export class TaComponent implements OnInit {
   }
 
   public requestNotificationToken() {
-    this.afMessaging.requestToken
-      .subscribe((token) => {
-        this.auth.addNotificationToken(this.course, token)
-          .then((tokenExisted) => {
-            if (!tokenExisted) {
-              this.toastService.add('You will now receive notifications from this course');
-            }
-          });
+    console.log('hello?');
+    this.notificationService.generateAndSaveToken(this.course)
+      .then(() => {
+        console.log('you added it succesfully, congratulatinos');
+        this.notificationsEnabled = true;
       });
   }
 
@@ -61,8 +69,10 @@ export class TaComponent implements OnInit {
   }
 
   public deleteNotificationToken() {
+    console.log('gonna delete!');
     this.afMessaging.getToken
       .subscribe((token) => {
+        console.log(token);
         this.afMessaging.deleteToken(token);
       })
       .unsubscribe();

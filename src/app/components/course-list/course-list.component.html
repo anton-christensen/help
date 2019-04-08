@@ -18,24 +18,20 @@
 
   <ng-template #ta>
     <h1>Your courses</h1>
-    <ul>
+    <course-link *ngFor="let course of relevantCourses(courses)" [course]="course"></course-link>
+    <!-- <ul>
       <li *ngFor="let course of relevantCourses(courses)">
         <a [routerLink]="['/course', course.slug]">
           {{ course.title }} ({{ course.slug | uppercase }})
         </a>
       </li>
-    </ul>
+    </ul> -->
   </ng-template>
 
   <ng-template #student>
     <h1>Active courses</h1>
-    <ul *ngIf="activeCourses(courses)">
-      <li *ngFor="let course of activeCourses(courses)">
-        <a [routerLink]="['/course', course.slug]">
-          {{ course.title }} ({{ course.slug | uppercase }})
-        </a>
-      </li>
-    </ul>
+
+    <course-link *ngFor="let course of activeCourses(courses)" [course]="course"></course-link>
 
     <ng-container *ngIf="!activeCourses(courses).length">
       <h2>There are no exercise sessions... in session</h2>

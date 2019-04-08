@@ -28,7 +28,8 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/marked/lib/marked.js"
+              "node_modules/marked/lib/marked.js",
+              "node_modules/clientjs/dist/client.min.js"
             ],
             "es5BrowserSupport": true
           },
