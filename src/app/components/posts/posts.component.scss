@@ -71,5 +71,14 @@ markdown {
     background: whitesmoke;
     padding: 0.25rem 0.5rem;
   }
+
+  a {
+   color: #2979ff;
+   text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
