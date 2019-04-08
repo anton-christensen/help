@@ -7,6 +7,8 @@ import { TrashCan } from 'src/app/models/trash-can';
 import { CommonService } from 'src/app/services/common.service';
 import { Course } from 'src/app/models/course';
 import { CourseService } from 'src/app/services/course.service';
+import {ToastService} from '../../services/toasts.service';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-ta',
@@ -15,9 +17,10 @@ import { CourseService } from 'src/app/services/course.service';
 })
 export class TaComponent implements OnInit {
   @Input() public course: Course;
-  trashCans$ : Observable<TrashCan[]>
+  trashCans$: Observable<TrashCan[]>;
 
   constructor(public auth: AuthService,
+              private toastService: ToastService,
               private afMessaging: AngularFireMessaging,
               private garbageCollector: TrashCanService,
               private courseService: CourseService,
@@ -25,23 +28,6 @@ export class TaComponent implements OnInit {
 
   ngOnInit() {
     this.trashCans$ = this.garbageCollector.getTrashCans(this.course.slug);
-    const sub = this.auth.user$
-    .subscribe((user) => {
-      if (!user || !user.admin) {
-        return;
-      }
-
-      this.afMessaging.requestToken
-        .subscribe((token) => {
-            sub.unsubscribe();
-            this.auth.addMessagingToken(token);
-          },
-          (error) => {
-            sub.unsubscribe();
-            console.error(error);
-          }
-        );
-      });
 
     this.afMessaging.messages
     .subscribe((message) => {
@@ -49,12 +35,36 @@ export class TaComponent implements OnInit {
     });
   }
 
-  public deleteTrashCan(can : TrashCan) {
+  public deleteTrashCan(can: TrashCan) {
     this.garbageCollector.deleteTrashCan(can);
   }
 
   public toggleCourseEnabled() {
     this.course.enabled = !this.course.enabled;
     this.courseService.setCourseEnabled(this.course);
+  }
+
+  public requestNotificationToken() {
+    this.afMessaging.requestToken
+      .subscribe((token) => {
+        this.auth.addNotificationToken(this.course, token)
+          .then((tokenExisted) => {
+            if (!tokenExisted) {
+              this.toastService.add('You will now receive notifications from this course');
+            }
+          });
+      });
+  }
+
+  public hasNotificationToken(): Observable<string> {
+    return this.afMessaging.getToken;
+  }
+
+  public deleteNotificationToken() {
+    this.afMessaging.getToken
+      .subscribe((token) => {
+        this.afMessaging.deleteToken(token);
+      })
+      .unsubscribe();
   }
 }

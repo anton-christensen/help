@@ -5,6 +5,17 @@
     <input id="enabled" name="enabled" type="checkbox" [checked]="course.enabled"/>
     <span class="slider"></span>
   </div>
+
+  <ng-container *ngIf="(hasNotificationToken() | async); then notificationsEnabled; else notificationsDisabled"></ng-container>
+
+  <ng-template #notificationsEnabled>
+    <button (click)="requestNotificationToken()">Get notifications</button>
+  </ng-template>
+
+  <ng-template #notificationsDisabled>
+    <button (click)="deleteNotificationToken( )">Stop notifications</button>
+  </ng-template>
+
 </div>
 
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>

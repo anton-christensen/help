@@ -9,15 +9,19 @@
     padding: 0.5rem 1rem;
   }
 
+  th:nth-child(3), td:nth-child(3) {
+    text-align: center;
+  }
+
   tr {
-    border-top: 1px solid $bg-grey-dark;
-    border-bottom: 1px solid $bg-grey-dark;
+    border-top: 1px solid $bg-grey-dark-hover;
+    border-bottom: 1px solid $bg-grey-dark-hover;
 
     &:first-child {
-      background-color: $bg-grey-dark;
+      background-color: $bg-grey-dark-hover;
 
       &:hover {
-        background-color: $bg-grey-dark;
+        background-color: $bg-grey-dark-hover;
       }
     }
 

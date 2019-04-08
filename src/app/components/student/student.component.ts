@@ -30,8 +30,6 @@ export class StudentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.trashCan = JSON.parse(localStorage.getItem(`trashCan-${this.course.slug}`));
 
-    console.log(this.trashCan);
-
     if (this.trashCan) {
       this.subscribeToTrashCan(this.trashCan);
     }

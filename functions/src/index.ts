@@ -2,27 +2,27 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 admin.initializeApp();
 
-export const onNewMessagingToken = functions.firestore
+export const onNewNotificationToken = functions.firestore
   .document('users/{id}').onUpdate((snap) => {
-    const data = snap.after.data();
+    const user = snap.after.data();
 
-    if (data.messagingTokens && data.messagingTokens.length) {
-      return admin.messaging().subscribeToTopic(data.messagingTokens, 'questions');
-    } else {
-      return null;
+    if (user.notificationTokens) {
+      for (const course of Object.keys(user.notificationTokens)) {
+        admin.messaging().subscribeToTopic(user.notificationTokens[course], `trash-can-${course}`);
+      }
     }
 
+    return null;
   });
 
 export const onHelpRequest = functions.firestore
-  .document('questions/{id}').onWrite((snap) => {
-    const roomNumber = snap.after.data().roomNumber;
-    const message = {
-      notification: {
-        title: 'Someone needs help!',
-        body: `Room no. ${roomNumber}`
-      }
-    };
+  .document('trash-cans/{id}').onWrite((snap) => {
+    const trashCan = snap.after.data();
 
-    return admin.messaging().sendToTopic('questions', message);
+    return admin.messaging().sendToTopic(`trash-can-${trashCan.course}`, {
+      notification: {
+        title: `A ${trashCan.course.toUpperCase()} student needs help!`,
+        body: `Room no. ${trashCan.room}`
+      }
+    });
   });

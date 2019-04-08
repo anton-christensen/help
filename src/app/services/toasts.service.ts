@@ -10,7 +10,7 @@ export class ToastService {
     this.clear();
   }
 
-  public add(message: string, time = 50000): string {
+  public add(message: string, time = 5000): string {
     const toast = {
       id: this.createId(),
       message,

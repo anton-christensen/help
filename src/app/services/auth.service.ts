@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {AngularFirestore} from '@angular/fire/firestore';
+import {AngularFirestore, DocumentSnapshot} from '@angular/fire/firestore';
 import {AngularFireMessaging} from '@angular/fire/messaging';
 import * as firebase from 'firebase/app';
 import {Observable, of} from 'rxjs';
@@ -42,8 +42,8 @@ export class AuthService {
       });
   }
 
-  public logout() {
-    this.fireAuth.auth.signOut();
+  public logout(): Promise<void> {
+    return this.fireAuth.auth.signOut();
   }
 
   public isAdmin(): boolean {
@@ -58,30 +58,35 @@ export class AuthService {
     return this.user && (this.user.admin || this.user.courses.includes(course.slug));
   }
 
-  private createUser(authData): Promise<any> {
-    let userData;
+  private createUser(authData): Promise<User> {
+    const user = new User(authData);
     const ref = this.db.firestore.collection('users').doc(authData.uid);
 
     return ref.get()
       .then(doc => {
         if (!doc.exists) {
-          userData = Object.assign({}, new User(authData));
-          ref.set(userData);
+          return ref.set(Object.assign({}, user));
         }
       })
       .then(() => {
-        return userData;
+        return user;
       });
   }
 
-  public addMessagingToken(token: string): Promise<any> {
+  public addNotificationToken(course: Course, token: string): Promise<boolean> {
+    let tokenExists: boolean;
     const ref = this.db.firestore.collection('users').doc(this.user.uid);
 
     return ref.get()
       .then((doc) => {
+        tokenExists = false;
         if (doc.exists) {
-          ref.update('messagingTokens', firebase.firestore.FieldValue.arrayUnion(token));
+          tokenExists = doc.data().notificationTokens[course.slug] && doc.data().notificationTokens[course.slug].includes(token);
+          return ref.update(`notificationTokens.${course.slug}`, firebase.firestore.FieldValue.arrayUnion(token));
         }
+      })
+      .then(() => {
+        return tokenExists;
       });
   }
 
