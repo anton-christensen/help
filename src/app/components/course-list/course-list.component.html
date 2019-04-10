@@ -7,30 +7,16 @@
 
   <ng-template #admin>
     <h1>All courses</h1>
-    <ul>
-      <li *ngFor="let course of courses">
-        <a [routerLink]="['/course', course.slug]">
-          {{ course.title }} ({{ course.slug | uppercase }})
-        </a>
-      </li>
-    </ul>
+    <course-link *ngFor="let course of courses" [course]="course"></course-link>
   </ng-template>
 
   <ng-template #ta>
     <h1>Your courses</h1>
     <course-link *ngFor="let course of relevantCourses(courses)" [course]="course"></course-link>
-    <!-- <ul>
-      <li *ngFor="let course of relevantCourses(courses)">
-        <a [routerLink]="['/course', course.slug]">
-          {{ course.title }} ({{ course.slug | uppercase }})
-        </a>
-      </li>
-    </ul> -->
   </ng-template>
 
   <ng-template #student>
     <h1>Active courses</h1>
-
     <course-link *ngFor="let course of activeCourses(courses)" [course]="course"></course-link>
 
     <ng-container *ngIf="!activeCourses(courses).length">
