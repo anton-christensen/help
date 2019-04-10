@@ -6,7 +6,7 @@ export const onNewNotificationToken = functions.firestore
   .document('notificationTokens/{id}').onCreate((snap) => {
     const data = snap.data();
 
-    return admin.messaging().subscribeToTopic(data.token, `trash-can-${data.courseSlug}`);
+    return admin.messaging().subscribeToTopic(data.token, `trashCan/${data.courseSlug}`);
   });
 
 export const onUpdatedNotificationToken = functions.firestore
@@ -14,9 +14,9 @@ export const onUpdatedNotificationToken = functions.firestore
     const oldData = snap.before.data();
     const newData = snap.after.data();
 
-    return admin.messaging().unsubscribeFromTopic(oldData.token, `trash-can-${oldData.courseSlug}`)
+    return admin.messaging().unsubscribeFromTopic(oldData.token, `trashCan/${oldData.courseSlug}`)
       .then(() => {
-        return admin.messaging().subscribeToTopic(newData.token, `trash-can-${newData.courseSlug}`);
+        return admin.messaging().subscribeToTopic(newData.token, `trashCan/${newData.courseSlug}`);
       });
   });
 
@@ -24,7 +24,7 @@ export const onDeleteNotificationToken = functions.firestore
   .document('notificationTokens/{id}').onDelete((snap) => {
     const data = snap.data();
 
-    return admin.messaging().unsubscribeFromTopic(data.token, `trash-can-${data.courseSlug}`);
+    return admin.messaging().unsubscribeFromTopic(data.token, `trashCan/${data.courseSlug}`);
   });
 
 export const onNoLongerTA = functions.firestore
@@ -52,7 +52,7 @@ export const onHelpRequest = functions.firestore
   .document('trash-cans/{id}').onCreate((snap) => {
     const trashCan = snap.data();
 
-    return admin.messaging().sendToTopic(`trash-can-${trashCan.course}`, {
+    return admin.messaging().sendToTopic(`trashCan/${trashCan.course}`, {
       notification: {
         title: `A ${trashCan.course.toUpperCase()} student needs help!`,
         body: `Room no. ${trashCan.room}`
