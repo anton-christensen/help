@@ -55,7 +55,9 @@ export const onHelpRequest = functions.firestore
     return admin.messaging().sendToTopic(`trashCan/${trashCan.course}`, {
       notification: {
         title: `A ${trashCan.course.toUpperCase()} student needs help!`,
-        body: `Room no. ${trashCan.room}`
+        body: `Room no. ${trashCan.room}`,
+        clickAction: `https://help.antonchristensen.net/courses/${trashCan.course}`,
+        icon: `https://help.antonchristensen.net/assets/icons/icon-128x128.png`
       }
     });
   });
