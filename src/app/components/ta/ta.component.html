@@ -6,16 +6,8 @@
     <span class="slider"></span>
   </div>
 
-  <ng-container *ngIf="notificationService.getToken(course) | async as token; then notificationsEnabled; else notificationsDisabled"></ng-container>
-
-  <ng-template #notificationsEnabled>
-    <button (click)="deleteNotificationToken(token)">Stop notifications</button>
-  </ng-template>
-  
-  <ng-template #notificationsDisabled>
-      <button (click)="requestNotificationToken()">Get notifications</button>
-  </ng-template>
-
+  <button *ngIf="!notificationToken" (click)="requestNotificationToken()">Enable notifications</button>
+  <button *ngIf="notificationToken" (click)="deleteNotificationToken()">Disable notifications</button>
 </div>
 
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>

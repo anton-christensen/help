@@ -9,6 +9,7 @@ export class NotificationToken {
 
   constructor(id: string, token: string, deviceId: number, user: {uid: string}, course: Course) {
     this.id = id;
+    this.token = token;
     this.deviceId = deviceId;
     this.userId = user.uid;
     this.courseSlug = course.slug

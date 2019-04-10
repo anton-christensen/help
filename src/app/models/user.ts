@@ -3,7 +3,6 @@ export class User {
   email: string;
   imageURL: string;
   name: string;
-  notificationTokens: object;
   admin: boolean;
   courses: string[];
 
@@ -12,7 +11,6 @@ export class User {
     this.email = authData.email;
     this.imageURL = authData.photoURL;
     this.name = '';
-    this.notificationTokens = {};
     this.admin = false;
     this.courses = [];
   }

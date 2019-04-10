@@ -21,26 +21,26 @@ export class NotificationService {
               private afMessaging: AngularFireMessaging,
               private auth: AuthService) {
               }
-
-  public unsubscribe(course: Course) {
-    this.afMessaging.messaging()  
-  }
   
   public generateAndSaveToken(course: Course): Promise<any> {
     return new Promise((resolve) => {
       // Request a new token
       this.afMessaging.requestToken
       .subscribe((token) => {
-        console.log('you ahve a tokeN!', token);
-        
         // Delete old tokens
-        this.db.collection<NotificationToken>('notificationTokens', ref => ref.where('deviceId', '==', this.clientJS.getFingerprint()).where('courseSlug', '==', course.slug)).get().toPromise()
-        .then((val) => {
-          val.forEach( res => {res.ref.delete();});
-          
+        this.db.collection<NotificationToken>('notificationTokens', ref => {
+          return ref.where('deviceId', '==', this.clientJS.getFingerprint())
+          .where('courseSlug', '==', course.slug)
+        }).get().toPromise()
+          .then((val) => {
+            val.forEach((res) => {
+              res.ref.delete();
+            });
+      
           // Then insert the new token
           const id = this.db.collection<NotificationToken>('notificationTokens').ref.doc().id;
-          this.db.collection<NotificationToken>('notificationTokens').doc(id).set(Object.assign({}, new NotificationToken(id, token, this.clientJS.getFingerprint(), this.auth.user, course)))
+          const doc = new NotificationToken(id, token, this.clientJS.getFingerprint(), this.auth.user, course)
+          this.db.collection<NotificationToken>('notificationTokens').doc(id).set(Object.assign({}, doc))
             .then(() => resolve());
         });
       });
@@ -68,6 +68,9 @@ export class NotificationService {
   }
   
   public deleteToken(token: NotificationToken): Promise<any> {
+    console.log(token.token);
+    this.afMessaging.deleteToken(token.token);
+
     return this.db.collection<NotificationToken>('notificationTokens').doc(token.id).delete();
   }
 }
