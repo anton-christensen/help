@@ -1,4 +1,7 @@
+
+
 <ng-container *ngIf="course$ | async as course">
+  <app-course-burger-bar [course]="course"></app-course-burger-bar>
   <h1 class="course-title">{{ course.title }}</h1>
   <hr>
 

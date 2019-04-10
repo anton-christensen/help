@@ -1,20 +1,12 @@
-<div class="fr">
-  <label for="enabled">{{course.enabled ? "Disable" : "Enable"}} exercise session</label>
-
-  <label class="visible" for="course-enable-switch">{{course.enabled ? "Disable" : "Enable"}} exercise session</label>
-  <div class="switch" id="course-enable-switch" (click)="toggleCourseEnabled()">
-    <input type="checkbox" [checked]="course.enabled"/>
-    <span class="slider"></span>
-  </div>
-  <br>
-  <label class="visible" for="notifications-enable-switch">{{notificationToken ? "Disable" : "Enable"}} notifications for this device</label>
-  <div class="switch" id="notifications-enable-switch" (click)="toggleNotificationsEnabled()">
-    <input type="checkbox" [checked]="notificationToken"/>
-    <span class="slider"></span>
-  </div>
-</div>
-
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
+<ng-container *ngIf="!course.enabled">
+  <div class="course-notice notice">
+  <h3 >
+    Course is not currently in session
+  </h3>
+  <p>Enable it in the sidebar before a session starts</p>
+  </div>
+</ng-container>
 <ng-container *ngIf="trashCans$ | async as trashCans">
   <div *ngIf="trashCans.length > 0">
     <table class="trash-cans">

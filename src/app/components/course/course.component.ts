@@ -8,7 +8,7 @@ import { CourseService } from 'src/app/services/course.service';
 @Component({
   selector: 'app-course',
   templateUrl: './course.component.html',
-  styles: []
+  styles: ['./course.component.scss']
 })
 export class CourseComponent implements OnInit {
   public course$: Observable<Course>;

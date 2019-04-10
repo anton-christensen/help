@@ -1,14 +1,6 @@
+@import '~src/sass/variables';
+
 .course-title {
   text-align: center;
 }
 
-.course-notice {
-  padding: 0.5rem;
-  border-radius: 0.2rem;
-  text-align: center;
-
-  &.danger {
-    background-color: salmon;
-    color: white;
-  }
-}

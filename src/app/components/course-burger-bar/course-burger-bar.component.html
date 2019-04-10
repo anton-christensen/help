@@ -1,0 +1,27 @@
+<ng-container *ngIf="auth.isTAInCourse(course)">
+  <div class="burger-bar {{open ? 'open' : ''}}">
+    <div class="close" (click)="closeMenu()">×</div>
+    <div class="switch-container">
+      <div class="floater fl">
+        <label class="visible" for="course-enable-switch">Exercise session</label>
+        <label class="visible sublabel" for="course-enable-switch">Let students ask for help</label>
+      </div>
+      <div class="switch" (click)="toggleCourseEnabled()">
+        <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
+        <span class="slider"></span>
+      </div>
+    </div>
+    <div class="switch-container">
+      <div class="floater fl">
+        <label class="visible" for="notifications-enable-switch">Notifications</label>
+        <label class="visible sublabel" for="notifications-enable-switch">On this device, for this course</label>
+      </div>
+
+      <div class="switch" (click)="toggleNotificationsEnabled()">
+        <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken"/>
+        <span class="slider"></span>
+      </div>
+    </div>
+  </div>
+  <div class="burger-button" (click)="openMenu()">☰</div>
+</ng-container>

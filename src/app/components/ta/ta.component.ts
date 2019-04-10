@@ -29,37 +29,9 @@ export class TaComponent implements OnInit {
 
   ngOnInit() {
     this.trashCans$ = this.garbageCollector.getTrashCans(this.course.slug);
-
-    this.afMessaging.messages
-    .subscribe((message) => {
-      console.log(message);
-    });
-
-    this.notificationService.getToken(this.course)
-      .subscribe((token) => {
-        this.notificationToken = token;
-      });
   }
 
   public deleteTrashCan(can: TrashCan) {
     this.garbageCollector.deleteTrashCan(can);
-  }
-
-  public toggleCourseEnabled() {
-    this.course.enabled = !this.course.enabled;
-    this.courseService.setCourseEnabled(this.course);
-  }
-
-  public toggleNotificationsEnabled() {
-    if(this.notificationToken) {
-      console.log(this.notificationToken);
-      this.notificationService.deleteToken(this.notificationToken);
-    }
-    else {
-      this.notificationService.generateAndSaveToken(this.course)
-        .then(() => {
-          console.log('you added it succesfully, congratulatinos');
-        });
-    }
   }
 }

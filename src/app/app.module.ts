@@ -20,6 +20,7 @@ import {TaComponent} from "./components/ta/ta.component";
 import {PostsComponent} from "./components/posts/posts.component";
 import { CourseLinkComponent } from './components/course-link/course-link.component';
 import { LoaderComponent } from './components/loader/loader.component';
+import { CourseBurgerBarComponent } from './components/course-burger-bar/course-burger-bar.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { LoaderComponent } from './components/loader/loader.component';
     PostsComponent,
     CourseLinkComponent,
     LoaderComponent,
+    CourseBurgerBarComponent,
   ],
   imports: [
     BrowserModule,
