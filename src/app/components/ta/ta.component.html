@@ -1,13 +1,17 @@
 <div class="fr">
   <label for="enabled">{{course.enabled ? "Disable" : "Enable"}} exercise session</label>
-  <div class="switch tooltip" (click)="toggleCourseEnabled()">
-    <span class="tooltiptext">{{course.enabled ? "Disable" : "Enable"}} exercise session</span> 
-    <input id="enabled" name="enabled" type="checkbox" [checked]="course.enabled"/>
+
+  <label class="visible" for="course-enable-switch">{{course.enabled ? "Disable" : "Enable"}} exercise session</label>
+  <div class="switch" id="course-enable-switch" (click)="toggleCourseEnabled()">
+    <input type="checkbox" [checked]="course.enabled"/>
     <span class="slider"></span>
   </div>
-
-  <button *ngIf="!notificationToken" (click)="requestNotificationToken()">Enable notifications</button>
-  <button *ngIf="notificationToken" (click)="deleteNotificationToken()">Disable notifications</button>
+  <br>
+  <label class="visible" for="notifications-enable-switch">{{notificationToken ? "Disable" : "Enable"}} notifications for this device</label>
+  <div class="switch" id="notifications-enable-switch" (click)="toggleNotificationsEnabled()">
+    <input type="checkbox" [checked]="notificationToken"/>
+    <span class="slider"></span>
+  </div>
 </div>
 
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>

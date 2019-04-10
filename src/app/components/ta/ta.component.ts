@@ -50,15 +50,16 @@ export class TaComponent implements OnInit {
     this.courseService.setCourseEnabled(this.course);
   }
 
-  public requestNotificationToken() {
-    this.notificationService.generateAndSaveToken(this.course)
-      .then(() => {
-        console.log('you added it succesfully, congratulatinos');
-      });
-  }
-
-  public deleteNotificationToken() {
-    console.log(this.notificationToken);
-    this.notificationService.deleteToken(this.notificationToken);
+  public toggleNotificationsEnabled() {
+    if(this.notificationToken) {
+      console.log(this.notificationToken);
+      this.notificationService.deleteToken(this.notificationToken);
+    }
+    else {
+      this.notificationService.generateAndSaveToken(this.course)
+        .then(() => {
+          console.log('you added it succesfully, congratulatinos');
+        });
+    }
   }
 }
