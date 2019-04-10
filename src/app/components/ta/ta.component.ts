@@ -13,7 +13,7 @@ import { NotificationToken } from 'src/app/models/notification-token';
 @Component({
   selector: 'app-ta',
   templateUrl: './ta.component.html',
-  styles: []
+  styleUrls: ['./ta.component.scss']
 })
 export class TaComponent implements OnInit {
   @Input() public course: Course;

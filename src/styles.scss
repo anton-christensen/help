@@ -1,9 +1,2 @@
-@import 'app/app.component';
-@import 'app/components/course/course.component';
-@import 'app/components/course-list/course-list.component';
-
-@import 'app/components/footer/footer.component';
-@import 'app/components/posts/posts.component';
-@import 'app/components/student/student.component';
-@import 'app/components/ta/ta.component';
-@import 'app/components/toasts/toasts.component';
+@import '~src/sass/variables';
+@import '~src/sass/common';

@@ -1,54 +1,5 @@
 @import '~src/sass/variables';
 
-h1 {
-  font-size: $font-size-h1;
-}
-
-h2 {
-  font-size: $font-size-h2;
-}
-
-h3 {
-  font-size: $font-size-h3;
-}
-
-h4 {
-  font-size: $font-size-h4;
-}
-
-h5 {
-  font-size: $font-size-h5;
-}
-
-ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-input {
-  height: 2.5rem;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-}
-
-label {
-  display: none;
-}
-
-label.visible {
-  display: inline-block;
-}
-
-body, html {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: white;
-  color: $txt-dark;
-  font-family: 'Roboto', sans-serif;
-}
-
 .page {
   width: 100%;
   min-height: 100vh;
@@ -59,7 +10,6 @@ body, html {
 }
 
 .container {
-  position: relative;
   width: 90%;
   max-width:50rem;
   padding: 1rem;
@@ -67,51 +17,4 @@ body, html {
   box-shadow: black 0 15px 41px -36px;
   border-radius: 0 0 5px 5px;
   margin: 1rem auto 3rem;
-}
-
-.fr {
-  float: right;
-}
-
-.btn {
-  margin: 0;
-  padding: 0 1rem;
-  height: 2.5rem;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  color: white;
-  background-color: $pri-col;
-  box-sizing: border-box;
-  font-size: 0.8rem;
-
-  transition: all 300ms ease-out;
-
-  &:hover {
-    background-color: $pri-col-hover;
-  }
-
-  &:active {
-    background-color: $pri-col-active;
-  }
-
-  &:disabled {
-    cursor: default;
-    color: $disabled-text;
-    background-color: $disabled;
-  }
-}
-
-.material-icons.clickable {
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: $txt-dark;
-
-  &:hover {
-    color: $txt-dark-hover;
-  }
-
-  &:active {
-    color: $txt-dark-active;
-  }
 }

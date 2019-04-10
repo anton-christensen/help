@@ -52,33 +52,4 @@
   }
 }
 
-markdown {
-  h1 {
-    font-size: $font-size-h3;
-  }
-
-  h2 {
-    font-size: $font-size-h4;
-
-  }
-
-  h3 {
-    font-size: $font-size-h5;
-
-  }
-
-  pre {
-    background: whitesmoke;
-    padding: 0.25rem 0.5rem;
-  }
-
-  a {
-   color: #2979ff;
-   text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-}
 

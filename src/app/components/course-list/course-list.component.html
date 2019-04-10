@@ -1,4 +1,4 @@
-<ng-container *ngIf="courses$ | async as courses">
+<ng-container *ngIf="courses$ | async as courses; else loader">
 
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
@@ -26,3 +26,7 @@
   </ng-template>
 
 </ng-container>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>
