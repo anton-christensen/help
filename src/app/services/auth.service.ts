@@ -47,6 +47,7 @@ export class AuthService {
   }
 
   public isAdmin(): boolean {
+    console.log(this.user);
     return this.user && this.user.admin;
   }
 

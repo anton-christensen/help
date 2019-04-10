@@ -21,6 +21,7 @@ import {PostsComponent} from "./components/posts/posts.component";
 import { CourseLinkComponent } from './components/course-link/course-link.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { CourseBurgerBarComponent } from './components/course-burger-bar/course-burger-bar.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { CourseBurgerBarComponent } from './components/course-burger-bar/course-
     CourseLinkComponent,
     LoaderComponent,
     CourseBurgerBarComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,

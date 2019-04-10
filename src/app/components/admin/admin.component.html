@@ -1,0 +1,49 @@
+<h1>Features</h1>
+<ul>
+  <li>manage courses</li>
+  <li>promote users</li>
+</ul>
+
+<ng-container *ngIf="courses$ | async as courses; else loader">
+  <h1>Courses</h1>
+
+  <div class="course-edit">
+    <h3>Write a post for the front page</h3>
+    <form [formGroup]="form" (ngSubmit)="submitPost()">
+      <label for="course">Post</label>
+      <input
+        type="text"
+        id="slug"
+        class="form-control"
+        formControlName="slug"
+        required />
+      <input
+        type="text"
+        id="title"
+        class="form-control"
+        formControlName="title"
+        required />
+      <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
+    </form>
+  </div>
+
+  <table class="trash-cans">
+    <tr>
+      <th>Slug</th>
+      <th>Title</th>
+      <th>Delete</th>
+    </tr>
+    <tr *ngFor="let course of courses" class="course">
+      <td class="slug">{{ course.slug }}</td>
+      <td class="title">{{ course.title }}</td>
+      <td (click)="deleteCourse(course)" class="delete">
+        <i class="material-icons clickable">delete_forever</i>
+      </td>
+    </tr>
+  </table>
+
+</ng-container>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>
