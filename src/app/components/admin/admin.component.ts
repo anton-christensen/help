@@ -18,7 +18,7 @@ export class AdminComponent implements OnInit {
 
   public form = new FormGroup({
     id: new FormControl(),
-    slug: new FormControl(''),
+    shorthand: new FormControl(''),
     title: new FormControl('')
   });
 
@@ -33,7 +33,7 @@ export class AdminComponent implements OnInit {
   public editCourse(course: Course) {
     this.form.setValue({
       id: course.id,
-      slug: course.slug,
+      shorthand: course.slug.toLowerCase(),
       title: course.title,
     });
 

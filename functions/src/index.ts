@@ -51,7 +51,7 @@ export const onUpdateCourse = functions.firestore
       });
     }
   );
-  
+
   // remove each notification token for the course
   admin.firestore().collection('notificationTokens')
     .where('courseSlug', '==', snap.before.data().slug).get()
@@ -61,6 +61,8 @@ export const onUpdateCourse = functions.firestore
       });
     }
   );
+
+  return null;
 });
 
 export const onDeleteCourse = functions.firestore
@@ -77,7 +79,7 @@ export const onDeleteCourse = functions.firestore
       });
     }
   );
-  
+
   console.log('done with users');
 
   // Delete posts of course
@@ -91,7 +93,7 @@ export const onDeleteCourse = functions.firestore
       });
     }
   );
-  
+
   console.log('done with posts');
 
   // remove each notification token for the course
@@ -104,6 +106,8 @@ export const onDeleteCourse = functions.firestore
       });
     }
   );
+
+  return null;
 });
 
 export const onNoLongerTA = functions.firestore

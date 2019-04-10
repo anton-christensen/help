@@ -9,6 +9,15 @@ body, html {
   font-family: 'Roboto', sans-serif;
 }
 
+hr {
+  box-shadow: inset rgba(0,0,0,0.1) 0 10px 10px -10px;
+  border: 0;
+  display: inline-block;
+  width: 100%;
+  height: 2rem;
+  margin: 0;
+}
+
 h1 {
   font-size: $font-size-h1;
 }
@@ -61,7 +70,7 @@ label.sublabel {
 }
 
 label.visible {
-  display: inline-block;
+  display: block;
 }
 
 .fr {
@@ -168,6 +177,63 @@ markdown {
 
 }
 
+/*************** Forms ****************/
+
+form {
+  margin: 1rem 0;
+  input, button, textarea {
+    display: block;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    z-index: 10;
+  }
+
+  input {
+    width: 20rem;
+    margin-bottom: 1rem;
+    background-color: $bg-grey-light;
+
+    &:hover {
+      background-color: $bg-grey-light-hover;
+    }
+
+    &:focus {
+      background-color: $bg-grey-light-focus;
+    }
+
+    &::placeholder {
+      font-size: 0.8rem;
+    }
+  }
+
+  button {
+    width: 5rem;
+  }
+
+  .error {
+    width: 20rem;
+    color: $danger;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.5rem;
+    text-align: center;
+    z-index: 5;
+
+    animation: glide-down 300ms ease-out;
+
+    @keyframes glide-down {
+      0% {
+        transform: translateY(-1.3rem);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+  }
+}
 
 
 /*************** Checkbox toggles ****************/

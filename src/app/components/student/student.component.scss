@@ -10,58 +10,21 @@
   }
 
   form {
-    width: 300px;
+    width: 20rem;
     margin: 0 auto;
 
     input, button {
-      position: relative;
-      padding: 0;
+      display: inline-block;
       margin: 0;
-      text-align: center;
-      z-index: 10;
-    }
-
-    input {
-      width: 200px;
-      background-color: $bg-grey-light;
-
-      &:hover {
-        background-color: $bg-grey-light-hover;
-      }
-
-      &:focus {
-        background-color: $bg-grey-light-focus;
-      }
-
-      &::placeholder {
-        font-size: 0.8rem;
-      }
     }
 
     button {
-      width: 100px;
+      width: 5rem;
+      float: right;
     }
 
-    .error {
-      width: 300px;
-      color: tomato;
-      font-size: 0.8rem;
-      font-weight: bold;
-      padding: 0.5rem;
-      text-align: center;
-      z-index: 5;
-
-      animation: glide-down 300ms ease-out;
-
-      @keyframes glide-down {
-        0% {
-          transform: translateY(-1.3rem);
-        }
-
-        100% {
-          transform: translateY(0);
-        }
-      }
+    input {
+      width: 15rem;
     }
   }
 

@@ -10,20 +10,23 @@
   <div class="course-edit">
     <h3>Write a post for the front page</h3>
     <form [formGroup]="form" (ngSubmit)="submitPost()">
-      <label for="course">Post</label>
+      <label for="shorthand" class="visible">Shorthand</label>
       <input
+        placeholder="AD"
         type="text"
-        id="slug"
+        id="shorthand"
         class="form-control"
-        formControlName="slug"
+        formControlName="shorthand"
         required />
+      <label for="title" class="visible">Title</label>
       <input
+        placeholder="Algorithms and Datastructures"
         type="text"
         id="title"
         class="form-control"
         formControlName="title"
         required />
-      <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
+      <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Create' }}</button>
     </form>
   </div>
 
