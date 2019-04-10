@@ -6,7 +6,7 @@ import {CourseComponent} from './components/course/course.component';
 
 const routes: Routes = [
   { path: 'courses', component: CourseListComponent},
-  { path: 'course/:course', component: CourseComponent, canActivate: [CourseExistsGuard] },
+  { path: 'courses/:course', component: CourseComponent, canActivate: [CourseExistsGuard] },
   { path: '**', redirectTo: 'courses' },
 ];
 
