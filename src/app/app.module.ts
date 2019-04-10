@@ -23,6 +23,7 @@ import {CourseLinkComponent} from './components/course-link/course-link.componen
 import {LoaderComponent} from './components/loader/loader.component';
 import {CourseBurgerBarComponent} from './components/course-burger-bar/course-burger-bar.component';
 import {AdminComponent} from './components/admin/admin.component';
+import { ModalComponent } from './components/modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import {AdminComponent} from './components/admin/admin.component';
     LoaderComponent,
     CourseBurgerBarComponent,
     AdminComponent,
+    ModalComponent,
   ],
   imports: [
     BrowserModule,

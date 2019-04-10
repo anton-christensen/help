@@ -1,13 +1,14 @@
 .burger-bar {
+  width: 20rem;
   position: fixed;
   top: 0;
   height: 100%;
   z-index: 2;
-  left: -100%;
+  left: -21rem;
   transition: left .4s;
   background: #616161;
   color: white;
-  box-shadow: black -48px 0px 41px 30px;
+  box-shadow: black -6px 0px 20px 2px;
 
   &.open {
     left: 0;

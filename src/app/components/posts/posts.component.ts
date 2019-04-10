@@ -6,6 +6,7 @@ import { PostService } from 'src/app/services/post.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Course } from 'src/app/models/course';
 import { CommonService } from 'src/app/services/common.service';
+import { ModalService } from 'src/app/services/modal.service';
 
 @Component({
   selector: 'app-posts',
@@ -23,6 +24,7 @@ export class PostsComponent implements OnInit {
   });
 
   constructor(public  common        :CommonService,
+              public  modalService  :ModalService,
               public  auth          :AuthService,
               private postalService :PostService) {
   }
@@ -53,7 +55,10 @@ export class PostsComponent implements OnInit {
   }
   
   public deletePost(post: Post) {
-    this.editPost(post);
-    this.postalService.deletePost(post);
+    this.modalService.add('Are you sure you want to delete this post?')
+      .then(() => {
+        this.postalService.deletePost(post);
+      })
+      .catch(() => {});
   }
 }

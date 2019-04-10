@@ -1,0 +1,13 @@
+<div class="modal-wrapper" *ngIf="modalService.modal">
+  <div class="modal">
+      <span>{{ modalService.modal.message }}</span>
+      <div>
+        <button class="btn" type="button" (click)="modalService.cancel()">
+            {{ modalService.modal.cancelText }}
+        </button>
+        <button class="btn" type="button" (click)="modalService.accept()">
+            {{ modalService.modal.acceptText }}
+        </button>
+      </div>
+  </div>
+</div>

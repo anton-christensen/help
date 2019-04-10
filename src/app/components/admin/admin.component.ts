@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CourseService } from 'src/app/services/course.service';
 import { Course } from 'src/app/models/course';
 import { FormGroup, FormControl } from '@angular/forms';
+import { ModalService } from 'src/app/services/modal.service';
 
 
 @Component({
@@ -22,13 +23,14 @@ export class AdminComponent implements OnInit {
   });
 
   constructor(public auth: AuthService,
+              private modalService: ModalService,
               private courseService: CourseService) {}
 
   ngOnInit() {
     this.courses$ = this.courseService.getAllCourses();
   }
 
-  public editPost(course: Course) {
+  public editCourse(course: Course) {
     this.form.setValue({
       id: course.id,
       slug: course.slug,
