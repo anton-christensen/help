@@ -1,17 +1,18 @@
 .burger-bar {
-  width: 20rem;
+  width: 16rem;
   position: fixed;
   top: 0;
   height: 100%;
   z-index: 2;
-  left: -21rem;
-  transition: left .4s;
+  right: -17rem;
+  transition: right .4s;
   background: #616161;
   color: white;
-  box-shadow: black -6px 0px 20px 2px;
+  box-shadow: black 6px 0px 20px 2px;
+  user-select: none;
 
   &.open {
-    left: 0;
+    right: 0;
   }
 
   & > * {
@@ -47,16 +48,17 @@
 }
 
 .burger-button {
+  user-select: none;
   font-size: 1.5rem;
   position: absolute;
-  left: 0;
+  right: 0;
   top: 0;
   cursor: pointer;
   padding: 1rem;
   z-index: 1;
 
   &:hover {
-    background-color: #f5f5f5;
+    // background-color: #f5f5f5;
   }
 }
 

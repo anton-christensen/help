@@ -17,6 +17,7 @@ export class CourseBurgerBarComponent implements OnInit {
   @Input() public course: Course;
   public open: boolean;
   public notificationToken: NotificationToken;
+  public tokenToggleBusy: boolean;
 
   constructor(public auth: AuthService,
               private courseService: CourseService,
@@ -49,13 +50,13 @@ export class CourseBurgerBarComponent implements OnInit {
 
   public toggleNotificationsEnabled() {
     if(this.notificationToken) {
-      console.log(this.notificationToken);
       this.notificationService.deleteToken(this.notificationToken);
     }
     else {
+      this.tokenToggleBusy = true;
       this.notificationService.generateAndSaveToken(this.course)
         .then(() => {
-          console.log('you added it succesfully, congratulatinos');
+          this.tokenToggleBusy = false;
         });
     }
   }

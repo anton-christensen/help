@@ -1,4 +1,4 @@
-@import '~src/sass/variables';
+// @import '~src/sass/variables';
 
 body, html {
   width: 100%;
@@ -181,27 +181,33 @@ markdown {
 
 form {
   margin: 1rem 0;
+  background: whitesmoke;
+  // max-width: 20rem;
+  padding: 1rem;
+  border: 1px solid #bdbdbd;
+
+  &.no-detail {
+    border: 0;
+    padding: 0;
+    background: transparent;
+  }
+
   input, button, textarea {
     display: block;
     position: relative;
     padding: 0;
     margin: 0;
-    text-align: center;
-    z-index: 10;
+    z-index: 1;
   }
 
   input {
-    width: 20rem;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
     margin-bottom: 1rem;
-    background-color: $bg-grey-light;
-
-    &:hover {
-      background-color: $bg-grey-light-hover;
-    }
-
-    &:focus {
-      background-color: $bg-grey-light-focus;
-    }
+    background-color: white;
+    border: 1px solid $bg-grey-dark-hover;
+    
 
     &::placeholder {
       font-size: 0.8rem;

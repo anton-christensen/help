@@ -8,8 +8,8 @@
   <h1>Courses</h1>
 
   <div class="course-edit">
-    <h3>Write a post for the front page</h3>
-    <form [formGroup]="form" (ngSubmit)="submitPost()">
+    <h3>Add a new course</h3>
+    <form [formGroup]="form" (ngSubmit)="submitCourse()">
       <label for="shorthand" class="visible">Shorthand</label>
       <input
         placeholder="AD"
@@ -34,11 +34,15 @@
     <tr>
       <th>Slug</th>
       <th>Title</th>
+      <th>Edit</th>
       <th>Delete</th>
     </tr>
     <tr *ngFor="let course of courses" class="course">
       <td class="slug">{{ course.slug }}</td>
       <td class="title">{{ course.title }}</td>
+      <td (click)="editCourse(course)" class="edit">
+        <i class="material-icons clickable">edit</i>
+      </td>
       <td (click)="deleteCourse(course)" class="delete">
         <i class="material-icons clickable">delete_forever</i>
       </td>

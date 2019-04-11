@@ -3,7 +3,7 @@
     <ng-container *ngIf="!trashCan">
       <h2>Enter your room number to get help</h2>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="no-detail">
         <label for="room">
           Room number
         </label>

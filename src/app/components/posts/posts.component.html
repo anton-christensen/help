@@ -1,7 +1,7 @@
 <ng-container *ngIf="auth.isTAInCourse(course)">
   <div class="post-edit">
     <h3>Write a post for the front page</h3>
-    <form [formGroup]="form" (ngSubmit)="submitPost()">
+    <form [formGroup]="form" (ngSubmit)="submitPost()" class="no-detail">
       <label for="post">Post</label>
       <textarea
         id="post"

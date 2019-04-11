@@ -25,6 +25,11 @@ export class CourseService {
     );
   }
 
+  public getCourseBySlugOnce(slug: string): Promise<any> {
+    return this.db.collection<Course>('courses', ref => ref.where('slug', '==', slug).limit(1)).get().toPromise()
+    .then((val) => val.docs.map(val => val.data()));
+  }
+
   public getAllCourses(): Observable<Course[]> {
     return this.db.collection<Course>('courses').snapshotChanges().pipe(
       map(actions => {
@@ -52,8 +57,7 @@ export class CourseService {
   }
 
   deleteCourse(course: Course) {
-    alert("Not implemented");
-    // Unnasign all TAs and delete posts and trash cans
+    return this.db.collection<Course>('courses').doc(course.id).delete();
   }
 
   public createOrUpdateCourse(course: Course): Promise<void> {
@@ -63,7 +67,7 @@ export class CourseService {
       return this.db.collection<Course>('courses').doc(course.id).set(Object.assign({}, course));
     } else {
       // Course already exists, just update the content
-      return this.db.collection<Course>('courses').ref.doc(course.id).update(course);
+      return this.db.collection<Course>('courses').ref.doc(course.id).update(Object.assign({}, course));
     }
   }
 }

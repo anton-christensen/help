@@ -31,7 +31,10 @@ export const onDeleteNotificationToken = functions.firestore
 
 export const onUpdateCourse = functions.firestore
   .document('courses/{id}').onUpdate((snap) => {
-
+    if(snap.before.data().slug == snap.after.data().slug) 
+      return null;
+    console.log("before: ", snap.before.data());
+    console.log("after: ", snap.after.data());
   // Update all notification tokens related to the course
   return admin.firestore().collection('notificationTokens')
     .where('courseSlug', '==', snap.before.data().slug).get()
@@ -118,6 +121,8 @@ export const onUserUpdate = functions.firestore
   .document('users/{id}').onUpdate((snap, context) => {
     const afterCourses = snap.after.data().courses;
     const changedCourses = snap.before.data().courses.filter((course) => !afterCourses.includes(course));
+    if(changedCourses.length == 0)
+      return null;
     console.log(`${snap.before.data().name} is no longer a TA in these courses:`, changedCourses);
 
     const promises = [];

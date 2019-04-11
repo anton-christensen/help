@@ -18,7 +18,7 @@
       </div>
 
       <div class="switch" (click)="toggleNotificationsEnabled()">
-        <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken"/>
+        <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
         <span class="slider"></span>
       </div>
     </div>
