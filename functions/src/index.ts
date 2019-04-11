@@ -30,105 +30,112 @@ export const onDeleteNotificationToken = functions.firestore
 
 
 export const onUpdateCourse = functions.firestore
-.document('courses/{id}').onUpdate((snap, context) => {
-  // update course from each of the TAs
-  admin.firestore().collection('users')
-    .where('courses', 'array-contains', snap.before.data().slug).get()
-    .then(users => {
-      users.forEach(user => {
-        user.ref.update({'courses': FieldValue.arrayRemove(snap.before.data().slug)});
-        user.ref.update({'courses': FieldValue.arrayUnion(snap.after.data().slug)});
-      });
-    }
-  );
+  .document('courses/{id}').onUpdate((snap) => {
 
-  // update posts to reflect new slug
-  admin.firestore().collection('posts')
-    .where('course', '==', snap.before.data().slug).get()
-    .then(posts => {
-      posts.forEach(post => {
-        post.ref.update({'course': snap.after.data().slug});
-      });
-    }
-  );
-
-  // remove each notification token for the course
-  admin.firestore().collection('notificationTokens')
+  // Update all notification tokens related to the course
+  return admin.firestore().collection('notificationTokens')
     .where('courseSlug', '==', snap.before.data().slug).get()
-    .then(tokens => {
+    .then((tokens) => {
+      const promises = [];
       tokens.forEach(token => {
-        token.ref.update({'courseSlug': snap.after.data().slug});
+        promises.push(token.ref.update({courseSlug: snap.after.data().slug}));
       });
-    }
-  );
-
-  return null;
+      return Promise.all(promises);
+    })
+  // Update all posts related to the course
+    .then(() => {
+      return admin.firestore().collection('posts')
+        .where('course', '==', snap.before.data().slug).get();
+    })
+    .then((posts) => {
+      const promises = [];
+      posts.forEach(post => {
+        promises.push(post.ref.update({course: snap.after.data().slug}));
+      });
+      return Promise.all(promises);
+    })
+  // Update the course for all TAs
+    .then(() => {
+      return admin.firestore().collection('users')
+        .where('courses', 'array-contains', snap.before.data().slug).get();
+    })
+    .then((users) => {
+      const promises = [];
+      users.forEach(user => {
+        promises.push(user.ref.update({courses: FieldValue.arrayRemove(snap.before.data().slug)}));
+        promises.push(user.ref.update({courses: FieldValue.arrayUnion(snap.after.data().slug)}));
+      });
+      return Promise.all(promises);
+    });
 });
 
 export const onDeleteCourse = functions.firestore
 .document('courses/{id}').onDelete((snap) => {
   console.log('started course deletion');
-  // remove course from each of the TAs
-  admin.firestore().collection('users')
-    .where('courses', 'array-contains', snap.data().slug).get()
-    .then(users => {
+
+  // Remove all notification tokens related to the course
+  return admin.firestore().collection('notificationTokens')
+    .where('courseSlug', '==', snap.data().slug).get()
+    .then((tokens) => {
+      console.log('gonna delete these tokens!', tokens);
+      const promises = [];
+      tokens.forEach(token => {
+        promises.push(token.ref.delete());
+      });
+      return Promise.all(promises);
+    })
+  // Remove all posts related to the course
+    .then(() => {
+      console.log('done with tokens');
+      return admin.firestore().collection('posts')
+        .where('course', '==', snap.data().slug).get();
+    })
+    .then((posts) => {
+      console.log('gonna delete these posts!', posts);
+      const promises = [];
+      posts.forEach(post => {
+        promises.push(post.ref.delete());
+      });
+      return Promise.all(promises);
+    })
+  // Remove the course from all TAs
+    .then(() => {
+      return admin.firestore().collection('users')
+        .where('courses', 'array-contains', snap.data().slug).get();
+    })
+    .then((users) => {
       console.log('These are the relevant users:', users);
+      const promises = [];
       users.forEach(user => {
         console.log('doing user', user);
-        user.ref.update({'courses': FieldValue.arrayRemove(snap.data().slug)});
+        promises.push(user.ref.update({courses: FieldValue.arrayRemove(snap.data().slug)}));
       });
-    }
-  );
-
-  console.log('done with users');
-
-  // Delete posts of course
-  admin.firestore().collection('posts')
-    .where('course', '==', snap.data().slug).get()
-    .then(posts => {
-
-      console.log('gonna delete these posts!', posts);
-      posts.forEach(post => {
-        post.ref.delete();
-      });
-    }
-  );
-
-  console.log('done with posts');
-
-  // remove each notification token for the course
-  admin.firestore().collection('notificationTokens')
-    .where('courseSlug', '==', snap.data().slug).get()
-    .then(tokens => {
-      console.log('gonna delete this tokens!', tokens);
-      tokens.forEach(token => {
-        token.ref.delete();
-      });
-    }
-  );
-
-  return null;
+      return Promise.all(promises);
+    });
 });
 
-export const onNoLongerTA = functions.firestore
+export const onUserUpdate = functions.firestore
   .document('users/{id}').onUpdate((snap, context) => {
     const afterCourses = snap.after.data().courses;
     const changedCourses = snap.before.data().courses.filter((course) => !afterCourses.includes(course));
     console.log(`${snap.before.data().name} is no longer a TA in these courses:`, changedCourses);
 
+    const promises = [];
     for (const changedCourse of changedCourses) {
-      admin.firestore().collection('notificationTokens')
+      promises.push(admin.firestore().collection('notificationTokens')
         .where('userId', '==', context.params.id)
         .where('courseSlug', '==', changedCourse).get()
         .then((tokens) => {
+          const tokenPromises = [];
           tokens.forEach((token) => {
             console.log('deleting', token.ref.path);
-            token.ref.delete();
+            tokenPromises.push(token.ref.delete());
           });
-        });
+          return Promise.all(tokenPromises);
+        }));
     }
 
-    return null;
+    return Promise.all(promises);
   });
 
 export const onHelpRequest = functions.firestore

@@ -16,8 +16,7 @@ export class AuthService {
   public user: User;
 
   constructor(private fireAuth: AngularFireAuth,
-              private db: AngularFirestore,
-              private afMessaging: AngularFireMessaging) {
+              private db: AngularFirestore) {
 
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
@@ -47,7 +46,6 @@ export class AuthService {
   }
 
   public isAdmin(): boolean {
-    console.log(this.user);
     return this.user && this.user.admin;
   }
 
