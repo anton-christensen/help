@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {AngularFirestore, DocumentSnapshot} from '@angular/fire/firestore';
-import {AngularFireMessaging} from '@angular/fire/messaging';
+import {AngularFirestore} from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 import {Observable, of} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
@@ -21,7 +20,12 @@ export class AuthService {
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
         if (authUser) {
-          return this.db.doc<User>(`users/${authUser.uid}`).valueChanges();
+          console.log(authUser.uid);
+          if (authUser.isAnonymous) {
+            return of(new User(authUser));
+          } else {
+            return this.db.doc<User>(`users/${authUser.uid}`).valueChanges();
+          }
         } else {
           return of(null);
         }
@@ -73,7 +77,7 @@ export class AuthService {
   }
 
   loggedIn(): boolean {
-    return !!this.user;
+    return this.user && !this.user.anon;
   }
 
   public isActualCourse(courseSlug: string): Promise<boolean> {
@@ -81,5 +85,11 @@ export class AuthService {
       .then((val) => {
         return !val.empty;
       });
+  }
+
+  public anonymousSignIn() {
+    this.fireAuth.auth.signInAnonymously().catch((error) => {
+      console.error(error);
+    });
   }
 }

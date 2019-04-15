@@ -3,8 +3,9 @@ import {ActivatedRoute} from '@angular/router';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from 'rxjs';
 import {TrashCan} from '../../models/trash-can';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-student',
@@ -14,7 +15,6 @@ import {TrashCan} from '../../models/trash-can';
 export class StudentComponent implements OnInit, OnDestroy {
   @Input() public course: Course;
   public trashCan: TrashCan;
-  private trashCanSubscription: Subscription;
 
   public form = new FormGroup({
     room: new FormControl('', [
@@ -24,59 +24,34 @@ export class StudentComponent implements OnInit, OnDestroy {
   });
 
   constructor(private route: ActivatedRoute,
+              private auth: AuthService,
               private trashCanService: TrashCanService) {
   }
 
   ngOnInit() {
-    this.trashCan = JSON.parse(localStorage.getItem(`trashCan-${this.course.slug}`));
-
-    if (this.trashCan) {
-      this.subscribeToTrashCan(this.trashCan);
-    }
+    this.trashCanService.getMyTrashCanByUser(this.course)
+      .subscribe((tc) => {
+        console.log(tc);
+        this.trashCan = tc;
+      });
   }
 
-  ngOnDestroy(): void {
-    if (this.trashCan) {
-      this.trashCanSubscription.unsubscribe();
-    }
-  }
+  ngOnDestroy(): void {}
 
   public onSubmit(): void {
     if (this.form.invalid) {
-      console.error('You tried to save something invalid...');
+      console.error('You tried to save something invalid... How did you accomplish that?');
       return;
     }
 
     this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
       .then((trashCan) => {
-        this.trashCanSet(trashCan);
         this.form.reset();
       });
   }
 
   public retractTrashCan(): void {
     this.trashCanService.deleteTrashCan(this.trashCan);
-  }
-
-  private subscribeToTrashCan(trashCan: TrashCan): void {
-    this.trashCanSubscription = this.trashCanService.getTrashById(trashCan.id)
-      .subscribe((tc) => {
-        if (!tc) {
-          this.clearTrashCanId();
-          this.trashCanSubscription.unsubscribe();
-        }
-      });
-  }
-
-  private trashCanSet(trashCan: TrashCan): void {
-    localStorage.setItem(`trashCan-${this.course.slug}`, JSON.stringify(trashCan));
-    this.trashCan = trashCan;
-    this.subscribeToTrashCan(trashCan);
-  }
-
-  private clearTrashCanId(): void {
-    localStorage.removeItem(`trashCan-${this.course.slug}`);
-    this.trashCan = null;
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {
