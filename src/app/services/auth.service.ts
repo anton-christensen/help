@@ -20,7 +20,6 @@ export class AuthService {
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
         if (authUser) {
-          console.log(authUser.uid);
           if (authUser.isAnonymous) {
             return of(new User(authUser));
           } else {
@@ -87,9 +86,7 @@ export class AuthService {
       });
   }
 
-  public anonymousSignIn() {
-    this.fireAuth.auth.signInAnonymously().catch((error) => {
-      console.error(error);
-    });
+  public anonymousSignIn(): Promise<any> {
+    return this.fireAuth.auth.signInAnonymously();
   }
 }

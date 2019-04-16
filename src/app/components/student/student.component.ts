@@ -3,7 +3,6 @@ import {ActivatedRoute} from '@angular/router';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
-import {Observable, Subscription} from 'rxjs';
 import {TrashCan} from '../../models/trash-can';
 import {AuthService} from '../../services/auth.service';
 
@@ -31,7 +30,6 @@ export class StudentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.trashCanService.getMyTrashCanByUser(this.course)
       .subscribe((tc) => {
-        console.log(tc);
         this.trashCan = tc;
       });
   }
@@ -39,6 +37,18 @@ export class StudentComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
 
   public onSubmit(): void {
+    if (!this.auth.user) {
+      this.auth.anonymousSignIn()
+        .then(() => {
+          this.save();
+        });
+    } else {
+      this.save();
+    }
+
+  }
+
+  private save() {
     if (this.form.invalid) {
       console.error('You tried to save something invalid... How did you accomplish that?');
       return;
