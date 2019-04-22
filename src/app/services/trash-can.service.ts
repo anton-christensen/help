@@ -66,10 +66,10 @@ export class TrashCanService {
       }));
   }
 
-  public addTrashCan(course: string, room: string): Promise<TrashCan> {
+  public addTrashCan(course: string, room: string, uid: string): Promise<TrashCan> {
     const id = this.db.collection<TrashCan>('trash-cans').ref.doc().id;
     const ref = this.db.collection<TrashCan>('trash-cans').doc(id);
-    const trashCan = new TrashCan(id, this.auth.user.uid, course, room);
+    const trashCan = new TrashCan(id, uid, course, room);
     
     return ref.set(Object.assign({}, trashCan))
       .then(() => {

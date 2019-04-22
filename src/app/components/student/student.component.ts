@@ -28,6 +28,10 @@ export class StudentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    if (!this.auth.user) {
+      this.auth.anonymousSignIn();
+    }
+
     this.trashCanService.getMyTrashCanByUser(this.course)
       .subscribe((tc) => {
         this.trashCan = tc;
@@ -39,22 +43,22 @@ export class StudentComponent implements OnInit, OnDestroy {
   public onSubmit(): void {
     if (!this.auth.user) {
       this.auth.anonymousSignIn()
-        .then(() => {
-          this.save();
+        .then((res) => {
+          console.log(res);
+          this.save(res.user.uid);
         });
     } else {
-      this.save();
+      this.save(this.auth.user.uid);
     }
-
   }
 
-  private save() {
+  private save(uid: string) {
     if (this.form.invalid) {
       console.error('You tried to save something invalid... How did you accomplish that?');
       return;
     }
 
-    this.trashCanService.addTrashCan(this.course.slug, this.form.value.room)
+    this.trashCanService.addTrashCan(this.course.slug, this.form.value.room, uid)
       .then((trashCan) => {
         this.form.reset();
       });
