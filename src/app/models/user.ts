@@ -4,7 +4,7 @@ export class User {
   imageURL: string;
   anon: boolean;
   name: string;
-  admin: boolean;
+  role: 'admin' | 'lecturer' | 'ta' | 'student';
   courses: string[];
 
   constructor(authData) {
@@ -13,7 +13,7 @@ export class User {
     this.imageURL = authData.photoURL;
     this.anon = authData.isAnonymous;
     this.name = '';
-    this.admin = false;
+    this.role = 'student';
     this.courses = [];
   }
 }

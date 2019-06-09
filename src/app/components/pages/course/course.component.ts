@@ -18,8 +18,9 @@ export class CourseComponent implements OnInit {
               private route: ActivatedRoute) { }
 
   ngOnInit() {
+    console.log(this.auth.user$.subscribe(user => console.log(user)));
     const courseSlug = this.route.snapshot.paramMap.get('course');
-    this.course$ = this.courseService.getCourseBySlug(courseSlug);
+    this.course$ = this.courseService.getBySlug(courseSlug);
   }
 
 }

@@ -30,14 +30,14 @@ export class AdminComponent implements OnInit {
               private courseService: CourseService) {}
 
   ngOnInit() {
-    this.courses$ = this.courseService.getAllCourses();
+    this.courses$ = this.courseService.getAll();
   }
 
   shorthandValidator(control: AbstractControl): Observable<ValidationErrors> {
     return timer(300).pipe(
         switchMap(() => {
             const slug = control.value.toLowerCase();
-            return this.courseService.getCourseBySlug(slug).pipe(
+            return this.courseService.getBySlug(slug).pipe(
               map((result) => {
                 if(result) {
                   if(this.form.value.id == result.id)

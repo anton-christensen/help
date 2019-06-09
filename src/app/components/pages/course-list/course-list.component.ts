@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CourseService } from 'src/app/services/course.service';
 import { Observable } from 'rxjs';
 import { Course } from 'src/app/models/course';
-import {AuthService} from '../../services/auth.service';
+import {AuthService} from '../../../services/auth.service';
 
 @Component({
   selector: 'app-course-list',
@@ -16,7 +16,7 @@ export class CourseListComponent implements OnInit {
               private courseService: CourseService) {}
 
   ngOnInit() {
-    this.courses$ = this.courseService.getAllCourses();
+    this.courses$ = this.courseService.getAll();
   }
 
   activeCourses(courses: Course[]): Course[] {

@@ -10,7 +10,7 @@ import { map, mergeMap } from 'rxjs/operators';
 export class CourseService {
   constructor(private db: AngularFirestore) {}
 
-  public getCourseBySlug(slug: string): Observable<Course> {
+  public getBySlug(slug: string): Observable<Course> {
     return this.db.collection<Course>('courses', ref => ref.where('slug', '==', slug).limit(1)).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
@@ -25,12 +25,12 @@ export class CourseService {
     );
   }
 
-  public getCourseBySlugOnce(slug: string): Promise<any> {
+  public getBySlugOnce(slug: string): Promise<any> {
     return this.db.collection<Course>('courses', ref => ref.where('slug', '==', slug).limit(1)).get().toPromise()
     .then((val) => val.docs.map(val => val.data()));
   }
 
-  public getAllCourses(): Observable<Course[]> {
+  public getAll(): Observable<Course[]> {
     return this.db.collection<Course>('courses').snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
@@ -41,7 +41,7 @@ export class CourseService {
       }));
   }
 
-  public getEnabledCourses(): Observable<Course[]> {
+  public getEnabled(): Observable<Course[]> {
     return this.db.collection<Course>('courses', ref => ref.where('enabled', '==', true)).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {

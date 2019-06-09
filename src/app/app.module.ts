@@ -14,16 +14,17 @@ import {environment} from '../environments/environment';
 
 import {ToastsComponent} from './components/toasts/toasts.component';
 import {FooterComponent} from './components/footer/footer.component';
-import {CourseListComponent} from './components/course-list/course-list.component';
-import {CourseComponent} from './components/course/course.component';
+import {CourseListComponent} from './components/pages/course-list/course-list.component';
+import {CourseComponent} from './components/pages/course/course.component';
 import {StudentComponent} from './components/student/student.component';
 import {TaComponent} from './components/ta/ta.component';
 import {PostsComponent} from './components/posts/posts.component';
 import {CourseLinkComponent} from './components/course-link/course-link.component';
 import {LoaderComponent} from './components/loader/loader.component';
 import {CourseBurgerBarComponent} from './components/course-burger-bar/course-burger-bar.component';
-import {AdminComponent} from './components/admin/admin.component';
+import {AdminComponent} from './components/pages/admin/admin.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { LecturerComponent } from './components/pages/lecturer/lecturer.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ModalComponent } from './components/modal/modal.component';
     CourseBurgerBarComponent,
     AdminComponent,
     ModalComponent,
+    LecturerComponent,
   ],
   imports: [
     BrowserModule,

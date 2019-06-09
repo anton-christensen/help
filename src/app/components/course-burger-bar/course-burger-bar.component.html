@@ -1,6 +1,30 @@
 <ng-container *ngIf="auth.isTAInCourse(course)">
   <div class="burger-bar {{open ? 'open' : ''}}">
     <div class="close" (click)="closeMenu()">×</div>
+
+    
+    <ng-container *ngIf="auth.isAdmin()">
+      <a routerlink="/admin">
+        <div class="switch-container">
+          <div class="floater fl">
+            <label class="visible">Admin page</label>
+            <label class="visible sublabel">Administrate the system</label>
+          </div>
+        </div>
+      </a>
+    </ng-container>
+
+    <ng-container *ngIf="auth.isLecturer()">
+      <a routerlink="/admin/courses">
+        <div class="switch-container">
+          <div class="floater fl">
+            <label class="visible">Courses</label>
+            <label class="visible sublabel">Add or modify courses</label>
+          </div>
+        </div>
+      </a>
+    </ng-container>
+
     <div class="switch-container">
       <div class="floater fl">
         <label class="visible" for="course-enable-switch">Exercise session</label>
@@ -11,6 +35,7 @@
         <span class="slider"></span>
       </div>
     </div>
+
     <div class="switch-container">
       <div class="floater fl">
         <label class="visible" for="notifications-enable-switch">Notifications</label>

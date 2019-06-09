@@ -49,15 +49,19 @@ export class AuthService {
   }
 
   public isAdmin(): boolean {
-    return this.user && this.user.admin;
+    return this.user && this.user.role == 'admin';
+  }
+
+  public isLecturer(): boolean {
+    return this.isAdmin() || this.user && this.user.role == 'lecturer';
   }
 
   public isTA(): boolean {
-    return this.user && (this.user.admin || this.user.courses.length > 0);
+    return this.isAdmin() || this.user && this.user.role == 'ta';
   }
 
   public isTAInCourse(course: Course): boolean {
-    return this.user && (this.user.admin || this.user.courses.includes(course.slug));
+    return this.user && (this.isAdmin() || this.user.courses.includes(course.slug));
   }
 
   private createUser(authData): Promise<User> {

@@ -4,27 +4,42 @@
   <div class="course-edit">
     <h3>Add a new course</h3>
     <form [formGroup]="form" (ngSubmit)="submitCourse()">
-      <label for="shorthand" class="visible">Shorthand</label>
+        <label for="title" class="visible">Title</label>
+        <input
+          placeholder="Algorithms and Datastructures"
+          type="text"
+          id="title"
+          class="form-control"
+          formControlName="title"
+          required />
+
+      <label for="institute" class="visible">Institute</label>
+      <select
+        id="institute"
+        class="form-control"
+        formControlName="institute"
+        required>
+
+        <option value="" disabled selected>Select your institute</option>
+        <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
+          {{ institute.title }}
+        </option>
+
+      </select>
+
+      <label for="slug" class="visible">Shorthand</label> 
       <input
         placeholder="AD"
         type="text"
-        id="shorthand"
+        id="slug"
         class="form-control"
         formControlName="shorthand"
-        required />
-      <label for="title" class="visible">Title</label>
-      <input
-        placeholder="Algorithms and Datastructures"
-        type="text"
-        id="title"
-        class="form-control"
-        formControlName="title"
         required />
       <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Create' }}</button>
     </form>
   </div>
 
-  <table class="trash-cans">
+  <table class="course-list">
     <tr>
       <th>Slug</th>
       <th>Title</th>
@@ -32,7 +47,7 @@
       <th>Delete</th>
     </tr>
     <tr *ngFor="let course of courses" class="course">
-      <td class="slug">{{ course.slug }}</td>
+      <td class="slug">{{ course.slug.toUpperCase() }}</td>
       <td class="title">{{ course.title }}</td>
       <td (click)="editCourse(course)" class="edit">
         <i class="material-icons clickable">edit</i>
