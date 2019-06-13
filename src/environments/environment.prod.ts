@@ -6,6 +6,7 @@ export const environment = {
     databaseURL: 'https://help-67ad0.firebaseio.com',
     projectId: 'help-67ad0',
     storageBucket: '',
-    messagingSenderId: '1067545049766'
+    messagingSenderId: '1067545049766',
+    appId: "1:1067545049766:web:a552810612976999"
   }
 };

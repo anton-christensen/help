@@ -68,13 +68,13 @@ export class AdminComponent implements OnInit {
   public submitCourse() {
     const val = this.form.value;
     this.courseService.createOrUpdateCourse(
-      new Course(val.id, val.title, val.shorthand.toLowerCase(), false)
+      new Course(val.id, val.title, val.institute, val.shorthand.toLowerCase(), false)
     );
   }
 
   public deleteCourse(course) {
     // Warn before delete
-    this.modalService.add("Are you sure you wanna delete "+course.title).then(() => {
+    this.modalService.add('Are you sure you wanna delete ' + course.title).then(() => {
       this.courseService.deleteCourse(course);
     }).catch(() => {});
   }
