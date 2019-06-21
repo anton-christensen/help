@@ -49,10 +49,9 @@ export class CourseBurgerBarComponent implements OnInit {
   }
 
   public toggleNotificationsEnabled() {
-    if(this.notificationToken) {
+    if (this.notificationToken) {
       this.notificationService.deleteToken(this.notificationToken);
-    }
-    else {
+    } else {
       this.tokenToggleBusy = true;
       this.notificationService.generateAndSaveToken(this.course)
         .then(() => {

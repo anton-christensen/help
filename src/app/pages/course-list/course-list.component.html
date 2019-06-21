@@ -6,18 +6,30 @@
   </ng-template>
 
   <ng-template #admin>
-    <h1>All courses</h1>
-    <course-link *ngFor="let course of courses" [course]="course"></course-link>
+    <app-emphasized><h1>All courses</h1></app-emphasized>
+    <ul>
+      <li *ngFor="let course of courses">
+        <course-link [course]="course"></course-link>
+      </li>
+    </ul>
   </ng-template>
 
   <ng-template #ta>
-    <h1>Your courses</h1>
-    <course-link *ngFor="let course of relevantCourses(courses)" [course]="course"></course-link>
+    <app-emphasized><h1>Your courses</h1></app-emphasized>
+    <ul>
+      <li *ngFor="let course of relevantCourses(courses)">
+        <course-link [course]="course"></course-link>
+      </li>
+    </ul>
   </ng-template>
 
   <ng-template #student>
-    <h1>Active courses</h1>
-    <course-link *ngFor="let course of activeCourses(courses)" [course]="course"></course-link>
+    <app-emphasized><h1>Active courses</h1></app-emphasized>
+    <ul>
+      <li *ngFor="let course of activeCourses(courses)">
+        <course-link [course]="course"></course-link>
+      </li>
+    </ul>
 
     <ng-container *ngIf="!activeCourses(courses).length">
       <h2>There are no exercise sessions... in session</h2>

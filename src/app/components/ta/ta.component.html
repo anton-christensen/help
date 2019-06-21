@@ -19,7 +19,7 @@
         <td class="room">
           {{ trashCan.room }}
         </td>
-        <td *ngIf="common.documentIsCreatedDatePresent(trashCan)" class="created">
+        <td *ngIf="hasCreatedDate(trashCan);" class="created">
           {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d, yyyy' }}
         </td>
         <td (click)=deleteTrashCan(trashCan) class="delete">

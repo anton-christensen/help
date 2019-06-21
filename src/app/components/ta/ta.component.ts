@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { TrashCan } from 'src/app/models/trash-can';
 import { CommonService } from 'src/app/services/common.service';
 import { Course } from 'src/app/models/course';
+import {SessionService} from '../../services/session.service';
 
 @Component({
   selector: 'app-ta',
@@ -12,18 +13,23 @@ import { Course } from 'src/app/models/course';
   styleUrls: ['./ta.component.scss']
 })
 export class TaComponent implements OnInit {
-  @Input() public course: Course;
+  public course: Course;
   trashCans$: Observable<TrashCan[]>;
 
   constructor(public auth: AuthService,
-              private garbageCollector: TrashCanService,
-              public common: CommonService) {}
+              private session: SessionService,
+              private garbageCollector: TrashCanService) {}
 
   ngOnInit() {
-    this.trashCans$ = this.garbageCollector.getTrashCans(this.course);
+    this.course = this.session.getCourse();
+    this.trashCans$ = this.garbageCollector.getActiveByCourse(this.course);
   }
 
   public deleteTrashCan(can: TrashCan) {
     this.garbageCollector.deleteTrashCan(can);
+  }
+
+  hasCreatedDate(trashCan: any): boolean {
+    return CommonService.documentIsCreatedDatePresent(trashCan);
   }
 }

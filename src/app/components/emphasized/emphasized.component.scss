@@ -1,0 +1,23 @@
+:host {
+  position: relative;
+  text-align: center;
+  display: block;
+
+  .fill-line {
+    height: 0.1rem;
+    background: #d4d4d4;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+}
+
+:host /deep/ :not(.fill-line) {
+    background: white;
+    display: inline;
+    padding: 0 2rem;
+    margin: 0;
+}

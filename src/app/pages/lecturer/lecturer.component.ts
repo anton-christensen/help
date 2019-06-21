@@ -26,7 +26,7 @@ export class LecturerComponent implements OnInit {
     id: new FormControl(),
     title: new FormControl('', Validators.required),
     institute: new FormControl('', Validators.required),
-    shorthand: new FormControl('', 
+    shorthand: new FormControl('',
       Validators.required,
       this.shorthandValidator.bind(this)),
   });
@@ -47,13 +47,13 @@ export class LecturerComponent implements OnInit {
             const slug = control.value.toLowerCase();
             return this.courseService.getBySlug(slug).pipe(
               map((result) => {
-                if(result) {
-                  if(this.form.value.id == result.id)
+                if (result) {
+                  if (this.form.value.id === result.id) {
                     return null;
-                  else
+                  } else {
                     return {shorthandInUse: true};
-                }
-                else {
+                  }
+                } else {
                   return null;
                 }
               }),
@@ -67,7 +67,7 @@ export class LecturerComponent implements OnInit {
     this.form.setValue({
       id: course.id,
       title: course.title,
-      institute: course.institute,
+      institute: course.instituteSlug,
       shorthand: course.slug.toUpperCase(),
     });
 
@@ -83,7 +83,7 @@ export class LecturerComponent implements OnInit {
 
   public deleteCourse(course) {
     // Warn before delete
-    this.modalService.add("Are you sure you want to delete " + course.title).then(() => {
+    this.modalService.add('Are you sure you want to delete ' + course.title).then(() => {
       this.courseService.deleteCourse(course);
     }).catch(() => {});
   }

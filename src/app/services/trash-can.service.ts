@@ -2,75 +2,63 @@ import { Injectable } from '@angular/core';
 import {Observable, of} from 'rxjs';
 import { TrashCan } from '../models/trash-can';
 import {map, mergeMap, switchMap} from 'rxjs/operators';
-import { AngularFirestore } from '@angular/fire/firestore';
+import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
 import {AuthService} from './auth.service';
 import {User} from '../models/user';
 import {Course} from '../models/course';
 import {Post} from '../models/post';
+import {Institute} from '../models/institute';
+import {CommonService} from './common.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrashCanService {
 
-  constructor(private db: AngularFirestore,
+  constructor(private afStore: AngularFirestore,
               private auth: AuthService) {}
 
-  public getTrashById(id: string): Observable<TrashCan> {
-    return this.db.doc<TrashCan>(`trash-cans/${id}`).valueChanges();
+  public getById(id: string): Observable<TrashCan> {
+    return this.afStore.doc<TrashCan>(`trash-cans/${id}`).valueChanges();
   }
 
-  public getMyTrashCanByUser(course: Course): Observable<TrashCan> {
+  public getOwnedByCourse(course: Course): Observable<TrashCan> {
     return this.auth.user$.pipe(
       switchMap((user) => {
         if (!user) {
           return of(null);
+        } else {
+          return this.getActiveByCourseAndUser(course, user);
         }
-
-        return this.db.collection<TrashCan>('trash-cans', (ref) => {
-          return ref
-            .where('active', '==', true)
-            .where('course', '==', course.slug)
-            .where('uid', '==', user.uid)
-            .limit(1);
-        }).snapshotChanges().pipe(
-          map(actions => {
-            return actions.map(a => {
-              const data = a.payload.doc.data();
-              const id = a.payload.doc.id;
-              return {id, ...data};
-            });
-          }),
-          mergeMap((result) => {
-            return result.length ? result : [null];
-          }));
       })
     );
-
-
   }
 
-  public getTrashCans(course: Course): Observable<TrashCan[]> {
-    return this.db.collection<TrashCan>('trash-cans', (ref) => {
+  public getActiveByCourseAndUser(course: Course, user: User): Observable<TrashCan> {
+    return this.getSingle((ref) => {
       return ref
         .where('active', '==', true)
+        .where('institute', '==', course.instituteSlug)
         .where('course', '==', course.slug)
-        .orderBy('created', 'desc');
-    }).snapshotChanges().pipe(
-      map(actions => {
-        return actions.map(a => {
-          const data = a.payload.doc.data();
-          const id = a.payload.doc.id;
-          return {id, ...data};
-        });
-      }));
+        .where('uid', '==', user.uid);
+    });
   }
 
-  public addTrashCan(course: string, room: string, uid: string): Promise<TrashCan> {
-    const id = this.db.collection<TrashCan>('trash-cans').ref.doc().id;
-    const ref = this.db.collection<TrashCan>('trash-cans').doc(id);
-    const trashCan = new TrashCan(id, uid, course, room);
-    
+  public getActiveByCourse(course: Course): Observable<TrashCan[]> {
+    return this.getMultiple((ref) => {
+      return ref
+        .where('active', '==', true)
+        .where('institute', '==', course.instituteSlug)
+        .where('course', '==', course.slug)
+        .orderBy('created', 'desc');
+    });
+  }
+
+  public addTrashCan(course: Course, room: string, uid: string): Promise<TrashCan> {
+    const id = this.afStore.collection<TrashCan>('trash-cans').ref.doc().id;
+    const ref = this.afStore.collection<TrashCan>('trash-cans').doc(id);
+    const trashCan = new TrashCan(id, uid, course.instituteSlug, course.slug, room);
+
     return ref.set(Object.assign({}, trashCan))
       .then(() => {
         return trashCan;
@@ -78,6 +66,14 @@ export class TrashCanService {
   }
 
   public deleteTrashCan(trashCan: TrashCan): Promise<any> {
-    return this.db.collection<TrashCan>('trash-cans').ref.doc(trashCan.id).update('active', false);
+    return this.afStore.collection<TrashCan>('trash-cans').ref.doc(trashCan.id).update('active', false);
+  }
+
+  private getSingle(qFn: QueryFn): Observable<TrashCan> {
+    return CommonService.getSingle<TrashCan>(this.afStore, 'trash-cans', qFn);
+  }
+
+  private getMultiple(qFn: QueryFn): Observable<TrashCan[]> {
+    return CommonService.getMultiple<TrashCan>(this.afStore, 'trash-can', qFn);
   }
 }

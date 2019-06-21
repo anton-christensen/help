@@ -1,0 +1,11 @@
+<ng-container *ngIf="course">
+  <app-emphasized>
+    <h1 class="course-title">{{ course.title }}</h1>
+  </app-emphasized>
+
+  <app-student *ngIf="!auth.isTAInCourse(course)"></app-student>
+
+  <app-ta *ngIf="auth.isTAInCourse(course)"></app-ta>
+
+  <app-posts></app-posts>
+</ng-container>
