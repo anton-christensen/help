@@ -1,4 +1,4 @@
-<div class="request-help-container">
+<div class="request-help-container" *ngIf="course$ | async as course">
   <ng-container *ngIf="course.enabled">
     <ng-container *ngIf="!trashCan">
       <h2>Enter your room number to get help</h2>
@@ -24,10 +24,10 @@
       </form>
     </ng-container>
 
-    <ng-container *ngIf="trashCan">
+    <ng-container *ngIf="trashCan$ | async as trashCan">
       <h2>Your trash can is out, help is on the way</h2>
       <div class="retract-trash-can">
-        <button (click)="retractTrashCan()" class="btn">Retract trash can</button>
+        <button (click)="retractTrashCan(trashCan)" class="btn">Retract trash can</button>
       </div>
     </ng-container>
   </ng-container>

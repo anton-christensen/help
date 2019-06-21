@@ -7,6 +7,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Course } from 'src/app/models/course';
 import { CommonService } from 'src/app/services/common.service';
 import { ModalService } from 'src/app/services/modal.service';
+import { SessionService } from 'src/app/services/session.service';
 
 @Component({
   selector: 'app-posts',
@@ -14,7 +15,7 @@ import { ModalService } from 'src/app/services/modal.service';
   styleUrls: ['./posts.component.scss']
 })
 export class PostsComponent implements OnInit {
-  @Input() public course: Course;
+  public course: Course;
   public posts$: Observable<Post[]>;
   public editing = false;
 
@@ -23,14 +24,17 @@ export class PostsComponent implements OnInit {
     content: new FormControl('')
   });
 
-  constructor(public  common        :CommonService,
-              public  modalService  :ModalService,
-              public  auth          :AuthService,
-              private postalService :PostService) {
+  constructor(public  common         :CommonService,
+              public  modalService   :ModalService,
+              public  auth           :AuthService,
+              private postalService  :PostService,
+              private sessionService :SessionService) {
   }
 
   ngOnInit() {
-    this.posts$ = this.postalService.getPosts(this.course.slug);
+    this.sessionService.getCourse$().subscribe(course => {
+      this.posts$ = this.postalService.getAll(course.slug);
+    });
   }
 
   public submitPost() {
@@ -38,7 +42,7 @@ export class PostsComponent implements OnInit {
       return;
     }
 
-    const post = new Post(this.form.value.id, this.course.slug, this.form.value.content);
+    const post = new Post(this.form.value.id, this.course.instituteSlug, this.course.slug, this.form.value.content);
     this.postalService.createOrUpdatePost(post).then(() => {
       this.form.reset();
       this.editing = false;

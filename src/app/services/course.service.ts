@@ -11,9 +11,11 @@ import {map} from 'rxjs/operators';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
-  public getBySlug(slug: string): Observable<Course> {
+  public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
+    console.log('getting course with', instituteSlug, courseSlug);
     return this.getSingle((ref) => {
-      return ref.where('slug', '==', slug);
+      return ref.where('instituteSlug', '==', instituteSlug)
+                .where('slug', '==', courseSlug);
     });
   }
 
@@ -21,9 +23,9 @@ export class CourseService {
     return this.getMultiple(ref => ref);
   }
 
-  public getAllByInstitute(slug: string): Observable<Course[]> {
+  public getAllByInstitute(instituteSlug: string): Observable<Course[]> {
     return this.getMultiple((ref) => {
-      return ref.where('institute', '==', slug);
+      return ref.where('instituteSlug', '==', instituteSlug);
     });
   }
 
@@ -33,8 +35,8 @@ export class CourseService {
     });
   }
 
-  isActualCourse(slug: string): Observable<boolean> {
-    return this.getBySlug(slug).pipe(
+  isActualCourse(instituteSlug: string, courseSlug: string): Observable<boolean> {
+    return this.getBySlug(instituteSlug, courseSlug).pipe(
       map((course) => {
         return !!course;
       })

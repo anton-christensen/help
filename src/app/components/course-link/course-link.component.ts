@@ -8,9 +8,11 @@ import { Course } from 'src/app/models/course';
 })
 export class CourseLinkComponent implements OnInit {
   @Input() public course: Course;
+  
   constructor() { }
 
   ngOnInit() {
+    console.log(this.course);
   }
 
 }

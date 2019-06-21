@@ -1,5 +1,6 @@
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
-<ng-container *ngIf="!course.enabled">
+<ng-container *ngIf="course$ | async as course">
+    <ng-container *ngIf="!course.enabled">
   <div class="course-notice notice">
   <h3 >
     Course is not currently in session
@@ -7,6 +8,8 @@
   <p>Enable it in the sidebar before a session starts</p>
   </div>
 </ng-container>
+</ng-container>
+
 <ng-container *ngIf="trashCans$ | async as trashCans">
   <div *ngIf="trashCans.length > 0">
     <table class="trash-cans">

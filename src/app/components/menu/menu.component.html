@@ -2,12 +2,29 @@
 -- is ulla?
   -- Go to ulla panel
   -- log out
+-->
+<ng-container *ngIf="auth.isAdmin()">
+  I am Ulla
+</ng-container>
+<!--
 -- is Professor?
   -- go to prof panel
   -- log out
+-->
+<ng-container *ngIf="auth.isLecturer()">
+  I am Hans
+</ng-container>
+  <!--
 -- is TA?
   -- go to TA courses panel????
   -- log out
+-->
+  <!-- 
+<ng-container *ngIf="auth.isTAInCourse(course)">
+  I am Thirteen
+</ng-container> 
+-->
+  <!--
 
 -- is institution list
 -- is a course-list

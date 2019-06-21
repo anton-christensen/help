@@ -61,7 +61,7 @@ export class AuthService {
   }
 
   public isTAInCourse(course: Course): boolean {
-    return this.user && (this.isAdmin() || this.user.courses.includes(course.slug));
+    return this.user && (this.isLecturer() || course.binMen.includes(this.user.uid));;
   }
 
   private createUser(authData): Promise<User> {

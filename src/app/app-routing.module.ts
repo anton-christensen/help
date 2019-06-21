@@ -4,14 +4,9 @@ import {AdminComponent} from './pages/admin/admin.component';
 import {CourseListComponent} from './pages/course-list/course-list.component';
 import {CourseExistsGuard} from './guards/course-exists.guard';
 import {CourseComponent} from './pages/course/course.component';
-import {LecturerComponent} from './pages/lecturer/lecturer.component';
-import { IsAdminGuard, IsLecturerGuard } from './guards/is-role.guard';
+import {IsLecturerGuard} from './guards/is-role.guard';
 import {InstituteListComponent} from './pages/institute-list/institute-list.component';
 import {InstituteExistsGuard} from './guards/institute-exists.guard';
-
-const routes: Routes = [
-  { path: 'admin', component: AdminComponent, canActivate: [IsAdminGuard]},
-  { path: 'institutes', component: InstituteListComponent},
 
 /*
 / -> /institutes
@@ -26,12 +21,13 @@ const routes: Routes = [
    # add users as TAs
 */
 
-  { path: ':institute', canActivate: [InstituteExistsGuard], children: [
-      { path: 'admin/courses', component: LecturerComponent, canActivate: [IsLecturerGuard]},
-      { path: 'courses', component: CourseListComponent},
-      { path: 'courses/:course', component: CourseComponent, canActivate: [CourseExistsGuard] },
-      { path: '', redirectTo: 'courses', pathMatch: 'full' },
-    ]},
+// { path: 'admin/courses', component: LecturerComponent, canActivate: [IsLecturerGuard]},
+const routes: Routes = [
+  { path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
+  { path: 'institutes/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard] },
+  { path: 'institutes/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
+  { path: 'institutes/:institute', canActivate: [InstituteExistsGuard], redirectTo: "/institutes/:institute/courses" },
+  { path: 'institutes', component: InstituteListComponent },
   { path: '**', redirectTo: 'institutes' },
 ];
 

@@ -25,6 +25,7 @@ export class TrashCanService {
   public getOwnedByCourse(course: Course): Observable<TrashCan> {
     return this.auth.user$.pipe(
       switchMap((user) => {
+        console.log(user);
         if (!user) {
           return of(null);
         } else {
@@ -38,8 +39,8 @@ export class TrashCanService {
     return this.getSingle((ref) => {
       return ref
         .where('active', '==', true)
-        .where('institute', '==', course.instituteSlug)
-        .where('course', '==', course.slug)
+        .where('instituteSlug', '==', course.instituteSlug)
+        .where('courseSlug', '==', course.slug)
         .where('uid', '==', user.uid);
     });
   }
@@ -48,8 +49,8 @@ export class TrashCanService {
     return this.getMultiple((ref) => {
       return ref
         .where('active', '==', true)
-        .where('institute', '==', course.instituteSlug)
-        .where('course', '==', course.slug)
+        .where('instituteSlug', '==', course.instituteSlug)
+        .where('courseSlug', '==', course.slug)
         .orderBy('created', 'desc');
     });
   }

@@ -25,6 +25,7 @@ export class MenuComponent implements OnInit {
               private afMessaging: AngularFireMessaging) { }
 
   ngOnInit() {
+    
     // this.afMessaging.messages
     // .subscribe((message) => {
     //   console.log(message);

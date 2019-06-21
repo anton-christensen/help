@@ -13,7 +13,7 @@ import {SessionService} from '../../services/session.service';
   styleUrls: ['./ta.component.scss']
 })
 export class TaComponent implements OnInit {
-  public course: Course;
+  public course$: Observable<Course>;
   trashCans$: Observable<TrashCan[]>;
 
   constructor(public auth: AuthService,
@@ -21,8 +21,12 @@ export class TaComponent implements OnInit {
               private garbageCollector: TrashCanService) {}
 
   ngOnInit() {
-    this.course = this.session.getCourse();
-    this.trashCans$ = this.garbageCollector.getActiveByCourse(this.course);
+    this.course$ = this.session.getCourse$();
+    console.log("subscribing to courses");
+    this.course$.subscribe((course) => {
+      console.log(course);
+      this.trashCans$ = this.garbageCollector.getActiveByCourse(course);
+    });
   }
 
   public deleteTrashCan(can: TrashCan) {

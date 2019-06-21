@@ -13,11 +13,11 @@
           formControlName="title"
           required />
 
-      <label for="institute" class="visible">Institute</label>
+      <label for="instituteSlug" class="visible">Institute</label>
       <select
-        id="institute"
+        id="instituteSlug"
         class="form-control"
-        formControlName="institute"
+        formControlName="instituteSlug"
         required>
 
         <option value="" disabled selected>Select your institute</option>
@@ -27,13 +27,13 @@
 
       </select>
 
-      <label for="slug" class="visible">Shorthand</label> 
+      <label for="courseSlug" class="visible">Shorthand</label> 
       <input
         placeholder="AD"
         type="text"
-        id="slug"
+        id="courseSlug"
         class="form-control"
-        formControlName="shorthand"
+        formControlName="courseSlug"
         required />
       <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Create' }}</button>
     </form>

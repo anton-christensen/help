@@ -17,16 +17,18 @@ export class CourseExistsGuard implements CanActivate {
 
   public canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    const instituteSlug = next.paramMap.get('institute');
     const courseSlug = next.paramMap.get('course');
 
-    return this.courseService.isActualCourse(courseSlug).pipe(
+    return this.courseService.isActualCourse(instituteSlug, courseSlug).pipe(
       map((exists) => {
+        console.log(`[GUARD] course ${instituteSlug}/${courseSlug} exists: `, exists);
         if (!exists) {
           this.toastService.add('Course not found', 5000);
           return this.router.parseUrl('/courses');
         }
 
-        return false;
+        return true;
       }));
   }
 }

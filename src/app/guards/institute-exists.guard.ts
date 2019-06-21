@@ -15,23 +15,24 @@ import {InstituteService} from '../services/institute.service';
 @Injectable({
   providedIn: 'root'
 })
-export class InstituteExistsGuard implements CanActivateChild {
+export class InstituteExistsGuard implements CanActivate {
   constructor(private router: Router,
               private instituteService: InstituteService,
               private toastService: ToastService) {}
 
-  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+  canActivate(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot):
   Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const instituteSlug = childRoute.paramMap.get('institute');
 
     return this.instituteService.isActualInstitute(instituteSlug).pipe(
       map((exists) => {
+        console.log("[GUARD] institute "+instituteSlug+" exists: ", exists);
         if (!exists) {
           this.toastService.add('Institute not found', 5000);
           return this.router.parseUrl('/institutes');
         }
 
-        return false;
+        return exists;
       }));
   }
 }

@@ -12,18 +12,15 @@ import {Observable} from 'rxjs';
 })
 export class CourseComponent implements OnInit {
   public course$: Observable<Course>;
-  public course: Course;
+  //public course: Course;
 
   constructor(public auth: AuthService,
-              private session: SessionService,
-              private route: ActivatedRoute) { }
+              private session: SessionService) { }
 
   ngOnInit() {
-    const courseSlug = this.route.snapshot.paramMap.get('course');
-    this.session.setCourse(courseSlug);
-
     this.course$ = this.session.getCourse$();
-    this.course = this.session.getCourse();
+    //this.course = this.session.getCourse();
+    //console.log(this.course);
   }
 
 }

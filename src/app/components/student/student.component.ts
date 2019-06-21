@@ -1,12 +1,11 @@
 import {Component, OnInit, Input, OnDestroy} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
 import {TrashCan} from '../../models/trash-can';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
-import {Subscription} from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-student',
@@ -14,8 +13,9 @@ import {Subscription} from 'rxjs';
   styleUrls: ['./student.component.scss']
 })
 export class StudentComponent implements OnInit, OnDestroy {
-  public course: Course;
-  public trashCan: TrashCan;
+  public course$: Observable<Course>;
+  private course: Course;
+  public trashCan$: Observable<TrashCan>;
 
   public form = new FormGroup({
     room: new FormControl('', [
@@ -25,8 +25,7 @@ export class StudentComponent implements OnInit, OnDestroy {
     ]),
   });
 
-  constructor(private route: ActivatedRoute,
-              private auth: AuthService,
+  constructor(private auth: AuthService,
               private session: SessionService,
               private trashCanService: TrashCanService) { }
 
@@ -35,12 +34,15 @@ export class StudentComponent implements OnInit, OnDestroy {
       this.auth.anonymousSignIn();
     }
 
-    this.course = this.session.getCourse();
+    this.course$ = this.session.getCourse$();
 
-    this.trashCanService.getOwnedByCourse(this.course)
-      .subscribe((tc) => {
-        this.trashCan = tc;
+    this.course$ 
+      .subscribe((course) => {
+        this.course = course;
+
+        this.trashCan$ = this.trashCanService.getOwnedByCourse(course);
       });
+
   }
 
   ngOnDestroy(): void {
@@ -70,8 +72,8 @@ export class StudentComponent implements OnInit, OnDestroy {
       });
   }
 
-  public retractTrashCan(): Promise<any> {
-    return this.trashCanService.deleteTrashCan(this.trashCan);
+  public retractTrashCan(trashCan): Promise<any> {
+    return this.trashCanService.deleteTrashCan(trashCan);
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

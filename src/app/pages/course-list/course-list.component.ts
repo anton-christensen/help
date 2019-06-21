@@ -17,13 +17,13 @@ export class CourseListComponent implements OnInit {
   constructor(public auth: AuthService,
               private route: ActivatedRoute,
               private session: SessionService,
-              private courseService: CourseService) {}
+              private courseService: CourseService) {
+              }
 
-  ngOnInit() {
-    const instituteSlug = this.route.snapshot.paramMap.get('institute');
-    this.session.setInstitute(instituteSlug);
-
-    this.courses$ = this.courseService.getAllByInstitute(instituteSlug);
+  ngOnInit() { 
+    this.session.getInstitute$().subscribe(institute => {
+      this.courses$ = this.courseService.getAllByInstitute(institute.slug);
+    });
   }
 
   activeCourses(courses: Course[]): Course[] {

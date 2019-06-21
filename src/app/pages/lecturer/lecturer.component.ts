@@ -20,15 +20,15 @@ export class LecturerComponent implements OnInit {
   public institutes$: Observable<Institute[]>;
 
   public editing = false;
-  public shortHandHasBeenEdited = false;
+  public courseSlugHasBeenEdited = false;
 
   public form = new FormGroup({
     id: new FormControl(),
     title: new FormControl('', Validators.required),
-    institute: new FormControl('', Validators.required),
-    shorthand: new FormControl('',
+    instituteSlug: new FormControl('', Validators.required),
+    courseSlug: new FormControl('',
       Validators.required,
-      this.shorthandValidator.bind(this)),
+      this.courseSlugValidator.bind(this)),
   });
 
   constructor(public auth: AuthService,
@@ -41,24 +41,26 @@ export class LecturerComponent implements OnInit {
     this.institutes$ = this.instituteService.getAll();
   }
 
-  shorthandValidator(control: AbstractControl): Observable<ValidationErrors> {
+  courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {
     return timer(300).pipe(
         switchMap(() => {
-            const slug = control.value.toLowerCase();
-            return this.courseService.getBySlug(slug).pipe(
-              map((result) => {
-                if (result) {
-                  if (this.form.value.id === result.id) {
-                    return null;
-                  } else {
-                    return {shorthandInUse: true};
-                  }
-                } else {
+          const instituteSlug = this.form.value.instituteSlug;
+          const courseSlug = control.value.toLowerCase();
+
+          return this.courseService.getBySlug(instituteSlug, courseSlug).pipe(
+            map((result) => {
+              if (result) {
+                if (this.form.value.id === result.id) {
                   return null;
+                } else {
+                  return {courseSlug: true};
                 }
-              }),
-              first()
-            );
+              } else {
+                return null;
+              }
+            }),
+            first()
+          );
         })
     );
   }
@@ -67,8 +69,8 @@ export class LecturerComponent implements OnInit {
     this.form.setValue({
       id: course.id,
       title: course.title,
-      institute: course.instituteSlug,
-      shorthand: course.slug.toUpperCase(),
+      instituteSlug: course.instituteSlug,
+      courseSlug: course.slug.toUpperCase(),
     });
 
     this.editing = true;
@@ -77,7 +79,7 @@ export class LecturerComponent implements OnInit {
   public submitCourse() {
     const val = this.form.value;
     this.courseService.createOrUpdateCourse(
-      new Course(val.id, val.title, val.institute, val.shorthand.toLowerCase(), false)
+      new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase())
     );
   }
 

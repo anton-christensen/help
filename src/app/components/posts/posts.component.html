@@ -1,32 +1,34 @@
-<ng-container *ngIf="auth.isTAInCourse(course)">
-  <div class="post-edit">
-    <h3>Write a post for the front page</h3>
-    <form [formGroup]="form" (ngSubmit)="submitPost()" class="no-detail">
-      <label for="post">Post</label>
-      <textarea
-        id="post"
-        class="form-control"
-        required
-        formControlName="content"></textarea>
-      <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
-    </form>
-  </div>
-</ng-container>
-
-<ng-container *ngIf="posts$ | async as posts">
-  <div class="posts" *ngIf="posts.length">
-    <h2>Frequently Asked Questions</h2>
-
-    <div class="post" *ngFor="let post of posts">
-      <div class="created" *ngIf="CommonService.documentIsCreatedDatePresent(post)">Posted at {{ post.created.seconds * 1000 | date : 'HH:mm on MMMM d, yyyy' }}</div>
-      <div class="actions" *ngIf="auth.isTAInCourse(course)">
-        <i class="material-icons clickable" (click)="editPost(post)">edit</i>
-        <i class="material-icons clickable" (click)="deletePost(post)">delete_forever</i>
+<ng-container *ngIf="course$ | async as course">
+  <ng-container *ngIf="auth.isTAInCourse(course)">
+      <div class="post-edit">
+        <h3>Write a post for the front page</h3>
+        <form [formGroup]="form" (ngSubmit)="submitPost()" class="no-detail">
+          <label for="post">Post</label>
+          <textarea
+            id="post"
+            class="form-control"
+            required
+            formControlName="content"></textarea>
+          <button [disabled]="form.invalid" type="submit" class="btn">{{ editing ? 'Update' : 'Post' }}</button>
+        </form>
       </div>
-      <article class="content">
-        <markdown>{{ post.content }}</markdown>
-      </article>
-    </div>
-
-  </div>
+    </ng-container>
+    
+    <ng-container *ngIf="posts$ | async as posts">
+      <div class="posts" *ngIf="posts.length">
+        <h2>Frequently Asked Questions</h2>
+    
+        <div class="post" *ngFor="let post of posts">
+          <div class="created" *ngIf="CommonService.documentIsCreatedDatePresent(post)">Posted at {{ post.created.seconds * 1000 | date : 'HH:mm on MMMM d, yyyy' }}</div>
+          <div class="actions" *ngIf="auth.isTAInCourse(course)">
+            <i class="material-icons clickable" (click)="editPost(post)">edit</i>
+            <i class="material-icons clickable" (click)="deletePost(post)">delete_forever</i>
+          </div>
+          <article class="content">
+            <markdown>{{ post.content }}</markdown>
+          </article>
+        </div>
+    
+      </div>
+    </ng-container>
 </ng-container>
