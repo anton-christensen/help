@@ -1,8 +1,15 @@
 <div class="request-help-container" *ngIf="course$ | async as course">
   <ng-container *ngIf="course.enabled">
-    <ng-container *ngIf="!trashCan">
-      <h2>Enter your room number to get help</h2>
 
+    <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
+      <h2>Your trash can is out, help is on the way</h2>
+      <div class="retract-trash-can">
+        <button (click)="retractTrashCan(trashCan)" class="btn">Retract trash can</button>
+      </div>
+    </ng-container>
+
+    <ng-template #trashCanNotOut>
+      <h2>Enter your room number to get help</h2>
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="no-detail">
         <label for="room">
           Room number
@@ -22,14 +29,8 @@
           That's an odd room number...
         </div>
       </form>
-    </ng-container>
+    </ng-template>
 
-    <ng-container *ngIf="trashCan$ | async as trashCan">
-      <h2>Your trash can is out, help is on the way</h2>
-      <div class="retract-trash-can">
-        <button (click)="retractTrashCan(trashCan)" class="btn">Retract trash can</button>
-      </div>
-    </ng-container>
   </ng-container>
 
   <ng-container *ngIf="!course.enabled">

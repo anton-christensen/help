@@ -1,13 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import { TrashCan } from '../models/trash-can';
-import {map, mergeMap, switchMap} from 'rxjs/operators';
+import {TrashCan} from '../models/trash-can';
+import {switchMap} from 'rxjs/operators';
 import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
 import {AuthService} from './auth.service';
 import {User} from '../models/user';
 import {Course} from '../models/course';
-import {Post} from '../models/post';
-import {Institute} from '../models/institute';
 import {CommonService} from './common.service';
 
 @Injectable({
@@ -18,14 +16,13 @@ export class TrashCanService {
   constructor(private afStore: AngularFirestore,
               private auth: AuthService) {}
 
-  public getById(id: string): Observable<TrashCan> {
-    return this.afStore.doc<TrashCan>(`trash-cans/${id}`).valueChanges();
+  public getAll() {
+    return this.getMultiple(ref => ref);
   }
 
   public getOwnedByCourse(course: Course): Observable<TrashCan> {
     return this.auth.user$.pipe(
       switchMap((user) => {
-        console.log(user);
         if (!user) {
           return of(null);
         } else {
@@ -75,6 +72,6 @@ export class TrashCanService {
   }
 
   private getMultiple(qFn: QueryFn): Observable<TrashCan[]> {
-    return CommonService.getMultiple<TrashCan>(this.afStore, 'trash-can', qFn);
+    return CommonService.getMultiple<TrashCan>(this.afStore, 'trash-cans', qFn);
   }
 }

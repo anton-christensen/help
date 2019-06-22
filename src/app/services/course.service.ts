@@ -12,7 +12,6 @@ export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
   public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
-    console.log('getting course with', instituteSlug, courseSlug);
     return this.getSingle((ref) => {
       return ref.where('instituteSlug', '==', instituteSlug)
                 .where('slug', '==', courseSlug);

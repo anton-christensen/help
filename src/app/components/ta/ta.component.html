@@ -1,17 +1,17 @@
 <h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
 <ng-container *ngIf="course$ | async as course">
-    <ng-container *ngIf="!course.enabled">
-  <div class="course-notice notice">
-  <h3 >
-    Course is not currently in session
-  </h3>
-  <p>Enable it in the sidebar before a session starts</p>
-  </div>
-</ng-container>
+  <ng-container *ngIf="!course.enabled">
+    <div class="course-notice notice">
+      <h3>Course is not currently in session</h3>
+      <p>Enable it in the sidebar before a session starts</p>
+    </div>
+  </ng-container>
 </ng-container>
 
 <ng-container *ngIf="trashCans$ | async as trashCans">
-  <div *ngIf="trashCans.length > 0">
+  <ng-container *ngIf="trashCans.length > 0; then trashCansPresent; else noTrashCans"></ng-container>
+
+  <ng-template #trashCansPresent>
     <table class="trash-cans">
       <tr>
         <th>Room number</th>
@@ -23,12 +23,22 @@
           {{ trashCan.room }}
         </td>
         <td *ngIf="hasCreatedDate(trashCan);" class="created">
-          {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d, yyyy' }}
+          {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d' }}
         </td>
-        <td (click)=deleteTrashCan(trashCan) class="delete">
-          <i class="material-icons clickable">delete_forever</i>
+        <td class="delete">
+          <i (click)="deleteTrashCan(trashCan)" class="material-icons clickable">
+            delete_forever
+          </i>
         </td>
       </tr>
     </table>
-  </div>
+  </ng-template>
+
+  <ng-template #noTrashCans>
+    <p>
+      There are currently no trash cans
+    </p>
+  </ng-template>
+
+
 </ng-container>
