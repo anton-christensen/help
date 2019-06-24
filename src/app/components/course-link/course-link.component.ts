@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Course } from 'src/app/models/course';
 
 @Component({
-  selector: 'course-link',
+  selector: 'app-course-link',
   templateUrl: './course-link.component.html',
   styleUrls: ['./course-link.component.scss']
 })
@@ -11,8 +11,6 @@ export class CourseLinkComponent implements OnInit {
   
   constructor() { }
 
-  ngOnInit() {
-    console.log(this.course);
-  }
+  ngOnInit() {}
 
 }

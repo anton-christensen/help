@@ -9,7 +9,7 @@
     <app-emphasized><h1>All courses</h1></app-emphasized>
     <ul>
       <li *ngFor="let course of courses">
-        <course-link [course]="course"></course-link>
+        <app-course-link [course]="course"></app-course-link>
       </li>
     </ul>
   </ng-template>
@@ -18,7 +18,7 @@
     <app-emphasized><h1>Your courses</h1></app-emphasized>
     <ul>
       <li *ngFor="let course of relevantCourses(courses)">
-        <course-link [course]="course"></course-link>
+        <app-course-link [course]="course"></app-course-link>
       </li>
     </ul>
   </ng-template>
@@ -27,7 +27,7 @@
     <app-emphasized><h1>Active courses</h1></app-emphasized>
     <ul>
       <li *ngFor="let course of activeCourses(courses)">
-        <course-link [course]="course"></course-link>
+        <app-course-link [course]="course"></app-course-link>
       </li>
     </ul>
 

@@ -1,13 +1,9 @@
-import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
-import { ToastService } from './toasts.service';
-import { AngularFireMessaging } from '@angular/fire/messaging';
-import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { Post } from '../models/post';
-import { map } from 'rxjs/operators';
-import {User} from "../models/user";
-import { CommonService } from './common.service';
+import {Injectable} from '@angular/core';
+import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
+import {Observable} from 'rxjs';
+import {Post} from '../models/post';
+import {CommonService} from './common.service';
+import {Course} from '../models/course';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +11,13 @@ import { CommonService } from './common.service';
 export class PostService {
   constructor(private afStore: AngularFirestore) { }
 
-  public getAll(course: String): Observable<Post[]> {
+  getAllByCourse(course: Course) {
     return this.getMultiple((ref) => {
-      return ref.where('course', '==', course).orderBy('created', 'desc');
-    })
+      return ref
+        .where('instituteSlug', '==', course.instituteSlug)
+        .where('courseSlug', '==', course.slug)
+        .orderBy('created', 'desc');
+    });
   }
 
   public createOrUpdatePost(post: Post): Promise<void> {
@@ -43,5 +42,4 @@ export class PostService {
   private getMultiple(qFn: QueryFn): Observable<Post[]> {
     return CommonService.getMultiple<Post>(this.afStore, 'posts', qFn);
   }
-
 }

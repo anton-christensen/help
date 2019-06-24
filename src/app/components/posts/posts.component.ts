@@ -1,13 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Post} from 'src/app/models/post';
-import { AuthService } from 'src/app/services/auth.service';
-import { PostService } from 'src/app/services/post.service';
-import { FormGroup, FormControl } from '@angular/forms';
-import { Course } from 'src/app/models/course';
-import { CommonService } from 'src/app/services/common.service';
-import { ModalService } from 'src/app/services/modal.service';
-import { SessionService } from 'src/app/services/session.service';
+import {AuthService} from 'src/app/services/auth.service';
+import {PostService} from 'src/app/services/post.service';
+import {FormGroup, FormControl} from '@angular/forms';
+import {Course} from 'src/app/models/course';
+import {ModalService} from 'src/app/services/modal.service';
+import {SessionService} from 'src/app/services/session.service';
+import {switchMap} from 'rxjs/operators';
+import {CommonService} from '../../services/common.service';
 
 @Component({
   selector: 'app-posts',
@@ -15,7 +16,7 @@ import { SessionService } from 'src/app/services/session.service';
   styleUrls: ['./posts.component.scss']
 })
 export class PostsComponent implements OnInit {
-  public course: Course;
+  public course$: Observable<Course>;
   public posts$: Observable<Post[]>;
   public editing = false;
 
@@ -24,26 +25,29 @@ export class PostsComponent implements OnInit {
     content: new FormControl('')
   });
 
-  constructor(public  common         :CommonService,
-              public  modalService   :ModalService,
-              public  auth           :AuthService,
-              private postalService  :PostService,
-              private sessionService :SessionService) {
+  constructor(public modalService: ModalService,
+              public auth: AuthService,
+              private postService: PostService,
+              private session: SessionService) {
   }
 
   ngOnInit() {
-    this.sessionService.getCourse$().subscribe(course => {
-      this.posts$ = this.postalService.getAll(course.slug);
-    });
+    this.course$ = this.session.getCourse$();
+
+    this.posts$ = this.course$.pipe(
+      switchMap((course) => {
+        return this.postService.getAllByCourse(course);
+      })
+    );
   }
 
-  public submitPost() {
+  public submitPost(course: Course) {
     if (this.form.invalid) {
       return;
     }
 
-    const post = new Post(this.form.value.id, this.course.instituteSlug, this.course.slug, this.form.value.content);
-    this.postalService.createOrUpdatePost(post).then(() => {
+    const post = new Post(this.form.value.id, course.instituteSlug, course.slug, this.form.value.content);
+    this.postService.createOrUpdatePost(post).then(() => {
       this.form.reset();
       this.editing = false;
     });
@@ -57,12 +61,16 @@ export class PostsComponent implements OnInit {
 
     this.editing = true;
   }
-  
+
   public deletePost(post: Post) {
     this.modalService.add('Are you sure you want to delete this post?')
       .then(() => {
-        this.postalService.deletePost(post);
+        this.postService.deletePost(post);
       })
       .catch(() => {});
+  }
+
+  public hasCreatedDate(post: any): boolean {
+    return CommonService.documentIsCreatedDatePresent(post);
   }
 }

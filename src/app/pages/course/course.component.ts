@@ -1,26 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
-import { ActivatedRoute } from '@angular/router';
-import { Course } from 'src/app/models/course';
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from 'src/app/services/auth.service';
+import {Course} from 'src/app/models/course';
 import {SessionService} from '../../services/session.service';
 import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-course',
   templateUrl: './course.component.html',
-  styles: ['./course.component.scss']
+  styleUrls: ['./course.component.scss']
 })
 export class CourseComponent implements OnInit {
   public course$: Observable<Course>;
-  //public course: Course;
 
   constructor(public auth: AuthService,
               private session: SessionService) { }
 
   ngOnInit() {
     this.course$ = this.session.getCourse$();
-    //this.course = this.session.getCourse();
-    //console.log(this.course);
   }
 
 }
