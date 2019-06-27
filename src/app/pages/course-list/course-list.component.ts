@@ -20,7 +20,7 @@ export class CourseListComponent implements OnInit {
               private courseService: CourseService) {
               }
 
-  ngOnInit() { 
+  ngOnInit() {
     this.session.getInstitute$().subscribe(institute => {
       this.courses$ = this.courseService.getAllByInstitute(institute.slug);
     });
@@ -31,6 +31,13 @@ export class CourseListComponent implements OnInit {
   }
 
   relevantCourses(courses: Course[]): Course[] {
-    return courses.filter(c => this.auth.user.courses.includes(c.slug));
+    return courses.filter((c) => {
+      const uid = this.auth.user.uid;
+      if (this.auth.user.role === 'assistant') {
+        return c.assistants.includes(this.auth.user.uid);
+      } else {
+        return c.lecturers.includes(this.auth.user.uid) || c.assistants.includes(this.auth.user.uid);
+      }
+    });
   }
 }

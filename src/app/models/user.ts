@@ -4,7 +4,7 @@ export class User {
   imageURL: string;
   anon: boolean;
   name: string;
-  role: 'admin' | 'lecturer' | 'ta' | 'student';
+  role: 'admin' | 'lecturer' | 'assistant' | 'student';
   courses: string[];
 
   constructor(authData) {

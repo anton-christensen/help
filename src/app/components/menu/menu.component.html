@@ -20,7 +20,7 @@
   -- log out
 -->
   <!-- 
-<ng-container *ngIf="auth.isTAInCourse(course)">
+<ng-container *ngIf="auth.isAssistantInCourse(course)">
   I am Thirteen
 </ng-container> 
 -->
@@ -32,7 +32,7 @@
   -- enable course (TA, Prof)
   -- enable notifications for course (TA, prof)
 
-<ng-container *ngIf="auth.isTAInCourse(course)">
+<ng-container *ngIf="auth.isAssistantInCourse(course)">
     <div class="burger-bar {{open ? 'open' : ''}}">
       <div class="close" (click)="closeMenu()">×</div>
   

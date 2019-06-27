@@ -26,7 +26,6 @@ export class InstituteExistsGuard implements CanActivate {
 
     return this.instituteService.isActualInstitute(instituteSlug).pipe(
       map((exists) => {
-        console.log("[GUARD] institute "+instituteSlug+" exists: ", exists);
         if (!exists) {
           this.toastService.add('Institute not found', 5000);
           return this.router.parseUrl('/institutes');

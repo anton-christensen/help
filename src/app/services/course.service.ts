@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Course } from '../models/course';
 import {CommonService} from './common.service';
 import {map} from 'rxjs/operators';
+import {User} from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,15 +12,24 @@ import {map} from 'rxjs/operators';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
-  public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
-    return this.getSingle((ref) => {
-      return ref.where('instituteSlug', '==', instituteSlug)
-                .where('slug', '==', courseSlug);
-    });
-  }
 
   public getAll(): Observable<Course[]> {
     return this.getMultiple(ref => ref);
+  }
+
+  public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
+    return this.getSingle((ref) => {
+      return ref
+        .where('instituteSlug', '==', instituteSlug)
+        .where('slug', '==', courseSlug);
+    });
+  }
+
+  getByLecturer(user: User) {
+    return this.getMultiple((ref) => {
+      return ref
+        .where('lecturers', 'array-contains', user.uid);
+    });
   }
 
   public getAllByInstitute(instituteSlug: string): Observable<Course[]> {
@@ -28,13 +38,7 @@ export class CourseService {
     });
   }
 
-  public getAllEnabled(): Observable<Course[]> {
-    return this.getMultiple((ref) => {
-      return ref.where('enabled', '==', true);
-    });
-  }
-
-  isActualCourse(instituteSlug: string, courseSlug: string): Observable<boolean> {
+  public isActualCourse(instituteSlug: string, courseSlug: string): Observable<boolean> {
     return this.getBySlug(instituteSlug, courseSlug).pipe(
       map((course) => {
         return !!course;
@@ -68,5 +72,4 @@ export class CourseService {
   private getMultiple(qFn: QueryFn): Observable<Course[]> {
     return CommonService.getMultiple<Course>(this.afStore, 'courses', qFn);
   }
-
 }

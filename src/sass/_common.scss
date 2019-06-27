@@ -199,7 +199,6 @@ markdown {
 form {
   margin: 1rem 0;
   background: whitesmoke;
-  // max-width: 20rem;
   padding: 1rem;
   border: 1px solid #bdbdbd;
 
@@ -209,7 +208,7 @@ form {
     background: transparent;
   }
 
-  input, button, textarea {
+  input, select, button, textarea {
     display: block;
     position: relative;
     padding: 0;
@@ -225,7 +224,6 @@ form {
     margin-bottom: 1rem;
     background-color: white;
     border: 1px solid $bg-grey-dark-hover;
-    
 
     &::placeholder {
       font-size: 0.8rem;

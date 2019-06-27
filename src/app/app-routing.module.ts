@@ -21,14 +21,14 @@ import {InstituteExistsGuard} from './guards/institute-exists.guard';
    # add users as TAs
 */
 
-// { path: 'admin/courses', component: LecturerComponent, canActivate: [IsLecturerGuard]},
+// { path: 'admin/courses', component: CourseEditComponent, canActivate: [IsLecturerGuard]},
 const routes: Routes = [
-  { path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
-  { path: 'institutes/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard] },
-  { path: 'institutes/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
-  { path: 'institutes/:institute', canActivate: [InstituteExistsGuard], redirectTo: "/institutes/:institute/courses" },
-  { path: 'institutes', component: InstituteListComponent },
-  { path: '**', redirectTo: 'institutes' },
+  {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
+  {path: 'institutes/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard]},
+  {path: 'institutes/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
+  {path: 'institutes/:institute', canActivate: [InstituteExistsGuard], redirectTo: '/institutes/:institute/courses'},
+  {path: 'institutes', component: InstituteListComponent},
+  {path: '**', redirectTo: 'institutes'},
 ];
 
 @NgModule({

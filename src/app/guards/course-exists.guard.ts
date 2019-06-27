@@ -22,7 +22,6 @@ export class CourseExistsGuard implements CanActivate {
 
     return this.courseService.isActualCourse(instituteSlug, courseSlug).pipe(
       map((exists) => {
-        console.log(`[GUARD] course ${instituteSlug}/${courseSlug} exists: `, exists);
         if (!exists) {
           this.toastService.add('Course not found', 5000);
           return this.router.parseUrl('/courses');

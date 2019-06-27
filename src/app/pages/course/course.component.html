@@ -3,10 +3,10 @@
     <h1 class="course-title">{{ course.title }}</h1>
   </app-emphasized>
 
-  <ng-container *ngIf="auth.isTAInCourse(course); then ta; else student"></ng-container>
+  <ng-container *ngIf="auth.isAssistantInCourse(course); then assistant; else student"></ng-container>
 
-  <ng-template #ta>
-    <app-ta></app-ta>
+  <ng-template #assistant>
+    <app-assistant></app-assistant>
   </ng-template>
 
   <ng-template #student>

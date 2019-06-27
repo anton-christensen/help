@@ -4,7 +4,8 @@ export class Course {
   slug: string;
   instituteSlug: string;
   enabled: boolean;
-  binMen: string[];
+  lecturers: string[];
+  assistants: string[];
 
   constructor(id: string, title: string, instituteSlug: string, slug: string) {
     this.id = id;
@@ -12,6 +13,7 @@ export class Course {
     this.instituteSlug = instituteSlug;
     this.slug = slug;
     this.enabled = false;
-    this.binMen = [];
+    this.lecturers = [];
+    this.assistants = [];
   }
 }

@@ -2,7 +2,7 @@
 
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
-    <ng-container *ngIf="auth.isTA(); then ta; else student"></ng-container>
+    <ng-container *ngIf="auth.isAssistant(); then assistant; else student"></ng-container>
   </ng-template>
 
   <ng-template #admin>
@@ -14,7 +14,7 @@
     </ul>
   </ng-template>
 
-  <ng-template #ta>
+  <ng-template #assistant>
     <app-emphasized><h1>Your courses</h1></app-emphasized>
     <ul>
       <li *ngFor="let course of relevantCourses(courses)">

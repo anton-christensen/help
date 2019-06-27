@@ -49,19 +49,19 @@ export class AuthService {
   }
 
   public isAdmin(): boolean {
-    return this.user && this.user.role == 'admin';
+    return this.user && this.user.role === 'admin';
   }
 
   public isLecturer(): boolean {
-    return this.isAdmin() || this.user && this.user.role == 'lecturer';
+    return this.isAdmin() || this.user && this.user.role === 'lecturer';
   }
 
-  public isTA(): boolean {
-    return this.isAdmin() || this.user && this.user.role == 'ta';
+  public isAssistant(): boolean {
+    return this.isAdmin() || this.user && this.user.role === 'assistant';
   }
 
-  public isTAInCourse(course: Course): boolean {
-    return this.user && (this.isLecturer() || course.binMen.includes(this.user.uid));;
+  public isAssistantInCourse(course: Course): boolean {
+    return this.user && (this.isLecturer() || course.assistants.includes(this.user.uid));
   }
 
   private createUser(authData): Promise<User> {
@@ -81,13 +81,6 @@ export class AuthService {
 
   loggedIn(): boolean {
     return this.user && !this.user.anon;
-  }
-
-  public isActualCourse(courseSlug: string): Promise<boolean> {
-    return this.db.collection<Course>('courses', ref => ref.where('slug', '==', courseSlug)).get().toPromise()
-      .then((val) => {
-        return !val.empty;
-      });
   }
 
   public anonymousSignIn(): Promise<any> {

@@ -17,14 +17,14 @@ import {FooterComponent} from './components/footer/footer.component';
 import {CourseListComponent} from './pages/course-list/course-list.component';
 import {CourseComponent} from './pages/course/course.component';
 import {StudentComponent} from './components/student/student.component';
-import {TaComponent} from './components/ta/ta.component';
+import {AssistantComponent} from './components/assistant/assistant.component';
 import {PostsComponent} from './components/posts/posts.component';
 import {CourseLinkComponent} from './components/course-link/course-link.component';
 import {LoaderComponent} from './components/loader/loader.component';
 import {CourseBurgerBarComponent} from './components/course-burger-bar/course-burger-bar.component';
 import {AdminComponent} from './pages/admin/admin.component';
 import { ModalComponent } from './components/modal/modal.component';
-import { LecturerComponent } from './pages/lecturer/lecturer.component';
+import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { InstituteListComponent } from './pages/institute-list/institute-list.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { EmphasizedComponent } from './components/emphasized/emphasized.component';
@@ -37,14 +37,14 @@ import { EmphasizedComponent } from './components/emphasized/emphasized.componen
     CourseListComponent,
     CourseComponent,
     StudentComponent,
-    TaComponent,
+    AssistantComponent,
     PostsComponent,
     CourseLinkComponent,
     LoaderComponent,
     CourseBurgerBarComponent,
     AdminComponent,
     ModalComponent,
-    LecturerComponent,
+    CourseEditComponent,
     InstituteListComponent,
     MenuComponent,
     EmphasizedComponent,

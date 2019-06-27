@@ -9,11 +9,11 @@ import {SessionService} from '../../services/session.service';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  selector: 'app-ta',
-  templateUrl: './ta.component.html',
-  styleUrls: ['./ta.component.scss']
+  selector: 'app-assistant',
+  templateUrl: './assistant.component.html',
+  styleUrls: ['./assistant.component.scss']
 })
-export class TaComponent implements OnInit {
+export class AssistantComponent implements OnInit {
   public course$: Observable<Course>;
   public trashCans$: Observable<TrashCan[]>;
 
