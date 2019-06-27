@@ -1,86 +1,73 @@
+<ng-container *ngIf="auth.isPromotedUser()">
+  <div class="burger-bar {{open ? 'open' : ''}}">
+    <div class="close menu-item" (click)="closeMenu()">×</div>
 <!--
 -- is ulla?
   -- Go to ulla panel
   -- log out
 -->
-<ng-container *ngIf="auth.isAdmin()">
-  I am Ulla
-</ng-container>
 <!--
 -- is Professor?
   -- go to prof panel
   -- log out
 -->
-<ng-container *ngIf="auth.isLecturer()">
-  I am Hans
+    <ng-container *ngIf="session.getCourse$() | async as course">
+      <ng-container *ngIf="isOnCoursePage && auth.isTAInCourse(course)">
+        <!-- Enable-course switch -->
+        <div class="menu-item">
+          <div class="floater fl">
+            <label class="visible" for="course-enable-switch">Exercise session</label>
+            <label class="visible sublabel" for="course-enable-switch">Let students ask for help</label>
+          </div>
+          <div class="switch" (click)="toggleCourseEnabled(course)">
+            <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
+            <span class="slider"></span>
+          </div>
+        </div>
+
+        <!-- Enable-trashcan-notifications switch -->
+        <div class="menu-item">
+          <div class="floater fl">
+            <label class="visible" for="notifications-enable-switch">Notifications</label>
+            <label class="visible sublabel" for="notifications-enable-switch">On this device, for this course</label>
+          </div>
+    
+          <div class="switch" (click)="toggleNotificationsEnabled(course)">
+            <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
+            <span class="slider"></span>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <div class="bottom">
+      <ng-container *ngIf="auth.isAdmin() || auth.isLecturer()">
+        <a class="menu-item {{isOnAdminPage ? 'active' : ''}}" [routerLink]="['/admin']">
+          <div class="floater fl">
+            <label class="visible">Admin page</label>
+            <label class="visible sublabel">Administrate the system</label>
+          </div>
+        </a>
+      </ng-container>
+      <div class="menu-item" (click)="auth.logout()">
+        <div class="floater fl">
+          <label class="visible">Log out</label>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="burger-button" (click)="openMenu()">☰</div>
 </ng-container>
-  <!--
--- is TA?
-  -- go to TA courses panel????
-  -- log out
--->
-  <!-- 
-<ng-container *ngIf="auth.isTAInCourse(course)">
-  I am Thirteen
-</ng-container> 
--->
-  <!--
-
--- is institution list
--- is a course-list
--- is a course
-  -- enable course (TA, Prof)
-  -- enable notifications for course (TA, prof)
-
+<!--
 <ng-container *ngIf="auth.isTAInCourse(course)">
     <div class="burger-bar {{open ? 'open' : ''}}">
       <div class="close" (click)="closeMenu()">×</div>
   
-      
-      <ng-container *ngIf="auth.isAdmin()">
-        <a routerlink="/admin">
-          <div class="switch-container">
-            <div class="floater fl">
-              <label class="visible">Admin page</label>
-              <label class="visible sublabel">Administrate the system</label>
-            </div>
-          </div>
-        </a>
-      </ng-container>
+
   
-      <ng-container *ngIf="auth.isLecturer()">
-        <a routerlink="/admin/courses">
-          <div class="switch-container">
-            <div class="floater fl">
-              <label class="visible">Courses</label>
-              <label class="visible sublabel">Add or modify courses</label>
-            </div>
-          </div>
-        </a>
-      </ng-container>
+
   
-      <div class="switch-container">
-        <div class="floater fl">
-          <label class="visible" for="course-enable-switch">Exercise session</label>
-          <label class="visible sublabel" for="course-enable-switch">Let students ask for help</label>
-        </div>
-        <div class="switch" (click)="toggleCourseEnabled()">
-          <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
-          <span class="slider"></span>
-        </div>
-      </div>
-  
-      <div class="switch-container">
-        <div class="floater fl">
-          <label class="visible" for="notifications-enable-switch">Notifications</label>
-          <label class="visible sublabel" for="notifications-enable-switch">On this device, for this course</label>
-        </div>
-  
-        <div class="switch" (click)="toggleNotificationsEnabled()">
-          <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
-          <span class="slider"></span>
-        </div>
-      </div>
     </div>
     <div class="burger-button" (click)="openMenu()">☰</div>
   </ng-container>
