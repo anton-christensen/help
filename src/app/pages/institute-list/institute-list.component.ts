@@ -12,7 +12,6 @@ export class InstituteListComponent implements OnInit {
   public institutes$: Observable<Institute[]>;
 
   constructor(private instituteService: InstituteService) { 
-    console.log("Constructed insituteListComponent");
   }
 
   ngOnInit() {

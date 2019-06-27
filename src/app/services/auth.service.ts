@@ -48,6 +48,10 @@ export class AuthService {
     return this.fireAuth.auth.signOut();
   }
 
+  public isPromotedUser(): boolean {
+    return this.isAdmin() || this.isLecturer() || this.isAssistant();
+  }
+
   public isAdmin(): boolean {
     return this.user && this.user.role === 'admin';
   }
