@@ -28,6 +28,7 @@ import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { InstituteListComponent } from './pages/institute-list/institute-list.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { EmphasizedComponent } from './components/emphasized/emphasized.component';
+import { LecturersManagerComponent } from './components/lecturers-manager/lecturers-manager.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { EmphasizedComponent } from './components/emphasized/emphasized.componen
     InstituteListComponent,
     MenuComponent,
     EmphasizedComponent,
+    LecturersManagerComponent,
   ],
   imports: [
     BrowserModule,

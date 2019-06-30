@@ -1,0 +1,50 @@
+<h1>Lecturers</h1>
+<h3>Promote or demote a user</h3>
+<form [formGroup]="form">
+  <div class="form-field">
+    <label for="query" class="visible">Search</label>
+    <input
+      placeholder="Search"
+      type="text"
+      id="query"
+      name="query"
+      class="form-control"
+      formControlName="query" />
+    <!-- <div *ngIf="f.courseSlug.dirty && f.courseSlug.errors" class="invalid-feedback">
+      <div *ngIf="f.courseSlug.errors.required">Shorthand is required</div>
+      <div *ngIf="f.courseSlug.errors.minlength">Shorthand must be at least 2 characters</div>
+      <div *ngIf="f.courseSlug.errors.maxlength">Shorthand must be less than 6 characters</div>
+      <div *ngIf="f.courseSlug.errors.courseSlugTaken">Shorthand must be unique in the institute</div>
+    </div> -->
+  </div>
+  <div class="halfnhalf">
+    <table class="lecturer-list">
+      <tr>
+        <th>E-Mail</th>
+        <!-- <th>Name</th> -->
+        <th class="icon">Demote</th>
+      </tr>
+      <tr *ngFor="let lecturer of filteredLecturers" class="lecturer">
+        <td class="email">{{ lecturer.email }}</td>
+        <!-- <td class="name">{{ lecturer.name }}</td> -->
+        <td (click)="demote(lecturer)" class="demote icon">
+          <i class="material-icons clickable">arrow_forward</i>
+        </td>
+      </tr>
+    </table>
+    <table class="user-list">
+      <tr>
+        <th class="icon">Promote</th>
+        <th>E-Mail</th>
+        <!-- <th>Name</th> -->
+      </tr>
+      <tr *ngFor="let user of filteredNonAdminAndLecturers" class="user">
+        <td (click)="promote(user)" class="promote icon">
+          <i class="material-icons clickable">arrow_back</i>
+        </td>
+        <td class="email">{{ user.email }}</td>
+        <!-- <td class="name">{{ user.name }}</td> -->
+      </tr>
+    </table>
+  </div>
+</form>

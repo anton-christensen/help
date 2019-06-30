@@ -1,10 +1,12 @@
+export type Role = 'admin' | 'lecturer' | 'assistant' | 'student';
+
 export class User {
   uid: string;
   email: string;
   imageURL: string;
   anon: boolean;
   name: string;
-  role: 'admin' | 'lecturer' | 'assistant' | 'student';
+  role: Role;
   courses: string[];
 
   constructor(authData) {
