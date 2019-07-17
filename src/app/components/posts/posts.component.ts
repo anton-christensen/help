@@ -46,7 +46,7 @@ export class PostsComponent implements OnInit {
       return;
     }
 
-    const post = new Post(this.form.value.id, course.instituteSlug, course.slug, this.form.value.content);
+    const post = new Post(this.form.value.id, course.id, this.form.value.content);
     this.postService.createOrUpdatePost(post).then(() => {
       this.form.reset();
       this.editing = false;

@@ -14,8 +14,7 @@ export class PostService {
   getAllByCourse(course: Course) {
     return this.getMultiple((ref) => {
       return ref
-        .where('instituteSlug', '==', course.instituteSlug)
-        .where('courseSlug', '==', course.slug)
+        .where('courseID', '==', course.id)
         .orderBy('created', 'desc');
     });
   }

@@ -36,9 +36,8 @@ export class TrashCanService {
     return this.getSingle((ref) => {
       return ref
         .where('active', '==', true)
-        .where('instituteSlug', '==', course.instituteSlug)
-        .where('courseSlug', '==', course.slug)
-        .where('uid', '==', user.uid);
+        .where('courseID', '==', course.id)
+        .where('userID', '==', user.uid);
     });
   }
 
@@ -46,8 +45,7 @@ export class TrashCanService {
     return this.getMultiple((ref) => {
       return ref
         .where('active', '==', true)
-        .where('instituteSlug', '==', course.instituteSlug)
-        .where('courseSlug', '==', course.slug)
+        .where('courseID', '==', course.id)
         .orderBy('created', 'desc');
     });
   }
@@ -55,7 +53,7 @@ export class TrashCanService {
   public addTrashCan(course: Course, room: string, uid: string): Promise<TrashCan> {
     const id = this.afStore.collection<TrashCan>('trash-cans').ref.doc().id;
     const ref = this.afStore.collection<TrashCan>('trash-cans').doc(id);
-    const trashCan = new TrashCan(id, uid, course.instituteSlug, course.slug, room);
+    const trashCan = new TrashCan(id, uid, course.id, room);
 
     return ref.set(Object.assign({}, trashCan))
       .then(() => {

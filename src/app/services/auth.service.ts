@@ -57,15 +57,23 @@ export class AuthService {
   }
 
   public isLecturer(): boolean {
-    return this.isAdmin() || this.user && this.user.role === 'lecturer';
+    return this.user && this.user.role === 'lecturer';
   }
 
   public isAssistant(): boolean {
-    return this.isAdmin() || this.user && this.user.role === 'assistant';
+    return this.user && this.user.role === 'assistant';
+  }
+
+  public isLecturerInCourse(course: Course): boolean {
+    return this.user && (this.isLecturer() && course.lecturers.includes(this.user.uid));
   }
 
   public isAssistantInCourse(course: Course): boolean {
-    return this.user && (this.isLecturer() || course.assistants.includes(this.user.uid));
+    return this.user && (this.isAssistant() && course.assistants.includes(this.user.uid));
+  }
+
+  public canAssistInCourse(course: Course): boolean {
+    return this.user && (this.isAdmin() || this.isAssistantInCourse(course) || this.isLecturerInCourse(course));
   }
 
   private createUser(authData): Promise<User> {

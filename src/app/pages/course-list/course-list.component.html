@@ -2,7 +2,7 @@
 
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
-    <ng-container *ngIf="auth.isAssistant(); then assistant; else student"></ng-container>
+    <ng-container *ngIf="auth.isLecturer() || auth.isAssistant(); then assistant; else student"></ng-container>
   </ng-template>
 
   <ng-template #admin>

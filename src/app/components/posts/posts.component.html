@@ -1,5 +1,5 @@
 <ng-container *ngIf="course$ | async as course">
-  <ng-container *ngIf="auth.isAssistantInCourse(course)">
+  <ng-container *ngIf="auth.canAssistInCourse(course)">
       <div class="post-edit">
         <h3>Write a post for the front page</h3>
         <form [formGroup]="form" (ngSubmit)="submitPost(course)" class="no-detail">
@@ -22,7 +22,7 @@
           <div class="created" *ngIf="hasCreatedDate(post)">
             Posted at {{ post.created.seconds * 1000 | date : 'HH:mm on MMMM d, yyyy' }}
           </div>
-          <div class="actions" *ngIf="auth.isAssistantInCourse(course)">
+          <div class="actions" *ngIf="auth.canAssistInCourse(course)">
             <i class="material-icons clickable" (click)="editPost(post)">edit</i>
             <i class="material-icons clickable" (click)="deletePost(post)">delete_forever</i>
           </div>

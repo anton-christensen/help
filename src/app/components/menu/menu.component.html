@@ -1,19 +1,13 @@
 <ng-container *ngIf="auth.isPromotedUser()">
+  <div class="burger-button" (click)="openMenu()">☰</div>
+
   <div class="burger-bar {{open ? 'open' : ''}}">
     <div class="close menu-item" (click)="closeMenu()">×</div>
-<!--
--- is ulla?
-  -- Go to ulla panel
-  -- log out
--->
-<!--
--- is Professor?
-  -- go to prof panel
-  -- log out
--->
+
     <ng-container *ngIf="session.getCourse$() | async as course">
-      <ng-container *ngIf="auth.isAssistantInCourse(course)">
-        <!-- Enable-course switch -->
+
+      <!-- Enable-course switch -->
+      <ng-container *ngIf="auth.canAssistInCourse(course)">
         <div class="menu-item">
           <div class="floater fl">
             <label class="visible" for="course-enable-switch">Exercise session</label>
@@ -39,6 +33,7 @@
         </div>
       </ng-container>
     </ng-container>
+
     <div class="bottom">
       <ng-container *ngIf="auth.isAdmin() || auth.isLecturer()">
         <a class="menu-item" [routerLink]="['/admin']" routerLinkActive="active">
@@ -55,15 +50,5 @@
       </div>
     </div>
 
-
   </div>
-  <div class="burger-button" (click)="openMenu()">☰</div>
 </ng-container>
-<!--
-<ng-container *ngIf="auth.isTAInCourse(course)">
-    <div class="burger-bar {{open ? 'open' : ''}}">
-      <div class="close" (click)="closeMenu()">×</div>
-    </div>
-    <div class="burger-button" (click)="openMenu()">☰</div>
-  </ng-container>
-  -->

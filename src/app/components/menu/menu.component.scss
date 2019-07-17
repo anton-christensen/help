@@ -41,6 +41,10 @@
     border-bottom: 1px solid #f5f5f5;
     overflow: hidden;
     color: white;
+
+    &:last-child {
+      border-bottom: none;
+    }
     
     &.active {
       background: $bg-grey-dark-hover;

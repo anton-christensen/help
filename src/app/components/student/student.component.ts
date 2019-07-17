@@ -36,7 +36,7 @@ export class StudentComponent implements OnInit, OnDestroy {
 
     this.course$ = this.session.getCourse$();
 
-    this.course$ 
+    this.course$
       .subscribe((course) => {
         this.course = course;
 
