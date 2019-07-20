@@ -15,3 +15,27 @@ th:nth-child(3), td:nth-child(3) {
   font-size: 0.8rem;
   color: #c62828;
 }
+
+.halfnhalf > * {
+  width: 49%;
+  float: left;
+  table-layout: fixed;
+}
+
+.halfnhalf {
+  overflow: hidden;
+}
+
+.halfnhalf :first-child {
+  margin-right: 2%;
+}
+
+table .icon {
+  width: 3.5rem;
+  overflow: hidden;
+  text-align: right;
+}
+
+table + table .icon {
+  text-align: left;
+}

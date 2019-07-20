@@ -28,7 +28,7 @@ import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { InstituteListComponent } from './pages/institute-list/institute-list.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { EmphasizedComponent } from './components/emphasized/emphasized.component';
-import { LecturersManagerComponent } from './components/lecturers-manager/lecturers-manager.component';
+import { RoleEditComponent } from './components/role-edit/role-edit.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +49,7 @@ import { LecturersManagerComponent } from './components/lecturers-manager/lectur
     InstituteListComponent,
     MenuComponent,
     EmphasizedComponent,
-    LecturersManagerComponent,
+    RoleEditComponent,
   ],
   imports: [
     BrowserModule,

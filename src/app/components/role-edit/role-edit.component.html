@@ -1,0 +1,31 @@
+<h1>Roles</h1>
+<h3>Set users roles</h3>
+<form [formGroup]="form">
+  <div class="form-field">
+    <label for="query" class="visible">Search</label>
+    <input
+      placeholder="Search"
+      type="text"
+      id="query"
+      name="query"
+      class="form-control"
+      formControlName="query" />
+  </div>
+  <table class="user-list">
+    <tr>
+      <th>E-Mail</th>
+      <th>Role</th>
+    </tr>
+    <tr *ngFor="let user of filteredUsers" class="user">
+      <td class="email">{{ user.email }}</td>
+      <td>
+        <select (change)="setRole(user, $event.target.value)" [value]='user.role' [disabled]='user.email == (auth.user$ | async)?.email'>
+          <option value='admin'    >admin</option>
+          <option value='lecturer' >lecturer</option>
+          <option value='assistant'>assistant</option>
+          <option value='student'  >student</option>
+        </select>
+      </td>
+    </tr>
+  </table>
+</form>

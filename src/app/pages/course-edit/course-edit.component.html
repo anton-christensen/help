@@ -1,8 +1,29 @@
 <ng-container *ngIf="courses$ | async as courses; else loader">
   <h1>Courses</h1>
 
+  <table class="course-list">
+      <tr>
+        <th>Title</th>
+        <th>Institute</th>
+        <th>Shorthand</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+      <tr *ngFor="let course of courses" class="course">
+        <td class="title">{{ course.title }}</td>
+        <td class="institute">{{ course.instituteSlug }}</td>
+        <td class="slug">{{ course.slug.toUpperCase() }}</td>
+        <td (click)="editCourse(course)" class="edit">
+          <i class="material-icons clickable">edit</i>
+        </td>
+        <td (click)="deleteCourse(course)" class="delete">
+          <i class="material-icons clickable">delete_forever</i>
+        </td>
+      </tr>
+    </table>
+
   <div class="course-edit">
-    <h3>Add a new course</h3>
+    <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>
     <form [formGroup]="form" (ngSubmit)="submitCourse()">
 
       <div class="form-field">
@@ -54,30 +75,46 @@
         </div>
       </div>
 
+      <!-- <div class="form-field">
+        <label for="query" class="visible">Search</label>
+        <input
+          placeholder="Search"
+          type="text"
+          id="query"
+          name="query"
+          class="form-control"
+          formControlName="query" />
+      </div>
+      <div class="halfnhalf">
+        <table class="lecturer-list">
+          <tr>
+            <th>E-Mail</th>
+            <th class="icon">Demote</th>
+          </tr>
+          <tr *ngFor="let lecturer of filteredLecturers" class="lecturer">
+            <td class="email">{{ lecturer.email }}</td>
+            <td (click)="demote(lecturer)" class="demote icon">
+              <i class="material-icons clickable">arrow_forward</i>
+            </td>
+          </tr>
+        </table>
+        <table class="user-list">
+          <tr>
+            <th class="icon">Promote</th>
+            <th>E-Mail</th>
+          </tr>
+          <tr *ngFor="let user of filteredNonAdminAndLecturers" class="user">
+            <td (click)="promote(user)" class="promote icon">
+              <i class="material-icons clickable">arrow_back</i>
+            </td>
+            <td class="email">{{ user.email }}</td>
+          </tr>
+        </table>
+      </div> -->
+
       <button [disabled]="form.invalid || form.pending" type="submit" class="btn">{{ editing ? 'Update' : 'Create' }}</button>
     </form>
   </div>
-
-  <table class="course-list">
-    <tr>
-      <th>Title</th>
-      <th>Institute</th>
-      <th>Shorthand</th>
-      <th>Edit</th>
-      <th>Delete</th>
-    </tr>
-    <tr *ngFor="let course of courses" class="course">
-      <td class="title">{{ course.title }}</td>
-      <td class="institute">{{ course.instituteSlug }}</td>
-      <td class="slug">{{ course.slug.toUpperCase() }}</td>
-      <td (click)="editCourse(course)" class="edit">
-        <i class="material-icons clickable">edit</i>
-      </td>
-      <td (click)="deleteCourse(course)" class="delete">
-        <i class="material-icons clickable">delete_forever</i>
-      </td>
-    </tr>
-  </table>
 
 </ng-container>
 
