@@ -105,18 +105,31 @@ label.visible {
 
   transition: all 300ms ease-out;
 
+  
   &:hover {
     background-color: $pri-col-hover;
   }
-
+  
   &:active {
     background-color: $pri-col-active;
   }
-
+  
   &:disabled {
     cursor: default;
     color: $disabled-text;
     background-color: $disabled;
+  }
+
+  &.btn-danger {
+    background-color: $danger;
+
+    &:hover {
+      background-color: $danger-hover;
+    }
+
+    &:active {
+      background-color: $danger-active;
+    }
   }
 }
 
@@ -198,6 +211,7 @@ markdown {
 /*************** Forms ****************/
 
 form {
+  overflow: hidden;
   margin: 1rem 0;
   background: whitesmoke;
   padding: 1rem;

@@ -112,7 +112,8 @@
         </table>
       </div> -->
 
-      <button [disabled]="form.invalid || form.pending" type="submit" class="btn">{{ editing ? 'Update' : 'Create' }}</button>
+      <button [disabled]="form.invalid || form.pending" type="submit" class="btn fl">{{ editing ? 'Update' : 'Create' }}</button>
+      <button *ngIf="editing" type="button" class="btn btn-danger fr" (click)="resetForm()">Cancel</button>
     </form>
   </div>
 

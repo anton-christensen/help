@@ -20,9 +20,7 @@ export class CourseEditComponent implements OnInit {
   public courses$: Observable<Course[]>;
   public institutes$: Observable<Institute[]>;
 
-  private usersAssociatedWithCourse: User[] = [];
   private allUsers: User[] = [];
-  public  filteredAllUsers: User[] = [];
 
   public editing = false;
   private courseBeingEdited: Course;
@@ -51,8 +49,7 @@ export class CourseEditComponent implements OnInit {
   constructor(public auth: AuthService,
               private modalService: ModalService,
               private courseService: CourseService,
-              private instituteService: InstituteService,
-              private promoter: PromotionService) {}
+              private instituteService: InstituteService) {}
 
   ngOnInit() {
     if (this.auth.isAdmin()) {
@@ -62,42 +59,11 @@ export class CourseEditComponent implements OnInit {
     }
     this.institutes$ = this.instituteService.getAll();
 
-    // this.promoter.getByRole("lecturer").subscribe(val => { 
-    //   console.log("Lecturers", val);
-    //   this.allLecturers = val; 
-    //   this.filteredLecturers = this.applyFilter(val);
-    // });
-    // this.promoter.getWherRoleIn(["assistant", "student"]).subscribe(val => { 
-    //   console.log("Scrubs", val);
-    //   this.allNonAdminAndLecturers = val; 
-    //   this.filteredNonAdminAndLecturers = this.applyFilter(val);
-    // });
-
     // Validate course slug when institute changes
     this.form.controls.instituteSlug.valueChanges
       .subscribe(() => {
         this.form.controls.courseSlug.updateValueAndValidity();
       });
-    
-    // update userlist when search field value changes
-    this.form.controls.userSearch.valueChanges.subscribe((val) => {
-      // this.filteredLecturers = this.applyFilter(this.allLecturers);
-      // this.filteredNonAdminAndLecturers = this.applyFilter(this.allNonAdminAndLecturers);
-    });
-  }
-
-  public applyFilter(users: User[]): User[] {
-    const filter = this.form.controls.userSearch.value;
-    const filtered = users.filter( user => user.email.includes(filter) || user.name.includes(filter));
-    return filtered;
-  }
-
-  public promote(user: User) {
-
-    this.promoter.setRole(user, 'lecturer');
-  }
-  public demote(user: User) {
-    this.promoter.setRole(user, 'assistant');
   }
 
   public get f() {
@@ -116,13 +82,7 @@ export class CourseEditComponent implements OnInit {
     this.editing = true;
   }
 
-  public submitCourse() {
-    if (this.editing) {
-      this.updateCourse();
-    } else {
-      this.createCourse();
-    }
-
+  public resetForm() {
     this.courseBeingEdited = null;
     this.editing = false;
 
@@ -132,6 +92,16 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: '',
       courseSlug: '',
     });
+  }
+
+  public submitCourse() {
+    if (this.editing) {
+      this.updateCourse();
+    } else {
+      this.createCourse();
+    }
+
+    this.resetForm();
   }
 
   private createCourse() {

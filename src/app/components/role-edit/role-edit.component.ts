@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { PromotionService } from 'src/app/services/promotion.service';
-import { Observable } from 'rxjs';
+import { UserService } from 'src/app/services/user.service';
 import { User, Role } from 'src/app/models/user';
-import { debounceTime } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -15,7 +13,7 @@ export class RoleEditComponent implements OnInit {
   
   private allUsers: User[];
   public  filteredUsers: User[];
-  private promoter: PromotionService;
+  private userService: UserService;
   public auth: AuthService;
   
   public form = new FormGroup({
@@ -23,12 +21,12 @@ export class RoleEditComponent implements OnInit {
   });
   
   constructor(
-    promoter: PromotionService,
+    userService: UserService,
     auth: AuthService  
   ) {
     this.auth = auth;
-    this.promoter = promoter;
-    promoter.getAll().subscribe(val => {
+    this.userService = userService;
+    userService.getAll().subscribe(val => {
       this.allUsers = val;
       this.filteredUsers = this.applyFilter(val);
     });
@@ -47,6 +45,6 @@ export class RoleEditComponent implements OnInit {
   }
 
   public setRole(user: User, role: Role) {
-    this.promoter.setRole(user, role);
+    this.userService.setRole(user, role);
   }
 }

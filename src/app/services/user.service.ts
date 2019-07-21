@@ -3,12 +3,12 @@ import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
 import { Observable, from, combineLatest } from 'rxjs';
 import { User, Role } from '../models/user';
 import { CommonService } from './common.service';
-import { map, mergeAll, mergeMapTo, zipAll, } from 'rxjs/operators';
+import { map, } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PromotionService {
+export class UserService {
 
   constructor(private afStore: AngularFirestore) {}
 
