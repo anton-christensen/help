@@ -9,7 +9,7 @@ import {AuthService} from '../../services/auth.service';
 import {ModalService} from '../../services/modal.service';
 import {Course} from '../../models/course';
 import { User } from 'src/app/models/user';
-import { PromotionService } from 'src/app/services/promotion.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-course-edit',
@@ -21,6 +21,11 @@ export class CourseEditComponent implements OnInit {
   public institutes$: Observable<Institute[]>;
 
   private allUsers: User[] = [];
+  private filteredUsers: User[] = [];
+  private lecturers: User[] = []
+  private lecturerIDs: string[] = [];
+  private assistants: User[] = [];
+  private assistantIDs: string[] = [];
 
   public editing = false;
   private courseBeingEdited: Course;
@@ -49,7 +54,8 @@ export class CourseEditComponent implements OnInit {
   constructor(public auth: AuthService,
               private modalService: ModalService,
               private courseService: CourseService,
-              private instituteService: InstituteService) {}
+              private instituteService: InstituteService,
+              private userService: UserService) {}
 
   ngOnInit() {
     if (this.auth.isAdmin()) {
@@ -58,6 +64,12 @@ export class CourseEditComponent implements OnInit {
       this.courses$ = this.courseService.getByLecturer(this.auth.user);
     }
     this.institutes$ = this.instituteService.getAll();
+
+    this.userService.getAll().subscribe(users => {
+      this.allUsers = users;
+      this.lecturers    = this.getUsersFromIDs(this.lecturerIDs);
+      this.assistants   = this.getUsersFromIDs(this.assistantIDs);
+    });
 
     // Validate course slug when institute changes
     this.form.controls.instituteSlug.valueChanges
@@ -70,6 +82,29 @@ export class CourseEditComponent implements OnInit {
     return this.form.controls;
   }
 
+  private getUsersFromIDs(ids : string[]) : User[] {
+    return ids.map( id => this.allUsers.find( user => user.uid == id) )
+  }
+
+  public userSearch(query) {
+    return this.filteredUsers = this.allUsers.filter((user) => user.email.indexOf(query) >= 0);
+  }
+
+  public attemptAddUser(userEmail) {
+    console.log("Attemp to add user: ", userEmail);
+    const user = this.allUsers.find( u => u.email == userEmail );
+    if(user === undefined)
+      return;
+    
+    if(['lecturer', 'admin'].includes(user.role)) {
+      this.lecturerIDs.push(user.uid);
+    }
+    else {
+      this.userService.setRole(user, 'assistant');
+      this.assistantIDs.push(user.uid);
+    }
+  }
+
   public editCourse(course: Course) {
     this.form.setValue({
       id: course.id,
@@ -77,6 +112,11 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: course.instituteSlug,
       courseSlug: course.slug.toUpperCase(),
     });
+
+    this.lecturerIDs  = course.lecturers;
+    this.assistantIDs = course.assistants;
+    this.lecturers    = this.getUsersFromIDs(this.lecturerIDs);
+    this.assistants   = this.getUsersFromIDs(this.assistantIDs);
 
     this.courseBeingEdited = course;
     this.editing = true;
@@ -92,6 +132,9 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: '',
       courseSlug: '',
     });
+
+    this.lecturers = [];
+    this.assistants = [];
   }
 
   public submitCourse() {

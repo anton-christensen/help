@@ -75,6 +75,15 @@
         </div>
       </div>
 
+      <ul>
+        <li *ngFor="let lecturer of lecturers">{{lecturer.email}} : lecturer</li>
+      </ul>
+      <label for="userAdd" class="visible">Add user to course</label>
+      <input id="userAdd" type="text" (change)="attemptAddUser($event.target.value)" (input)="userSearch($event.target.value)" list="userOptions">
+      <datalist id="userOptions">
+        <option *ngFor="let user of filteredUsers" value="{{user.email}}">
+      </datalist>
+
       <!-- <div class="form-field">
         <label for="query" class="visible">Search</label>
         <input

@@ -16,6 +16,10 @@ export class UserService {
     return this.getMultiple(ref => ref);
   }
 
+  public getWithIDs(): Observable<User[]> {
+    return this.getMultiple(ref => ref);
+  }
+
   public setRole(user: User, role: Role) {
     return this.afStore.collection<User>('users').doc(user.uid).update({role: role});
   }
