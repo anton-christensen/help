@@ -66,7 +66,7 @@ export class AuthService {
   }
 
   public isLecturerInCourse(course: Course): boolean {
-    return this.user && (this.isLecturer() && course.lecturers.includes(this.user.uid));
+    return this.user && (this.isLecturer() && course.assistants.includes(this.user.uid));
   }
 
   public isAssistantInCourse(course: Course): boolean {

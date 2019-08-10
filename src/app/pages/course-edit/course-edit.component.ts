@@ -107,7 +107,7 @@ export class CourseEditComponent implements OnInit {
       this.userService.setRole(user, 'assistant');
     }
     this.assistantIDs.push(user.uid);
-    this.assistantIDs = [...new Set(this.assistantIDs)];
+    this.assistantIDs = Array.from(new Set(this.assistantIDs));
     this.assistants = this.getUsersFromIDs(this.assistantIDs);
 
     this.filterSearchForm.reset({
