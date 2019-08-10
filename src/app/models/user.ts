@@ -7,15 +7,13 @@ export class User {
   anon: boolean;
   name: string;
   role: Role;
-  courses: string[];
 
   constructor(authData) {
     this.uid = authData.uid;
     this.email = authData.email;
     this.imageURL = authData.photoURL;
     this.anon = authData.isAnonymous;
-    this.name = '';
+    this.name = authData.displayName;
     this.role = 'student';
-    this.courses = [];
   }
 }

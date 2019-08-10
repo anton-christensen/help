@@ -40,6 +40,7 @@ export class AuthService {
   public login(): Promise<User> {
     return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(credential => {
+        console.log("Login attempt: ", credential);
         return this.createUser(credential.user);
       });
   }
@@ -83,7 +84,7 @@ export class AuthService {
     return ref.get()
       .then(doc => {
         if (!doc.exists) {
-          return ref.set(Object.assign({}, user));
+          return ref.set(Object.assign({}, user)).catch( reason => console.log(Object.assign({}, user)));
         }
       })
       .then(() => {

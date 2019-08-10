@@ -4,7 +4,6 @@ export class Course {
   slug: string;
   instituteSlug: string;
   enabled: boolean;
-  lecturers: string[];
   assistants: string[];
 
   constructor(id: string, title: string, instituteSlug: string, slug: string) {
@@ -13,7 +12,6 @@ export class Course {
     this.instituteSlug = instituteSlug;
     this.slug = slug;
     this.enabled = false;
-    this.lecturers = [];
     this.assistants = [];
   }
 }

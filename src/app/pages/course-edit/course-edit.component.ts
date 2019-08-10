@@ -22,8 +22,6 @@ export class CourseEditComponent implements OnInit {
 
   private allUsers: User[] = [];
   private filteredUsers: User[] = [];
-  private lecturers: User[] = []
-  private lecturerIDs: string[] = [];
   private assistants: User[] = [];
   private assistantIDs: string[] = [];
 
@@ -67,8 +65,7 @@ export class CourseEditComponent implements OnInit {
 
     this.userService.getAll().subscribe(users => {
       this.allUsers = users;
-      this.lecturers    = this.getUsersFromIDs(this.lecturerIDs);
-      this.assistants   = this.getUsersFromIDs(this.assistantIDs);
+      this.assistants = this.getUsersFromIDs(this.assistantIDs);
     });
 
     // Validate course slug when institute changes
@@ -86,8 +83,18 @@ export class CourseEditComponent implements OnInit {
     return ids.map( id => this.allUsers.find( user => user.uid == id) )
   }
 
-  public userSearch(query) {
-    return this.filteredUsers = this.allUsers.filter((user) => user.email.indexOf(query) >= 0);
+  public userSearch(query : string) {
+    query = query.toLowerCase();
+    console.log(this.assistantIDs, this.allUsers);
+    this.filteredUsers = this.allUsers
+      .filter((user) => !(this.assistantIDs.includes(user.uid)))
+      .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
+    return this.filteredUsers;
+  }
+
+  public removeAssistant(assistantID : string) {
+    this.assistantIDs = this.assistantIDs.filter( userID => userID !== assistantID);
+    this.assistants = this.getUsersFromIDs(this.assistantIDs);
   }
 
   public attemptAddUser(userEmail) {
@@ -96,13 +103,16 @@ export class CourseEditComponent implements OnInit {
     if(user === undefined)
       return;
     
-    if(['lecturer', 'admin'].includes(user.role)) {
-      this.lecturerIDs.push(user.uid);
-    }
-    else {
+    if(user.role == 'student') {
       this.userService.setRole(user, 'assistant');
-      this.assistantIDs.push(user.uid);
     }
+    this.assistantIDs.push(user.uid);
+    this.assistantIDs = [...new Set(this.assistantIDs)];
+    this.assistants = this.getUsersFromIDs(this.assistantIDs);
+
+    this.filterSearchForm.reset({
+      userSearch: ''
+    });
   }
 
   public editCourse(course: Course) {
@@ -112,11 +122,14 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: course.instituteSlug,
       courseSlug: course.slug.toUpperCase(),
     });
+    this.filterSearchForm.setValue({
+      userSearch: ''
+    });
 
-    this.lecturerIDs  = course.lecturers;
     this.assistantIDs = course.assistants;
-    this.lecturers    = this.getUsersFromIDs(this.lecturerIDs);
     this.assistants   = this.getUsersFromIDs(this.assistantIDs);
+
+    console.log(this.assistantIDs);
 
     this.courseBeingEdited = course;
     this.editing = true;
@@ -132,8 +145,10 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: '',
       courseSlug: '',
     });
+    this.filterSearchForm.reset({
+      userSearch: ''
+    });
 
-    this.lecturers = [];
     this.assistants = [];
   }
 
@@ -152,7 +167,7 @@ export class CourseEditComponent implements OnInit {
     const course = new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase());
 
     if (!this.auth.isAdmin()) {
-      course.lecturers = [this.auth.user.uid];
+      course.assistants = [this.auth.user.uid];
     }
 
     this.courseService.createOrUpdateCourse(course);
@@ -163,6 +178,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.title = val.title;
     this.courseBeingEdited.instituteSlug = val.instituteSlug;
     this.courseBeingEdited.slug = val.courseSlug.toLowerCase();
+    this.courseBeingEdited.assistants = this.assistantIDs;
 
     this.courseService.createOrUpdateCourse(this.courseBeingEdited);
   }

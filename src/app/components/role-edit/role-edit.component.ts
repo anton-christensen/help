@@ -39,8 +39,8 @@ export class RoleEditComponent implements OnInit {
   }
 
   public applyFilter(users: User[]): User[] {
-    const filter = this.form.controls.query.value;
-    const filtered = users.filter( user => user.email.includes(filter) || user.name.includes(filter));
+    const filter = this.form.controls.query.value.toLocaleLowerCase();
+    const filtered = users.filter( user => user.email.toLocaleLowerCase().includes(filter) || user.name.toLocaleLowerCase().includes(filter));
     return filtered.sort( (a,b) => a.email.localeCompare(b.email) );
   }
 
