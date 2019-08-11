@@ -85,7 +85,6 @@ export class CourseEditComponent implements OnInit {
 
   public userSearch(query : string) {
     query = query.toLowerCase();
-    console.log(this.assistantIDs, this.allUsers);
     this.filteredUsers = this.allUsers
       .filter((user) => !(this.assistantIDs.includes(user.uid)))
       .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
@@ -98,7 +97,6 @@ export class CourseEditComponent implements OnInit {
   }
 
   public attemptAddUser(userEmail) {
-    console.log("Attemp to add user: ", userEmail);
     const user = this.allUsers.find( u => u.email == userEmail );
     if(user === undefined)
       return;
@@ -128,8 +126,6 @@ export class CourseEditComponent implements OnInit {
 
     this.assistantIDs = course.assistants;
     this.assistants   = this.getUsersFromIDs(this.assistantIDs);
-
-    console.log(this.assistantIDs);
 
     this.courseBeingEdited = course;
     this.editing = true;

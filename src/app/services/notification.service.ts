@@ -30,7 +30,7 @@ export class NotificationService {
         // Delete old tokens
         this.db.collection<NotificationToken>('notificationTokens', ref => {
           return ref.where('deviceId', '==', this.clientJS.getFingerprint())
-          .where('courseSlug', '==', course.slug)
+          .where('courseId', '==', course.id)
         }).get().toPromise()
           .then((val) => {
             val.forEach((res) => {
@@ -51,7 +51,7 @@ export class NotificationService {
     const fingerprint = this.clientJS.getFingerprint();
     return this.db.collection<NotificationToken>('notificationTokens', ref => {
       return ref.where('deviceId', '==', fingerprint)
-      .where('courseSlug', '==', course.slug)
+      .where('courseId', '==', course.id)
       .limit(1);
     }).snapshotChanges().pipe(
       map(actions => {
