@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Course } from 'src/app/models/course';
 
 import { AuthService } from 'src/app/services/auth.service';
@@ -8,32 +8,38 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { NotificationToken } from 'src/app/models/notification-token';
 import { SessionService } from 'src/app/services/session.service';
 import { CourseService } from 'src/app/services/course.service';
-import { Subscription } from 'rxjs';
-import { map, switchAll } from 'rxjs/operators';
+import { Subscription, Observable } from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent implements OnInit, OnDestroy {
   public open = false;
+  public notificationToken$: Observable<NotificationToken>;
+  private notificationTokenSub: Subscription;
   public notificationToken: NotificationToken;
   public tokenToggleBusy = false;
-  private notificationSubscription: Subscription = new Subscription();
 
   constructor(public auth: AuthService,
-              public session: SessionService,
+              public sessionService: SessionService,
               private notificationService: NotificationService,
               private courseService: CourseService,
               private afMessaging: AngularFireMessaging) {
-    // get notificationTokens when a course appears
-    session.getCourse$().pipe(
-      map(course => notificationService.getToken(course)),
-      switchAll()
-    )
-      .subscribe(token => {
+    
+    // Get notificationTokens when a course appears
+    this.notificationToken$ = this.sessionService.getCourse$().pipe(
+      switchMap((course: Course) => {
+        return notificationService.getToken(course);
+      }
+    ));
+
+    this.notificationTokenSub = this.notificationToken$
+      .subscribe((token) => {
         this.notificationToken = token;
+        console.log("new token", token);
       });
   }
 
@@ -47,6 +53,10 @@ export class MenuComponent implements OnInit {
       .subscribe((message) => {
         console.log('Notification: ', message);
       });
+  }
+
+  ngOnDestroy() {
+    this.notificationTokenSub.unsubscribe();
   }
 
   public openMenu() {

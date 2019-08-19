@@ -124,7 +124,7 @@ export class CourseEditComponent implements OnInit {
       userSearch: ''
     });
 
-    this.assistantIDs = course.assistants;
+    this.assistantIDs = course.associatedUserIDs;
     this.assistants   = this.getUsersFromIDs(this.assistantIDs);
 
     this.courseBeingEdited = course;
@@ -163,7 +163,7 @@ export class CourseEditComponent implements OnInit {
     const course = new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase());
 
     if (!this.auth.isAdmin()) {
-      course.assistants = [this.auth.user.uid];
+      course.associatedUserIDs = [this.auth.user.uid];
     }
 
     this.courseService.createOrUpdateCourse(course);
@@ -174,14 +174,14 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.title = val.title;
     this.courseBeingEdited.instituteSlug = val.instituteSlug;
     this.courseBeingEdited.slug = val.courseSlug.toLowerCase();
-    this.courseBeingEdited.assistants = this.assistantIDs;
+    this.courseBeingEdited.associatedUserIDs = this.assistantIDs;
 
     this.courseService.createOrUpdateCourse(this.courseBeingEdited);
   }
 
   public deleteCourse(course) {
     // Warn before delete
-    this.modalService.add('Are you sure you want to delete ' + course.title).then(() => {
+    this.modalService.add('Are you sure you want to delete ' + course.title, "Delete", "Cancel").then(() => {
       this.courseService.deleteCourse(course);
     }).catch(() => {});
   }

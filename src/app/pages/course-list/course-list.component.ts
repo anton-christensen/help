@@ -33,7 +33,7 @@ export class CourseListComponent implements OnInit {
   relevantCourses(courses: Course[]): Course[] {
     return courses.filter((c) => {
       const uid = this.auth.user.uid;
-      return c.assistants.includes(this.auth.user.uid);
+      return c.associatedUserIDs.includes(this.auth.user.uid);
     });
   }
 }

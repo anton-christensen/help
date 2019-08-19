@@ -1,5 +1,7 @@
 import * as firebase from 'firebase/app';
 
+export const TrashCanPath = 'trashCans';
+
 export class TrashCan {
   public id: string;
   public userID: string;

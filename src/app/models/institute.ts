@@ -1,3 +1,5 @@
+export const InstitutePath = 'institutes';
+
 export class Institute {
     id: string; 
     title: string;

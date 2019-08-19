@@ -4,29 +4,29 @@
   <div class="burger-bar {{open ? 'open' : ''}}">
     <div class="close menu-item" (click)="closeMenu()">×</div>
 
-    <ng-container *ngIf="session.getCourse$() | async as course">
+    <ng-container *ngIf="sessionService.getCourse$() | async as course">
 
       <!-- Enable-course switch -->
       <ng-container *ngIf="auth.canAssistInCourse(course)">
-        <div class="menu-item">
+        <div class="menu-item" (click)="toggleCourseEnabled(course)">
           <div class="floater fl">
             <label class="visible" for="course-enable-switch">Exercise session</label>
             <label class="visible sublabel" for="course-enable-switch">Let students ask for help</label>
           </div>
-          <div class="switch" (click)="toggleCourseEnabled(course)">
+          <div class="switch">
             <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
             <span class="slider"></span>
           </div>
         </div>
 
         <!-- Enable-trashcan-notifications switch -->
-        <div class="menu-item">
+        <div class="menu-item" (click)="toggleNotificationsEnabled(course)">
           <div class="floater fl">
             <label class="visible" for="notifications-enable-switch">Notifications</label>
             <label class="visible sublabel" for="notifications-enable-switch">On this device, for this course</label>
           </div>
     
-          <div class="switch" (click)="toggleNotificationsEnabled(course)">
+          <div class="switch">
             <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
             <span class="slider"></span>
           </div>

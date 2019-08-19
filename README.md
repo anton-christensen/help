@@ -51,68 +51,68 @@ Run `ng build --prod && firebase deploy --only hosting` to build the project and
 Here follows prescriptions of the datastructures.
 Please update the following sections to the desired structure, before making changes to the code or database.
 
-#### Courses
-
-Field         | Type     | Links to  | Explanation
---------------------------------------------------
-id            | string   |           | Unique identifier, assigned by the database.
-title         | string   |           | Full name of the course e.g. "Diskret matematik".
-slug          | string   |           | Lowercase shorthand of course used for URL part e.g. "dmat".
-instituteSlug | string   | Institute | Lowercase shorthand of the course's associated institute used for URL part e.g. "cs".
-enabled       | boolean  |           | Weather an exercise session is currently running or not. Assistants can toggle this.
-assistants    | string[] | Users     | List of IDs of users associated with the course i.e. 
-
 #### Institute
 
 Institutes can **not** be edited through the system (maybe this should be possible later).
 For now, if additions or changes to the list of institutes are neccessary, a developer should make the changes directly through the database.
 
-Field         | Type     | Links to  | Explanation
+Field               | Type     | Links to  | Explanation
 --------------------------------------------------
-id            | string   |           | Unique identifier, assigned by the database.
-title         | string   |           | Full name of the institute e.g. "Institut for Datalogi".
-slug          | string   |           | Lowercase shorthand of institute used for URL part e.g. "cs".
-faculty       | string   |           | Full name of the faculty which the institute is under e.g. "Det Tekniske Fakultet for IT og Design".
+id                  | string   |           | Unique identifier, assigned by the database.
+title               | string   |           | Full name of the institute e.g. "Institut for Datalogi".
+slug                | string   |           | Lowercase shorthand of institute used for URL part e.g. "cs".
+faculty             | string   |           | Full name of the faculty which the institute is under e.g. "Det Tekniske Fakultet for IT og Design".
+
+#### Courses
+
+Field               | Type     | Links to  | Explanation
+--------------------------------------------------
+id                  | string   |           | Unique identifier, assigned by the database.
+title               | string   |           | Full name of the course e.g. "Diskret matematik".
+slug                | string   |           | Lowercase shorthand of course used for URL part e.g. "dmat".
+instituteSlug       | string   | Institute | Lowercase shorthand of the course's associated institute used for URL part e.g. "cs".
+enabled             | boolean  |           | Weather an exercise session is currently running or not. Assistants can toggle this.
+associatedUserIDs   | string[] | Users     | List of IDs of users associated with the course i.e. 
+
+#### Post
+
+Field               | Type     | Links to  | Explanation
+--------------------------------------------------
+id                  | string   |           | Unique identifier, assigned by the database.
+courseID            | string   | Course    | The id of the course this post was posted on.
+content             | string   |           | The markdown representation of the post content.
+created             | string   |           | Time and date for when the post was posted.
+
+#### Trash Can
+
+Field               | Type     | Links to  | Explanation
+--------------------------------------------------
+id                  | string   |           | Unique identifier, assigned by the database.
+userID              | string   | User      | ID of the user who put out the trash can
+courseID            | string   | Course    | ID of the course for which this trash can was put out
+room                | string   |           | A short user-entered descriptor that identifies the room e.g. "Novi 9 - 1.32.44".
+active              | boolean  |           | *True* when the trash can is put out, *False* when the can is remove by an assistant. We do this soft-deletion, in order to be able to do statistics on this data later.
+created             | string   |           | Time and date for when the post was posted.
+
+#### User
+
+Field               | Type     | Links to  | Explanation
+--------------------------------------------------
+uid                 | string   |           | Unique identifier, assigned by the database.
+email               | string   |           | The email of the user. This must be unique.
+imageURL            | string   |           | An optional URL to an image of the user
+anon                | boolean  |           | Is true for students who are not logged in.
+name                | string   |           | The display name of the user
+role                | Role     |           | The role of the user (admin, lecturer, assistant or student)
 
 #### Notification Token
 
 Describes an assistants request to have a notification sent to a device, when a new trash can is put out for a specified course.
 
-Field         | Type     | Links to  | Explanation
+Field               | Type     | Links to  | Explanation
 --------------------------------------------------
-id            | string   |           | Unique identifier, assigned by the database.
-token         | string   |           | The notification token itself.
-deviceId      | number   |           | Identifier of the device.
-userId        | string   | User      | ID of user.
-courseId      | string   | Course    | ID of the course the user wants notifications for.
-
-#### Post
-
-Field         | Type     | Links to  | Explanation
---------------------------------------------------
-id            | string   |           | Unique identifier, assigned by the database.
-courseID      | string   | Course    | The id of the course this post was posted on.
-content       | string   |           | The markdown representation of the post content.
-created       | string   |           | Time and date for when the post was posted.
-
-#### Trash Can
-
-Field         | Type     | Links to  | Explanation
---------------------------------------------------
-id            | string   |           | Unique identifier, assigned by the database.
-userID        | string   | User      | ID of the user who put out the trash can
-courseID      | string   | Course    | ID of the course for which this trash can was put out
-room          | string   |           | A short user-entered descriptor that identifies the room e.g. "Novi 9 - 1.32.44".
-active        | boolean  |           | *True* when the trash can is put out, *False* when the can is remove by an assistant. We do this soft-deletion, in order to be able to do statistics on this data later.
-created       | string   |           | Time and date for when the post was posted.
-
-#### User
-
-Field         | Type     | Links to  | Explanation
---------------------------------------------------
-uid           | string   |           | Unique identifier, assigned by the database.
-email         | string   |           | The email of the user. This must be unique.
-imageURL      | string   |           | An optional URL to an image of the user
-anon          | boolean  |           | Is true for students who are not logged in.
-name          | string   |           | The display name of the user
-role          | Role     |           | The role of the user (admin, lecturer, assistant or student)
+id                  | string   |           | Unique identifier, assigned by the database.
+token               | string   |           | The notification token itself.
+deviceID            | string   |           | Identifier of the device.
+userID              | string   | User      | ID of user.
+courseID            | string   | Course    | ID of the course the user wants notifications for.

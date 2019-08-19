@@ -1,5 +1,7 @@
 import * as firebase from 'firebase/app';
 
+export const PostPath = 'posts';
+ 
 export class Post {
   public id: string;
   public courseID: string;

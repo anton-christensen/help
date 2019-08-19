@@ -3,16 +3,15 @@ import { CanActivate, UrlTree, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import {map} from 'rxjs/operators';
+import { Role } from '../models/user';
 
-function isRoleGenerator(acceptedRoles: string[], auth: AuthService, router: Router) {
+function isRoleGenerator(acceptedRoles: Role[], auth: AuthService, router: Router) {
   return (): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree => {
-
     return auth.user$.pipe(
       map((user) => {
-        if (user && !acceptedRoles.includes(user.role)) {
+        if (!user || (user && !acceptedRoles.includes(user.role))) {
           return router.parseUrl('/');
         }
-
         return true;
       }));
   };
@@ -35,7 +34,7 @@ export class IsLecturerGuard implements CanActivate {
   constructor(private router: Router,
               private auth: AuthService) {}
 
-    canActivate = isRoleGenerator(['admin', 'lecturer'], this.auth, this.router);
+  canActivate = isRoleGenerator(['admin', 'lecturer'], this.auth, this.router);
 }
 
 @Injectable({

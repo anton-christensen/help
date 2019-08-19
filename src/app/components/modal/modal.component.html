@@ -2,11 +2,12 @@
   <div class="modal">
       <span>{{ modalService.modal.message }}</span>
       <div>
+
+        <button class="btn btn-danger" type="button" (click)="modalService.accept()">
+            {{ modalService.modal.acceptText }}
+        </button>
         <button class="btn" type="button" (click)="modalService.cancel()">
             {{ modalService.modal.cancelText }}
-        </button>
-        <button class="btn" type="button" (click)="modalService.accept()">
-            {{ modalService.modal.acceptText }}
         </button>
       </div>
   </div>

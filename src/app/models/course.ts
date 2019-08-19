@@ -1,10 +1,12 @@
+export const CoursePath = 'courses';
+
 export class Course {
   id: string;
   title: string;
   slug: string;
   instituteSlug: string;
   enabled: boolean;
-  assistants: string[];
+  associatedUserIDs: string[];
 
   constructor(id: string, title: string, instituteSlug: string, slug: string) {
     this.id = id;
@@ -12,6 +14,6 @@ export class Course {
     this.instituteSlug = instituteSlug;
     this.slug = slug;
     this.enabled = false;
-    this.assistants = [];
+    this.associatedUserIDs = [];
   }
 }

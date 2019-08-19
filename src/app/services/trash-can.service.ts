@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import {TrashCan} from '../models/trash-can';
+import {TrashCan, TrashCanPath} from '../models/trash-can';
 import {switchMap} from 'rxjs/operators';
 import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
 import {AuthService} from './auth.service';
@@ -51,8 +51,8 @@ export class TrashCanService {
   }
 
   public addTrashCan(course: Course, room: string, uid: string): Promise<TrashCan> {
-    const id = this.afStore.collection<TrashCan>('trash-cans').ref.doc().id;
-    const ref = this.afStore.collection<TrashCan>('trash-cans').doc(id);
+    const id = this.afStore.collection<TrashCan>(TrashCanPath).ref.doc().id;
+    const ref = this.afStore.collection<TrashCan>(TrashCanPath).doc(id);
     const trashCan = new TrashCan(id, uid, course.id, room);
 
     return ref.set(Object.assign({}, trashCan))
@@ -62,14 +62,14 @@ export class TrashCanService {
   }
 
   public deleteTrashCan(trashCan: TrashCan): Promise<any> {
-    return this.afStore.collection<TrashCan>('trash-cans').ref.doc(trashCan.id).update('active', false);
+    return this.afStore.collection<TrashCan>(TrashCanPath).ref.doc(trashCan.id).update('active', false);
   }
 
   private getSingle(qFn: QueryFn): Observable<TrashCan> {
-    return CommonService.getSingle<TrashCan>(this.afStore, 'trash-cans', qFn);
+    return CommonService.getSingle<TrashCan>(this.afStore, TrashCanPath, qFn);
   }
 
   private getMultiple(qFn: QueryFn): Observable<TrashCan[]> {
-    return CommonService.getMultiple<TrashCan>(this.afStore, 'trash-cans', qFn);
+    return CommonService.getMultiple<TrashCan>(this.afStore, TrashCanPath, qFn);
   }
 }

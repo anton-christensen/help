@@ -16,7 +16,7 @@ export class CourseComponent implements OnInit {
               private session: SessionService) { }
 
   ngOnInit() {
-    this.course$ = this.session.getCourse$();
+    this.course$ = this.session.getCourse$(); 
   }
 
 }

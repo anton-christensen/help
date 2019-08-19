@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { Institute } from '../models/institute';
+import {Observable} from 'rxjs';
+import {Institute, InstitutePath } from '../models/institute';
 import {CommonService} from './common.service';
 import {map} from 'rxjs/operators';
 
@@ -33,10 +33,10 @@ export class InstituteService {
   }
 
   private getSingle(qFn: QueryFn): Observable<Institute> {
-    return CommonService.getSingle<Institute>(this.afStore, 'institutes', qFn);
+    return CommonService.getSingle<Institute>(this.afStore, InstitutePath, qFn);
   }
 
   private getMultiple(qFn: QueryFn): Observable<Institute[]> {
-    return CommonService.getMultiple<Institute>(this.afStore, 'institutes', qFn);
+    return CommonService.getMultiple<Institute>(this.afStore, InstitutePath, qFn);
   }
 }

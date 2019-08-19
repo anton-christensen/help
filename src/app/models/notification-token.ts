@@ -1,17 +1,19 @@
 import { Course } from './course';
 
+export const NotificationTokenPath = 'notificationTokens';
+
 export class NotificationToken {
   id: string;
   token: string;
-  deviceId: number;
-  userId: string;
-  courseId: string;
+  deviceID: string;
+  userID: string;
+  courseID: string;
 
-  constructor(id: string, token: string, deviceId: number, user: {uid: string}, course: Course) {
+  constructor(id: string, token: string, deviceID: string, user: {uid: string}, course: Course) {
     this.id = id;
     this.token = token;
-    this.deviceId = deviceId;
-    this.userId = user.uid;
-    this.courseId = course.id;
+    this.deviceID = deviceID;
+    this.userID = user.uid;
+    this.courseID = course.id;
   }
 }

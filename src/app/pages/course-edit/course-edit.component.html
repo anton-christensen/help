@@ -1,5 +1,5 @@
 <ng-container *ngIf="courses$ | async as courses; else loader">
-  <h1>Courses</h1>
+  <h1>{{ auth.isAdmin() ? 'All' : 'Your' }} Courses</h1>
 
   <table class="course-list">
     <tr>
@@ -75,6 +75,7 @@
         </div>
       </div>
 
+      <label>Users associated with course</label>
       <table class="user-list">
         <tr>
           <th>User</th>
@@ -98,11 +99,8 @@
         </datalist>
       </div>
 
-
-      
-
-      <button [disabled]="form.invalid || form.pending" type="submit" class="btn fl">{{ editing ? 'Update' : 'Create' }}</button>
-      <button *ngIf="editing" type="button" class="btn btn-danger fr" (click)="resetForm()">Cancel</button>
+      <button *ngIf="editing" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
+      <button [disabled]="form.invalid || form.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
     </form>
   </div>
 

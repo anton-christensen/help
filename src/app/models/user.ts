@@ -1,5 +1,7 @@
 export type Role = 'admin' | 'lecturer' | 'assistant' | 'student';
 
+export const UserPath = 'users';
+
 export class User {
   uid: string;
   email: string;
