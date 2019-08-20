@@ -14,11 +14,11 @@ export const onNewTrashCan = functions.firestore
           notification: {
             title: `A ${course.slug.toUpperCase()} student needs help!`,
             body: `Room no. ${trashCan.room}`,
-            clickAction: `https://help.aau.dk/${course.instituteSlug}/courses/${course.slug}`,
+            clickAction: `https://help.aau.dk/institutes/${course.instituteSlug}/courses/${course.slug}`,
             icon: `https://help.aau.dk/assets/icons/icon-128x128.png`
           }
         });
-    })
+    });
   });
 
 
@@ -50,7 +50,7 @@ export const onDeleteNotificationToken = functions.firestore
 export const onUpdateCourse = functions.firestore
   .document('courses/{courseID}').onUpdate((snap, ctx) => {
     // Check if there was a change to associated users
-    let removedUsers = [];
+    const removedUsers = [];
     for (const oldUser of snap.before.data().associatedUserIDs) {
       if (!snap.after.data().associatedUserIDs.includes(oldUser)) {
         removedUsers.push(oldUser);
@@ -59,7 +59,7 @@ export const onUpdateCourse = functions.firestore
 
     if (removedUsers.length === 0) {
       return null;
-    } 
+    }
     console.log(`These users were removed from course ${ctx.params.courseID}:`, removedUsers);
 
     // Remove notification tokens for each removed user and this course
