@@ -1,4 +1,8 @@
-<div class="request-help-container" *ngIf="course$ | async as course">
+<ng-template #loading>
+  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</ng-template>
+
+<div class="request-help-container" *ngIf="course$ | async as course; else loading">
   <ng-container *ngIf="course.enabled">
 
     <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
