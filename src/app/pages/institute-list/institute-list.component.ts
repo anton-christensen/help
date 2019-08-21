@@ -11,8 +11,7 @@ import {Institute} from '../../models/institute';
 export class InstituteListComponent implements OnInit {
   public institutes$: Observable<Institute[]>;
 
-  constructor(private instituteService: InstituteService) { 
-  }
+  constructor(private instituteService: InstituteService) {}
 
   ngOnInit() {
     this.institutes$ = this.instituteService.getAll();

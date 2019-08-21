@@ -1,4 +1,8 @@
-<ng-container *ngIf="courses$ | async as courses">
+<ng-template #loading>
+  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</ng-template>
+
+<ng-container *ngIf="courses$ | async as courses; else loading">
 
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
