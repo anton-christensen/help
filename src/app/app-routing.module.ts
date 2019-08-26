@@ -9,11 +9,11 @@ import {InstituteListComponent} from './pages/institute-list/institute-list.comp
 import {InstituteExistsGuard} from './guards/institute-exists.guard';
 
 /*
-/ -> /institutes
-/institiutes (institute-list)
-/institiutes/:institute -> /institiutes/:institute/courses
-/institiutes/:institute/courses (courses-list)
-/institiutes/:institute/courses/:course (course)
+/ -> /departments
+/departments (institute-list)
+/departments/:institute -> /institiutes/:institute/courses
+/departments/:institute/courses (courses-list)
+/departments/:institute/courses/:course (course)
 
 /admin
  # promote users to professors (professors are attached to an institute)
@@ -24,11 +24,11 @@ import {InstituteExistsGuard} from './guards/institute-exists.guard';
 // { path: 'admin/courses', component: CourseEditComponent, canActivate: [IsLecturerGuard]},
 const routes: Routes = [
   {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
-  {path: 'institutes/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard]},
-  {path: 'institutes/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
-  {path: 'institutes/:institute', canActivate: [InstituteExistsGuard], redirectTo: '/institutes/:institute/courses'},
-  {path: 'institutes', component: InstituteListComponent},
-  {path: '**', redirectTo: 'institutes'},
+  {path: 'departments/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard]},
+  {path: 'departments/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
+  {path: 'departments/:institute', canActivate: [InstituteExistsGuard], redirectTo: '/departments/:institute/courses'},
+  {path: 'departments', component: InstituteListComponent},
+  {path: '**', redirectTo: 'departments'},
 ];
 
 @NgModule({

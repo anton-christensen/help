@@ -1,7 +1,7 @@
-<app-emphasized><h1 class="course-title">All institutes</h1></app-emphasized>
+<app-emphasized><h1 class="course-title">All departments</h1></app-emphasized>
 <ul>
   <li *ngFor="let institute of institutes$ | async">
-    <a [routerLink]="['/', 'institutes', institute.slug , 'courses']" class="institute-link">
+    <a [routerLink]="['/', 'departments', institute.slug , 'courses']" class="institute-link">
       {{ institute.title }}
     </a>
   </li>
