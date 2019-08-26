@@ -1,8 +1,17 @@
-<app-emphasized><h1 class="course-title">All departments</h1></app-emphasized>
-<ul>
-  <li *ngFor="let institute of institutes$ | async">
-    <a [routerLink]="['/', 'departments', institute.slug , 'courses']" class="institute-link">
-      {{ institute.title }}
-    </a>
-  </li>
-</ul>
+<ng-template #loading>
+  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</ng-template>
+
+<div *ngIf="institutes$ | async as institutes; else loading">
+  <app-emphasized>
+    <h1 class="course-title">All departments</h1>
+  </app-emphasized>
+
+  <ul>
+    <li *ngFor="let institute of institutes">
+      <a [routerLink]="['/', 'departments', institute.slug , 'courses']" class="institute-link">
+        {{ institute.title }}
+      </a>
+    </li>
+  </ul>
+</div>

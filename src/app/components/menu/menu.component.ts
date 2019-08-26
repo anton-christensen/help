@@ -28,7 +28,7 @@ export class MenuComponent implements OnInit, OnDestroy {
               private notificationService: NotificationService,
               private courseService: CourseService,
               private afMessaging: AngularFireMessaging) {
-    
+
     // Get notificationTokens when a course appears
     this.notificationToken$ = this.sessionService.getCourse$().pipe(
       switchMap((course: Course) => {
@@ -39,7 +39,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.notificationTokenSub = this.notificationToken$
       .subscribe((token) => {
         this.notificationToken = token;
-        console.log("new token", token);
       });
   }
 

@@ -105,15 +105,15 @@ label.visible {
 
   transition: all 300ms ease-out;
 
-  
+
   &:hover {
     background-color: $pri-col-hover;
   }
-  
+
   &:active {
     background-color: $pri-col-active;
   }
-  
+
   &:disabled {
     cursor: default;
     color: $disabled-text;
@@ -192,6 +192,7 @@ markdown {
   h1 {
     text-align: left;
     font-size: $font-size-h3;
+    text-align: left;
   }
 
   h2 {

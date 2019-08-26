@@ -1,4 +1,8 @@
-<ng-container *ngIf="course$ | async as course">
+<ng-template #loading>
+  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</ng-template>
+
+<ng-container *ngIf="course$ | async as course; else loading">
   <app-emphasized>
     <h1 class="course-title">{{ course.title }}</h1>
   </app-emphasized>
@@ -7,7 +11,7 @@
 
   <ng-template #assistant>
     <app-assistant></app-assistant>
-  </ng-template>    
+  </ng-template>
 
   <ng-template #student>
     <app-student></app-student>
