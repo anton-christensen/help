@@ -4,7 +4,7 @@
   <table class="course-list">
     <tr>
       <th>Title</th>
-      <th>Institute</th>
+      <th>Department</th>
       <th>Shorthand</th>
       <th>Edit</th>
       <th>Delete</th>
@@ -42,14 +42,14 @@
       </div>
 
       <div class="form-field">
-        <label for="instituteSlug" class="visible">Institute</label>
+        <label for="instituteSlug" class="visible">Department</label>
         <select
           id="instituteSlug"
           class="form-control"
           formControlName="instituteSlug"
           required>
 
-          <option value="" disabled selected>Select an institute</option>
+          <option value="" disabled selected>Select an department</option>
           <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
             {{ institute.title }}
           </option>
@@ -71,7 +71,7 @@
           <div *ngIf="f.courseSlug.errors.required">Shorthand is required</div>
           <div *ngIf="f.courseSlug.errors.minlength">Shorthand must be at least 2 characters</div>
           <div *ngIf="f.courseSlug.errors.maxlength">Shorthand must be less than 6 characters</div>
-          <div *ngIf="f.courseSlug.errors.courseSlugTaken">Shorthand must be unique in the institute</div>
+          <div *ngIf="f.courseSlug.errors.courseSlugTaken">Shorthand must be unique in the department</div>
         </div>
       </div>
 

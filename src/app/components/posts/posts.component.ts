@@ -70,6 +70,11 @@ export class PostsComponent implements OnInit {
       .catch(() => {});
   }
 
+  public cancelEdit() {
+    this.form.reset();
+    this.editing = false;
+  }
+
   public hasCreatedDate(post: any): boolean {
     return CommonService.documentIsCreatedDatePresent(post);
   }

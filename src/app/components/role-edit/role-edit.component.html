@@ -1,5 +1,5 @@
 <h1>Roles</h1>
-<h3>Set users roles</h3>
+<h3>Set users' roles</h3>
 <form [formGroup]="form">
   <div class="form-field">
     <label for="query" class="visible">Search</label>
@@ -22,7 +22,7 @@
         <select (change)="setRole(user, $event.target.value)" [value]='user.role' [disabled]='user.email == (auth.user$ | async)?.email'>
           <option value='admin'    >admin</option>
           <option value='lecturer' >lecturer</option>
-          <option value='assistant'>assistant</option>
+          <option value='assistant'>TA</option>
           <option value='student'  >student</option>
         </select>
       </td>

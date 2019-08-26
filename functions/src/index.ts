@@ -14,7 +14,7 @@ export const onNewTrashCan = functions.firestore
           notification: {
             title: `A ${course.slug.toUpperCase()} student needs help!`,
             body: `Room no. ${trashCan.room}`,
-            clickAction: `https://help.aau.dk/institutes/${course.instituteSlug}/courses/${course.slug}`,
+            clickAction: `https://help.aau.dk/departments/${course.instituteSlug}/courses/${course.slug}`,
             icon: `https://help.aau.dk/assets/icons/icon-128x128.png`
           }
         });

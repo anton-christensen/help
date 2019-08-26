@@ -24,10 +24,20 @@
     }
   }
 
-  .btn {
+  .btn.cancel {
+    position: absolute;
+    right: 6rem;
+    bottom: 0;
+
+    &:disabled {
+      background-color: #aaa;
+    }
+  }
+
+  .btn.submit {
     position: absolute;
     right: 0;
-    top: 0;
+    bottom: 0;
   }
 }
 
