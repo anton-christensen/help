@@ -13,8 +13,10 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "express": "^4.17.1",
     "firebase-admin": "~7.0.0",
-    "firebase-functions": "^2.2.0"
+    "firebase-functions": "^2.2.0",
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "typescript": "^3.2.2"

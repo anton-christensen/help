@@ -63,7 +63,7 @@ export const onUpdateCourse = functions.firestore
     console.log(`These users were removed from course ${ctx.params.courseID}:`, removedUsers);
 
     // Remove notification tokens for each removed user and this course
-    const removedUsersPromises = []
+    const removedUsersPromises = [];
     for (const removedUser of removedUsers) {
       removedUsersPromises.push(
         admin.firestore().collection('notificationTokens')
@@ -111,7 +111,7 @@ export const onDeleteCourse = functions.firestore
         promises.push(post.ref.delete());
       });
       return Promise.all(promises);
-    })
+    });
 });
 
 
@@ -148,3 +148,27 @@ export const onUserDelete = functions.firestore
         return Promise.all(tokenPromises);
       });
   });
+
+import * as express from 'express';
+import * as request from 'request';
+const app = express();
+
+app.get('/api/', (req, res) => {
+  console.log('Got request', req);
+  if (typeof(req.query.ticket) === 'string') {
+    console.log('Got ticket: ', req.query.ticket);
+    console.log('validating ticket');
+    request(`https://login.aau.dk/cas/serviceValidate?service=https://help.aau.dk&ticket=${req.query.ticket}`, { json: true }, (err, res2, body) => {
+      if (err) {
+        return console.log(err);
+      }
+      console.log(body);
+      res.send(body);
+    });
+  } else {
+    console.log('No ticket... redirecting to CAS portal');
+    res.redirect('https://login.aau.dk/cas/login?service=https://help.aau.dk');
+  }
+});
+
+export const casAPI = functions.https.onRequest(app);
