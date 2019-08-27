@@ -8,8 +8,9 @@ import {Institute} from '../../models/institute';
 import {AuthService} from '../../services/auth.service';
 import {ModalService} from '../../services/modal.service';
 import {Course} from '../../models/course';
-import { User } from 'src/app/models/user';
-import { UserService } from 'src/app/services/user.service';
+import {User} from 'src/app/models/user';
+import {UserService} from 'src/app/services/user.service';
+import {ToastService} from 'src/app/services/toasts.service';
 
 @Component({
   selector: 'app-course-edit',
@@ -22,7 +23,7 @@ export class CourseEditComponent implements OnInit {
 
   private allUsers: User[] = [];
   private filteredUsers: User[] = [];
-  private assistants: User[] = [];
+  public assistants: User[] = [];
   private assistantIDs: string[] = [];
 
   public editing = false;
@@ -51,11 +52,14 @@ export class CourseEditComponent implements OnInit {
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
+              private toastService: ToastService,
               private courseService: CourseService,
               private instituteService: InstituteService,
               private userService: UserService) {}
 
   ngOnInit() {
+    this.resetForm();
+
     this.courses$ = this.auth.user$.pipe(
       switchMap((user) => {
         if (!user) {
@@ -69,6 +73,7 @@ export class CourseEditComponent implements OnInit {
         }
       })
     );
+
     this.institutes$ = this.instituteService.getAll();
 
     this.userService.getAll().subscribe(users => {
@@ -100,8 +105,17 @@ export class CourseEditComponent implements OnInit {
   }
 
   public removeAssistant(assistantID: string) {
-    this.assistantIDs = this.assistantIDs.filter( userID => userID !== assistantID);
-    this.assistants = this.getUsersFromIDs(this.assistantIDs);
+    const newListIDs = this.assistantIDs.filter( userID => userID !== assistantID);
+    const newListUsers = this.getUsersFromIDs(this.assistantIDs);
+
+    // if there are no admins or lecturer left in course
+    if (newListUsers.findIndex((user) => ['admin', 'lecturer'].includes(user.role)) === -1) {
+      this.toastService.add('There must be at least one admin or lecturer associated with every course');
+      return;
+    }
+
+    this.assistantIDs = newListIDs;
+    this.assistants = newListUsers;
   }
 
   public attemptAddUser(userEmail) {
@@ -154,7 +168,8 @@ export class CourseEditComponent implements OnInit {
       userSearch: ''
     });
 
-    this.assistants = [];
+    this.assistantIDs = [this.auth.user.uid];
+    this.assistants = [this.auth.user];
   }
 
   public submitCourse() {
@@ -171,10 +186,6 @@ export class CourseEditComponent implements OnInit {
     const val = this.form.value;
     const course = new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase());
 
-    if (!this.auth.isAdmin()) {
-      course.associatedUserIDs = [this.auth.user.uid];
-    }
-
     this.courseService.createOrUpdateCourse(course);
   }
 
@@ -188,11 +199,15 @@ export class CourseEditComponent implements OnInit {
     this.courseService.createOrUpdateCourse(this.courseBeingEdited);
   }
 
-  public deleteCourse(course) {
+  public deleteCourse(course: Course) {
     // Warn before delete
     this.modalService.add('Are you sure you want to delete ' + course.title, 'Delete', 'Cancel').then(() => {
-      this.courseService.deleteCourse(course);
-    }).catch(() => {});
+      this.courseService.deleteCourse(course).then(() => {
+        if (this.editing && this.courseBeingEdited.id === course.id) {
+          this.resetForm();
+        }
+      });
+    }).catch();
   }
 
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {

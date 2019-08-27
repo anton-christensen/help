@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, AfterViewInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Post} from 'src/app/models/post';
 import {AuthService} from 'src/app/services/auth.service';
@@ -9,16 +9,19 @@ import {ModalService} from 'src/app/services/modal.service';
 import {SessionService} from 'src/app/services/session.service';
 import {switchMap} from 'rxjs/operators';
 import {CommonService} from '../../services/common.service';
+import * as SimpleMDE from 'simplemde';
+// declare var SimpleMDE : any;
 
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss']
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent implements OnInit, AfterViewInit {
   public course$: Observable<Course>;
   public posts$: Observable<Post[]>;
   public editing = false;
+  private wysiwyg: SimpleMDE;
 
   public form = new FormGroup({
     id: new FormControl(),
@@ -41,6 +44,18 @@ export class PostsComponent implements OnInit {
     );
   }
 
+  ngAfterViewInit() {
+    this.wysiwyg = new SimpleMDE({
+      forceSync: true,
+      spellChecker: false,
+      status: false,
+      placeholder: "Write a post on the bulletin board.\nStyling is done in markdown.\nClick the ?-mark to get an overview"
+    });
+    this.wysiwyg.codemirror.on("change", () => {
+      this.form.controls['content'].setValue( this.wysiwyg.value() );
+    });
+  }
+
   public submitPost(course: Course) {
     if (this.form.invalid) {
       return;
@@ -48,8 +63,7 @@ export class PostsComponent implements OnInit {
 
     const post = new Post(this.form.value.id, course.id, this.form.value.content);
     this.postService.createOrUpdatePost(post).then(() => {
-      this.form.reset();
-      this.editing = false;
+      this.cancelEdit();
     });
   }
 
@@ -58,6 +72,7 @@ export class PostsComponent implements OnInit {
       content: post.content,
       id: post.id
     });
+    this.wysiwyg.value(post.content);
 
     this.editing = true;
   }
@@ -71,8 +86,13 @@ export class PostsComponent implements OnInit {
   }
 
   public cancelEdit() {
+    this.wysiwyg.value("");
     this.form.reset();
     this.editing = false;
+
+    if(this.wysiwyg.isFullscreenActive()) {
+      SimpleMDE.toggleFullScreen(this.wysiwyg);
+    }
   }
 
   public hasCreatedDate(post: any): boolean {

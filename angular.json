@@ -25,7 +25,8 @@
               "src/firebase-messaging-sw.js"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/simplemde/dist/simplemde.min.css"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
