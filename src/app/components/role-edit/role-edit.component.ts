@@ -10,19 +10,19 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./role-edit.component.scss']
 })
 export class RoleEditComponent implements OnInit {
-  
+
   private allUsers: User[];
   public  filteredUsers: User[];
   private userService: UserService;
   public auth: AuthService;
-  
+
   public form = new FormGroup({
     query: new FormControl(''),
   });
-  
+
   constructor(
     userService: UserService,
-    auth: AuthService  
+    auth: AuthService
   ) {
     this.auth = auth;
     this.userService = userService;
@@ -40,8 +40,10 @@ export class RoleEditComponent implements OnInit {
 
   public applyFilter(users: User[]): User[] {
     const filter = this.form.controls.query.value.toLocaleLowerCase();
-    const filtered = users.filter( user => user.email.toLocaleLowerCase().includes(filter) || user.name.toLocaleLowerCase().includes(filter));
-    return filtered.sort( (a,b) => a.email.localeCompare(b.email) );
+    const filtered = users.filter((user) => {
+      return user.email.toLocaleLowerCase().includes(filter) || user.name.toLocaleLowerCase().includes(filter);
+    });
+    return filtered.sort((a, b) => a.email.localeCompare(b.email) );
   }
 
   public setRole(user: User, role: Role) {
