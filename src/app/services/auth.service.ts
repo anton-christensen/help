@@ -37,6 +37,28 @@ export class AuthService {
       });
   }
 
+  public loginAAU(token: string) {
+    return this.fireAuth.auth.signInWithCustomToken(token)
+      .then(credential => {
+        // credential.user.email = credential.user.uid;
+        return this.createUser(credential.user).then(user => {
+          if(!user.email) {
+            credential.user.updateEmail(credential.user.uid).then(() => {
+              return user;
+            });
+          }
+        });
+      });
+
+    firebase.auth().signInWithCustomToken(token).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+    });
+    
+  }
+
   public login(): Promise<User> {
     return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(credential => {

@@ -155,17 +155,55 @@ const app = express();
 const casUrl = 'https://login.aau.dk/cas';
 const helpUrl = 'https://help.aau.dk/login';
 
+// var success = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n<cas:authenticationSuccess>\n<cas:user>achri15@student.aau.dk</cas:user>\n</cas:authenticationSuccess>\n</cas:serviceResponse>";
+// var error = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n<cas:authenticationFailure code='INVALID_TICKET'>\nticket &#039;ST-25250-s64agWia4mUUs0scpSfV-cas&#039; not recognized\n</cas:authenticationFailure>\n</cas:serviceResponse>";
+
+function encodeServiceURL(target) {
+  return encodeURIComponent(`${helpUrl}${typeof(target) === 'string' ? '?target='+encodeURIComponent(target) : ''}`);
+}
+
 app.get('/login', (req, res) => {
-  console.log('Got request:', req);
   if (typeof(req.query.ticket) === 'string') {
-    request(`${casUrl}/serviceValidate?service=${helpUrl}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
+    request(`${casUrl}/serviceValidate?service=${encodeServiceURL(req.query.target)}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
       if (err) {
-        return console.log(err);
+        res.send("CAS validate error: " + err);
       }
-      res.send(body);
+      else {
+        if(!body.includes("<cas:authenticationSuccess>")) {
+          res.send("CAS authentication error\n"+body);
+          return;
+        }
+        else {
+          body = body.substring(body.indexOf("<cas:user>")+10, body.indexOf("</cas:user>"))
+        }
+        let userId = body;
+        let additionalClaims = {
+          email: userId
+        };
+
+        admin.auth().createCustomToken(userId, additionalClaims)
+        .then(function(customToken) {
+          // res.cookie('fb-token', customToken);
+          // res.cookie('fb-test', "Ingen test uden hest");
+          // res.cookie('fb-email', body);
+          if(typeof(req.query.target) === 'string') {
+            res.redirect(req.query.target+`/authed?token=${customToken}&user=${userId}`);
+          }
+          else {
+            res.redirect(`https://help.aau.dk/authed?token=${customToken}&user=${userId}`);
+          }
+          
+        })
+        .catch(function(error) {
+          console.log('Error creating custom token:', error);
+          res.send(error);
+          
+        });
+      }
     });
   } else {
-    res.redirect(`${casUrl}/login?service=${helpUrl}`);
+    
+    res.redirect(`${casUrl}/login?service=${encodeServiceURL(req.query.target)}`);
   }
 });
 

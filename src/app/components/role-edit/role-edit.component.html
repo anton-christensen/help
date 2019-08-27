@@ -12,22 +12,26 @@
       formControlName="query" />
   </div>
   <table class="user-list">
-    <tr>
-      <th>User</th>
-      <th>Role</th>
-    </tr>
-    <tr *ngFor="let user of filteredUsers" class="user">
-      <td class="user"><span class="block name">{{ user.name }}</span><span class="explanation email">{{ user.email }}</span></td>
-      <td>
-        <select (change)="setRole(user, $event.target.value)"
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of filteredUsers" class="user">
+        <td class="user"><span class="block name">{{ user.name }}</span><span class="explanation email">{{ user.email }}</span></td>
+        <td>
+          <select (change)="setRole(user, $event.target.value)"
                 [value]='user.role'
                 [disabled]='user.email == (auth.user$ | async)?.email'>
-          <option value='admin'    >Admin</option>
-          <option value='lecturer' >Lecturer</option>
-          <option value='assistant'>TA</option>
-          <option value='student'  >Student</option>
-        </select>
-      </td>
-    </tr>
+            <option value='admin'    >Admin</option>
+            <option value='lecturer' >Lecturer</option>
+            <option value='assistant'>TA</option>
+            <option value='student'  >Student</option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </form>

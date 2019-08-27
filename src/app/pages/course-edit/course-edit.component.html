@@ -101,7 +101,7 @@
 
       <div [formGroup]="filterSearchForm">
         <label class="visible">Add user to course</label>
-        <input placeholder="Search for user by name or email" formControlName="userSearch" type="text" (change)="attemptAddUser($event.target.value);$event.target.blur();" (input)="userSearch($event.target.value)" list="userOptions">
+        <input placeholder="Search for user by name or email" formControlName="userSearch" type="text" (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value);" list="userOptions">
         <datalist id="userOptions">
           <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>
         </datalist>

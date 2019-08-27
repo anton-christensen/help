@@ -28,6 +28,7 @@ import { InstituteListComponent } from './pages/institute-list/institute-list.co
 import { MenuComponent } from './components/menu/menu.component';
 import { EmphasizedComponent } from './components/emphasized/emphasized.component';
 import { RoleEditComponent } from './components/role-edit/role-edit.component';
+import { HandleSuccessfullAuthComponent } from './components/handle-successfull-auth/handle-successfull-auth.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { RoleEditComponent } from './components/role-edit/role-edit.component';
     MenuComponent,
     EmphasizedComponent,
     RoleEditComponent,
+    HandleSuccessfullAuthComponent,
   ],
   imports: [
     BrowserModule,
