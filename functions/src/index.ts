@@ -155,7 +155,8 @@ const app = express();
 const casUrl = 'https://login.aau.dk/cas';
 const helpUrl = 'https://help.aau.dk/login';
 
-app.get('/', (req, res) => {
+app.get('/login', (req, res) => {
+  console.log('Got request:', req);
   if (typeof(req.query.ticket) === 'string') {
     request(`${casUrl}/serviceValidate?service=${helpUrl}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
       if (err) {
