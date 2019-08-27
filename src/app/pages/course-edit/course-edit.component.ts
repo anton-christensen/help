@@ -2,7 +2,7 @@ import {InstituteService} from '../../services/institute.service';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {first, map, switchMap} from 'rxjs/operators';
 import {CourseService} from '../../services/course.service';
-import {Observable, timer} from 'rxjs';
+import {Observable, of, timer} from 'rxjs';
 import {Component, OnInit} from '@angular/core';
 import {Institute} from '../../models/institute';
 import {AuthService} from '../../services/auth.service';
@@ -56,11 +56,19 @@ export class CourseEditComponent implements OnInit {
               private userService: UserService) {}
 
   ngOnInit() {
-    if (this.auth.isAdmin()) {
-      this.courses$ = this.courseService.getAll();
-    } else {
-      this.courses$ = this.courseService.getByLecturer(this.auth.user);
-    }
+    this.courses$ = this.auth.user$.pipe(
+      switchMap((user) => {
+        if (!user) {
+          return of([]);
+        } else {
+          if (user.role === 'admin') {
+            return this.courseService.getAll();
+          } else {
+            return this.courseService.getByLecturer(user);
+          }
+        }
+      })
+    );
     this.institutes$ = this.instituteService.getAll();
 
     this.userService.getAll().subscribe(users => {
@@ -97,7 +105,7 @@ export class CourseEditComponent implements OnInit {
   }
 
   public attemptAddUser(userEmail) {
-    const user = this.allUsers.find( u => u.email === userEmail );
+    const user = this.allUsers.find((u) => u.email === userEmail );
     if (user === undefined) {
       return;
     }
