@@ -79,11 +79,11 @@ export class CourseEditComponent implements OnInit {
     return this.form.controls;
   }
 
-  private getUsersFromIDs(ids : string[]) : User[] {
-    return ids.map( id => this.allUsers.find( user => user.uid == id) )
+  private getUsersFromIDs(ids: string[]): User[] {
+    return ids.map( id => this.allUsers.find( (user) => user.uid === id));
   }
 
-  public userSearch(query : string) {
+  public userSearch(query: string) {
     query = query.toLowerCase();
     this.filteredUsers = this.allUsers
       .filter((user) => !(this.assistantIDs.includes(user.uid)))
@@ -91,17 +91,18 @@ export class CourseEditComponent implements OnInit {
     return this.filteredUsers;
   }
 
-  public removeAssistant(assistantID : string) {
+  public removeAssistant(assistantID: string) {
     this.assistantIDs = this.assistantIDs.filter( userID => userID !== assistantID);
     this.assistants = this.getUsersFromIDs(this.assistantIDs);
   }
 
   public attemptAddUser(userEmail) {
-    const user = this.allUsers.find( u => u.email == userEmail );
-    if(user === undefined)
+    const user = this.allUsers.find( u => u.email === userEmail );
+    if (user === undefined) {
       return;
-    
-    if(user.role == 'student') {
+    }
+
+    if (user.role === 'student') {
       this.userService.setRole(user, 'assistant');
     }
     this.assistantIDs.push(user.uid);
@@ -181,7 +182,7 @@ export class CourseEditComponent implements OnInit {
 
   public deleteCourse(course) {
     // Warn before delete
-    this.modalService.add('Are you sure you want to delete ' + course.title, "Delete", "Cancel").then(() => {
+    this.modalService.add('Are you sure you want to delete ' + course.title, 'Delete', 'Cancel').then(() => {
       this.courseService.deleteCourse(course);
     }).catch(() => {});
   }
