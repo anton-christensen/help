@@ -152,23 +152,20 @@ export const onUserDelete = functions.firestore
 import * as express from 'express';
 import * as request from 'request';
 const app = express();
+const casUrl = 'https://login.aau.dk/cas';
+const helpUrl = 'https://help.aau.dk/login';
 
-app.get('/api/', (req, res) => {
-  console.log('Got request', req);
+app.get('/', (req, res) => {
   if (typeof(req.query.ticket) === 'string') {
-    console.log('Got ticket: ', req.query.ticket);
-    console.log('validating ticket');
-    request(`https://login.aau.dk/cas/serviceValidate?service=https://help.aau.dk&ticket=${req.query.ticket}`, { json: true }, (err, res2, body) => {
+    request(`${casUrl}/serviceValidate?service=${helpUrl}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
       if (err) {
         return console.log(err);
       }
-      console.log(body);
       res.send(body);
     });
   } else {
-    console.log('No ticket... redirecting to CAS portal');
-    res.redirect('https://login.aau.dk/cas/login?service=https://help.aau.dk');
+    res.redirect(`${casUrl}/login?service=${helpUrl}`);
   }
 });
 
-export const casAPI = functions.https.onRequest(app);
+export const casLogin = functions.https.onRequest(app);
