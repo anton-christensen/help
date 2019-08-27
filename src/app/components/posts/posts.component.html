@@ -9,8 +9,8 @@
             class="form-control"
             required
             formControlName="content"></textarea>
-            <button [disabled]="form.invalid" (click)="cancelEdit()" class="btn btn-danger cancel">Cancel</button>
-            <button [disabled]="form.invalid" type="submit" class="btn submit">{{ editing ? 'Update' : 'Post' }}</button>
+            <button [disabled]="form.invalid" [class.fullscreen-editor]="wysiwyg && wysiwyg.isFullscreenActive()" (click)="cancelEdit()" class="btn btn-danger cancel">Cancel</button>
+            <button [disabled]="form.invalid" [class.fullscreen-editor]="wysiwyg && wysiwyg.isFullscreenActive()" type="submit" class="btn submit">{{ editing ? 'Update' : 'Post' }}</button>
           </form>
       </div>
     </ng-container>
