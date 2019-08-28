@@ -44,5 +44,5 @@ export class IsAssistantGuard implements CanActivate {
   constructor(private router: Router,
               private auth: AuthService) {}
 
-    canActivate = isRoleGenerator(['admin', 'lecturer', 'assistant'], this.auth, this.router);
+    canActivate = isRoleGenerator(['admin', 'lecturer', 'TA'], this.auth, this.router);
 }

@@ -133,6 +133,10 @@ label.visible {
   }
 }
 
+.pressable {
+  cursor: pointer;
+}
+
 .block {
   display: block;
 }
@@ -341,44 +345,6 @@ input:checked + .slider:before {
   -webkit-transform: translateX(16px);
   -ms-transform: translateX(16px);
   transform: translateX(16px);
-}
-
-/*************** TOOLTIPS *****************/
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  width: 12rem;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  top: 150%;
-  left: -50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity .2s;
-}
-
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent black transparent;
-}
-
-.tooltip:hover .tooltiptext {
-  opacity: 1;
 }
 
 

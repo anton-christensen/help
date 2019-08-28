@@ -79,7 +79,7 @@ export class AuthService {
   }
 
   public isAssistant(): boolean {
-    return this.user && this.user.role === 'assistant';
+    return this.user && this.user.role === 'TA';
   }
 
   public isLecturerInCourse(course: Course): boolean {

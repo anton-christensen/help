@@ -20,14 +20,16 @@
     </thead>
     <tbody>
       <tr *ngFor="let user of filteredUsers" class="user">
-        <td class="user"><span class="block name">{{ user.name }}</span><span class="explanation email">{{ user.email }}</span></td>
+        <td class="user">
+          <span class="block name">{{ user.name }}</span>
+          <span class="explanation email">{{ user.email }}</span></td>
         <td>
           <select (change)="setRole(user, $event.target.value)"
                 [value]='user.role'
                 [disabled]='user.email == (auth.user$ | async)?.email'>
             <option value='admin'    >Admin</option>
             <option value='lecturer' >Lecturer</option>
-            <option value='assistant'>TA</option>
+            <option value='TA'       >TA</option>
             <option value='student'  >Student</option>
           </select>
         </td>

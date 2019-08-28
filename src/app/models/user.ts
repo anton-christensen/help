@@ -1,4 +1,4 @@
-export type Role = 'admin' | 'lecturer' | 'assistant' | 'student';
+export type Role = 'admin' | 'lecturer' | 'TA' | 'student';
 
 export const UserPath = 'users';
 

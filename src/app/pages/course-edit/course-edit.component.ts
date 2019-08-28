@@ -125,7 +125,7 @@ export class CourseEditComponent implements OnInit {
     }
 
     if (user.role === 'student') {
-      this.userService.setRole(user, 'assistant');
+      this.userService.setRole(user, 'TA');
     }
 
     this.assistantIDs.push(user.id);

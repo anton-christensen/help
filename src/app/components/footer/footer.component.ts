@@ -10,28 +10,27 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent implements OnInit {
-  public returnTarget: string = "https://help.aau.dk";
-  private currentPath = "/"
+  public returnTarget = 'https://help.aau.dk';
+  private currentPath = '/';
+
   constructor(@Inject(DOCUMENT) private document: Document,
               public auth: AuthService,
               private router: Router,
-              private location: PlatformLocation) { 
-           
+              private location: PlatformLocation) {
     router.events.subscribe((val) => {
-      if(val instanceof NavigationEnd) {
+      if (val instanceof NavigationEnd) {
         this.currentPath = val.urlAfterRedirects;
       }
     });
-    this.returnTarget = `${location.protocol}//${location.hostname}${location.port.length ? ':'+location.port : ''}`;
+    this.returnTarget = `${location.protocol}//${location.hostname}${location.port.length ? ':' + location.port : ''}`;
   }
 
   ngOnInit() {
   }
 
-  clickLogin() {
+  public clickLogin() {
     localStorage.setItem('pre-login-path', this.currentPath);
     this.document.location.href = `https://help.aau.dk/login?target=${this.returnTarget}`;
-    
   }
 
 }

@@ -1,4 +1,10 @@
 <footer>
-  <p *ngIf="auth.loggedIn()">Are you not a TA? <span (click)="auth.logout()">log out</span> to access less options</p>
-  <p *ngIf="!auth.loggedIn()">Are you a TA? <span (click)="clickLogin()">log in</span> to access more options</p>
+  <p *ngIf="auth.loggedIn()">
+    Logged in as {{ auth.user.role }}.
+    <span (click)="auth.logout()" class="pressable">Click here</span> to log out
+  </p>
+
+  <p *ngIf="!auth.loggedIn()">
+    Not a student?
+    <span (click)="clickLogin()" class="pressable">Click here</span> to log in</p>
 </footer>

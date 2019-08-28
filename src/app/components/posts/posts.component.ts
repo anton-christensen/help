@@ -51,10 +51,10 @@ export class PostsComponent implements OnInit, AfterViewInit {
       forceSync: true,
       spellChecker: false,
       status: false,
-      placeholder: "Write a post on the bulletin board.\nStyling is done in markdown.\nClick the ?-mark to get an overview"
+      placeholder: 'Write a post on the bulletin board.\nPosts can be styled by using markdown.\nClick the \'?\' to get an overview of what is possible.'
     });
-    this.wysiwyg.codemirror.on("change", () => {
-      this.form.controls['content'].setValue( this.wysiwyg.value() );
+    this.wysiwyg.codemirror.on('change', () => {
+      this.form.controls.content.setValue( this.wysiwyg.value() );
     });
   }
 
