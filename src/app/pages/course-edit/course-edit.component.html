@@ -1,18 +1,20 @@
 <h1>{{ auth.isAdmin() ? '' : 'Your' }} Courses</h1>
 <h3>Select department to edit course from</h3>
-<form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
-  <select
-  id="instituteSlug"
-  class="form-control"
-  formControlName="instituteSlug"
-  required>
-  
-  <option value="" disabled selected>Select an department</option>
-  <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
-    {{ institute.title }}
-  </option>
-</select>
-</form>
+<ng-container *ngIf="(auth.user$ | async).role === 'admin'">
+  <form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
+    <select
+      id="instituteSlug"
+      class="form-control"
+      formControlName="instituteSlug"
+      required>
+      
+      <option value="" disabled selected>Select an department</option>
+      <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
+        {{ institute.title }}
+      </option>
+    </select>
+  </form>
+</ng-container>
 <ng-container *ngIf="coursesPager && coursesPager.data | async as courses">
   <div class="tablefix-wrapper">
     <table class="course-list">
