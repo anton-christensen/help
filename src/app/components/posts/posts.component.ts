@@ -10,6 +10,7 @@ import {SessionService} from 'src/app/services/session.service';
 import {switchMap} from 'rxjs/operators';
 import {CommonService} from '../../services/common.service';
 import * as SimpleMDE from 'simplemde';
+import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
 // declare var SimpleMDE : any;
 
 @Component({
@@ -31,7 +32,8 @@ export class PostsComponent implements OnInit, AfterViewInit {
   constructor(public modalService: ModalService,
               public auth: AuthService,
               private postService: PostService,
-              private session: SessionService) {
+              private session: SessionService,
+              private _scrollToService: ScrollToService) {
   }
 
   ngOnInit() {
@@ -75,6 +77,8 @@ export class PostsComponent implements OnInit, AfterViewInit {
     this.wysiwyg.value(post.content);
 
     this.editing = true;
+    
+    this._scrollToService.scrollTo({target: 'editor-header', duration: 250});
   }
 
   public deletePost(post: Post) {
