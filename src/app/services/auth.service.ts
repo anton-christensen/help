@@ -4,7 +4,7 @@ import {AngularFirestore} from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 import {Observable, of} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
-import {User, UserPath} from '../models/user';
+import {Role, User, UserPath} from '../models/user';
 import {Course} from '../models/course';
 
 @Injectable({
@@ -21,7 +21,11 @@ export class AuthService {
       switchMap((authUser) => {
         if (authUser) {
           if (authUser.isAnonymous) {
-            return of(new User(authUser));
+            return of({
+              uid: authUser.uid,
+              anon: true,
+              role: 'student',
+            });
           } else {
             return this.db.doc<User>(`${UserPath}/${authUser.uid}`).valueChanges();
           }
@@ -39,30 +43,15 @@ export class AuthService {
 
   public loginAAU(token: string) {
     return this.fireAuth.auth.signInWithCustomToken(token)
-      .then(credential => {
-        // credential.user.email = credential.user.uid;
-        return this.createUser(credential.user).then(user => {
-          if(!user.email) {
-            credential.user.updateEmail(credential.user.uid).then(() => {
-              return user;
-            });
-          }
-        });
+      .then((credentials: firebase.auth.UserCredential) => {
+        return this.createOrUpdateUser(credentials);
       });
-
-    firebase.auth().signInWithCustomToken(token).catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
-    });
-    
   }
 
-  public login(): Promise<User> {
+  public loginGoogle(): Promise<User> {
     return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then(credential => {
-        return this.createUser(credential.user);
+      .then((credentials: firebase.auth.UserCredential) => {
+        return this.createOrUpdateUser(credentials);
       });
   }
 
@@ -98,17 +87,28 @@ export class AuthService {
     return this.user && (this.isAdmin() || this.isAssistantInCourse(course) || this.isLecturerInCourse(course));
   }
 
-  private createUser(authData): Promise<User> {
-    const user = new User(authData);
-    const ref = this.db.firestore.collection(UserPath).doc(authData.uid);
+  private createOrUpdateUser(credentials: firebase.auth.UserCredential): Promise<User> {
+    const user = {
+      email: credentials.user.uid,
+      anon: false,
+      name: '',
+      role: 'student',
+    } as User;
+    const ref = this.db.firestore.collection(UserPath).doc(credentials.user.uid);
 
     return ref.get()
-      .then(doc => {
+      .then((doc) => {
         if (!doc.exists) {
-          return ref.set(Object.assign({}, user)).catch( reason => console.log(Object.assign({}, user)));
+          return ref.set(user);
+        } else {
+          return ref.update(user);
         }
       })
+      .catch((err) => {
+        console.error('Error saving user:', err);
+      })
       .then(() => {
+        user.uid = credentials.user.uid;
         return user;
       });
   }

@@ -24,20 +24,19 @@ export class NotificationService {
     this.fingerprint$ = new Observable<string>((observer) => {
       if (this.fingerprint === undefined) {
         setTimeout(() => {
-          let options = {};
+          const options = {};
           Fingerprint.get(options, (components) => {
-            var values = components.map((component) => component.value);
+            const values = components.map((component) => component.value);
             this.fingerprint = Fingerprint.x64hash128(values.join(''), 31);
             observer.next(this.fingerprint);
           });
         }, 500);
-      }
-      else {
-        observer.next(this.fingerprint); 
+      } else {
+        observer.next(this.fingerprint);
       }
     });
   }
-  
+
   public generateAndSaveToken(course: Course): Promise<any> {
     return new Promise((resolve) => {
       // get device fingerprint
@@ -47,12 +46,12 @@ export class NotificationService {
           this.afMessaging.requestToken
             .subscribe((token) => {
               // resolve() when done
-              const ref = this.afStore.collection<NotificationToken>(NotificationTokenPath, (ref) => {
-                return ref
+              const ref = this.afStore.collection<NotificationToken>(NotificationTokenPath, (ref2) => {
+                return ref2
                 .where('userID', '==', this.auth.user.uid)
                 .where('deviceID', '==', fingerprint)
                 .where('courseID', '==', course.id)
-                .limit(1)
+                .limit(1);
               });
 
               ref.get().toPromise()
@@ -63,8 +62,8 @@ export class NotificationService {
                     const doc = new NotificationToken(id, token, fingerprint, this.auth.user, course);
                     return this.afStore.collection<NotificationToken>(NotificationTokenPath).doc(id).set(Object.assign({}, doc));
                   } else {
-                    // Update the token 
-                    return snapshot.docs[0].ref.update({token});                  
+                    // Update the token
+                    return snapshot.docs[0].ref.update({token});
                   }
                 })
                 .then(() => {
@@ -82,16 +81,16 @@ export class NotificationService {
           switchMap((user) => {
             return this.getSingle((ref) => {
               return ref
-              .where('userID', '==', this.auth.user ? this.auth.user.uid : '')
+              .where('userID', '==', user ? user.uid : '')
               .where('deviceID', '==', fingerprint)
               .where('courseID', '==', course.id);
             });
           })
-        )
+        );
       })
-    )
+    );
   }
-  
+
   public deleteToken(token: NotificationToken): Promise<any> {
     this.afMessaging.deleteToken(token.token);
 

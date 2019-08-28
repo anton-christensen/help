@@ -105,7 +105,7 @@ export class CourseEditComponent implements OnInit {
   }
 
   public removeAssistant(assistantID: string) {
-    const newListIDs = this.assistantIDs.filter( userID => userID !== assistantID);
+    const newListIDs = this.assistantIDs.filter((userID) => userID !== assistantID);
     const newListUsers = this.getUsersFromIDs(this.assistantIDs);
 
     // if there are no admins or lecturer left in course
