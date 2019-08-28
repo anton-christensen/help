@@ -7,6 +7,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {Role, User, UserPath} from '../models/user';
 import {Course} from '../models/course';
 import {CommonService} from './common.service';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class AuthService {
   public user: User;
 
   constructor(private fireAuth: AngularFireAuth,
-              private db: AngularFirestore) {
+              private afStore: AngularFirestore,
+              private userService: UserService) {
 
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
@@ -28,13 +30,7 @@ export class AuthService {
               role: 'student',
             });
           } else {
-            return this.db.doc<User>(`${UserPath}/${authUser.uid}`).snapshotChanges().pipe(
-              map((action) => {
-                const data = action.payload.data() as any;
-                const id = action.payload.id;
-                return {id, ...data};
-              })
-            );
+            return this.userService.getByID(authUser.uid);
           }
         } else {
           return of(null);
@@ -51,14 +47,14 @@ export class AuthService {
   public loginAAU(token: string) {
     return this.fireAuth.auth.signInWithCustomToken(token)
       .then((credentials: firebase.auth.UserCredential) => {
-        return this.createOrUpdateUser(credentials.user.uid);
+        return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
       });
   }
 
   public loginGoogle(): Promise<User> {
     return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then((credentials: firebase.auth.UserCredential) => {
-        return this.createOrUpdateUser(credentials.user.uid);
+        return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
       });
   }
 
@@ -92,30 +88,6 @@ export class AuthService {
 
   public canAssistInCourse(course: Course): boolean {
     return this.user && (this.isAdmin() || this.isAssistantInCourse(course) || this.isLecturerInCourse(course));
-  }
-
-  public createOrUpdateUser(email: string): Promise<User> {
-    const user = {
-      email: email,
-      anon: false,
-      name: '',
-      role: 'student',
-    } as User;
-    const ref = this.db.firestore.collection(UserPath).doc(email);
-
-    return ref.get()
-      .then((doc) => {
-        if (!doc.exists) {
-          return ref.set(user);
-        }
-      })
-      .catch((err) => {
-        console.error('Error saving user:', err);
-      })
-      .then(() => {
-        user.id = email;
-        return user;
-      });
   }
 
   loggedIn(): boolean {

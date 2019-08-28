@@ -1,4 +1,19 @@
 table td select {
   margin: 0;
-  padding: 0 0 0 0.2rem;
+}
+
+form {
+  margin: 0 auto;
+  position: relative;
+
+  input, button {
+    display: inline-block;
+    margin: 0;
+  }
+
+  button {
+    position: absolute;
+    right: 0;
+    width: 5rem;
+  }
 }

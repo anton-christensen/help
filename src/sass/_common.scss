@@ -202,7 +202,6 @@ markdown,.editor-preview-side {
   h1 {
     text-align: left;
     font-size: $font-size-h3;
-    text-align: left;
   }
 
   h2 {
@@ -270,8 +269,18 @@ form {
     width: 5rem;
   }
 
+  .info {
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.5rem;
+    text-align: center;
+    z-index: 5;
+
+    animation: glide-down 300ms ease-out;
+  }
+
   .error {
-    width: 20rem;
+    width: 17rem;
     color: $danger;
     font-size: 0.8rem;
     font-weight: bold;

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-import { UserService } from 'src/app/services/user.service';
-import { User, Role } from 'src/app/models/user';
-import { AuthService } from 'src/app/services/auth.service';
-import { ModalService } from 'src/app/services/modal.service';
+import {Component, OnInit} from '@angular/core';
+import {FormGroup, FormControl, Validators} from '@angular/forms';
+import {UserService} from 'src/app/services/user.service';
+import {User, Role} from 'src/app/models/user';
+import {AuthService} from 'src/app/services/auth.service';
+import {Observable, Subject} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-role-edit',
@@ -11,53 +12,56 @@ import { ModalService } from 'src/app/services/modal.service';
   styleUrls: ['./role-edit.component.scss']
 })
 export class RoleEditComponent implements OnInit {
-
-  private allUsers: User[];
-  public  filteredUsers: User[];
+  private email$ = new Subject<string>();
+  public user$: Observable<User>;
+  private user: User;
+  public gettingUser = false;
 
   public form = new FormGroup({
-    query: new FormControl(''),
+    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)]),
   });
 
-  constructor(
-    private userService: UserService,
-    public  auth: AuthService,
-    private modalService: ModalService
-  ) {
-    userService.getAll().subscribe(val => {
-      this.allUsers = val;
-      this.filteredUsers = this.applyFilter(val);
-    });
-  }
+  constructor(private userService: UserService,
+              private auth: AuthService) {}
 
   ngOnInit() {
-    this.form.controls.query.valueChanges.subscribe((val : string) => {
-      this.filteredUsers = this.applyFilter(this.allUsers);
-      val = val.toLowerCase();
-      // if no users match the query, the query is a valid email, its an email from the university
-      var isEmailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-      if(this.filteredUsers.length == 0 && isEmailRegex.test(val) && /[.@]aau.dk$/.test(val)) {
-        this.modalService.add(`The email ${val} does not exsist on help.aau.dk yet, would you like to add it?`).then(
-          () => {
-            // yes please
-            this.auth.createOrUpdateUser(val);
-          },
-          () => {
-            // no thanks
-          }
-        )
-      }
-    });
-  }
+    this.user$ = this.email$.pipe(
+      switchMap((email: string) => {
+        this.gettingUser = true;
+        return this.userService.getByEmail(email);
+      })
+    );
 
-  public applyFilter(users: User[]): User[] {
-    const filter = this.form.controls.query.value.toLocaleLowerCase();
-    return users.filter((user) => {
-      return user.email.toLocaleLowerCase().includes(filter) || user.name.toLocaleLowerCase().includes(filter);
-    }).slice(0, 10);
+    this.user$
+      .subscribe((user) => {
+        this.gettingUser = false;
+        this.user = user;
+      });
+
+    this.form.controls.email.valueChanges
+      .subscribe((email) => {
+        this.findUser(email.trim());
+    });
   }
 
   public setRole(user: User, role: Role) {
     this.userService.setRole(user, role);
+  }
+
+  onSubmit() {
+    if (this.form.invalid) {
+      return;
+    }
+
+    this.userService.createUserWithEmail(this.form.controls.email.value)
+      .then(() => {
+        this.findUser(this.form.controls.email.value);
+      });
+  }
+
+  private findUser(email: string) {
+    if (this.user || /[.@]aau.dk$/.test(email.toLowerCase())) {
+      this.email$.next(email);
+    }
   }
 }
