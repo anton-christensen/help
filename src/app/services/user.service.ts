@@ -21,7 +21,7 @@ export class UserService {
   }
 
   public setRole(user: User, role: Role) {
-    return this.afStore.collection<User>('users').doc(user.uid).update({role: role});
+    return this.afStore.collection<User>('users').doc(user.id).update({role});
   }
 
   public getByRole(role: Role): Observable<User[]> {
@@ -29,16 +29,6 @@ export class UserService {
       return ref
         .where('role', '==', role);
     });
-  }
-
-  public getWherRoleIn(roles: Role[]): Observable<User[]> {
-    return combineLatest(
-      roles.map( role => this.getByRole(role) )
-    ).pipe(
-      map( 
-        (values: User[][]) => values.reduce((acc, val) => acc.concat(val), []) 
-      )
-    );
   }
 
   private getSingle(qFn: QueryFn): Observable<User> {

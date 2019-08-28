@@ -48,7 +48,7 @@ export class NotificationService {
               // resolve() when done
               const ref = this.afStore.collection<NotificationToken>(NotificationTokenPath, (ref2) => {
                 return ref2
-                .where('userID', '==', this.auth.user.uid)
+                .where('userID', '==', this.auth.user.id)
                 .where('deviceID', '==', fingerprint)
                 .where('courseID', '==', course.id)
                 .limit(1);
@@ -59,8 +59,14 @@ export class NotificationService {
                   if (snapshot.docs.length === 0) {
                     // Create a new token
                     const id = this.afStore.collection<NotificationToken>(NotificationTokenPath).ref.doc().id;
-                    const doc = new NotificationToken(id, token, fingerprint, this.auth.user, course);
-                    return this.afStore.collection<NotificationToken>(NotificationTokenPath).doc(id).set(Object.assign({}, doc));
+                    const doc = {
+                      token,
+                      deviceID: fingerprint,
+                      userID: this.auth.user.id,
+                      courseID: course.id
+                    };
+
+                    return this.afStore.collection<NotificationToken>(NotificationTokenPath).doc(id).set(doc);
                   } else {
                     // Update the token
                     return snapshot.docs[0].ref.update({token});
@@ -81,7 +87,7 @@ export class NotificationService {
           switchMap((user) => {
             return this.getSingle((ref) => {
               return ref
-              .where('userID', '==', user ? user.uid : '')
+              .where('userID', '==', user ? user.id : '')
               .where('deviceID', '==', fingerprint)
               .where('courseID', '==', course.id);
             });

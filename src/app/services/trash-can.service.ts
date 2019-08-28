@@ -37,7 +37,7 @@ export class TrashCanService {
       return ref
         .where('active', '==', true)
         .where('courseID', '==', course.id)
-        .where('userID', '==', user.uid);
+        .where('userID', '==', user.id);
     });
   }
 

@@ -14,7 +14,7 @@ export class CommonService {
     return document && document.created && document.created.seconds;
   }
 
-  public static getSingle<T>(db: AngularFirestore, path: string, qFn: QueryFn): Observable<T> {
+  public static getSingle<T>(db: AngularFirestore, path: string, qFn: QueryFn = (ref) => ref): Observable<T> {
     return db.collection<Course>(path, (ref) => {
       return qFn(ref).limit(1);
     }).snapshotChanges().pipe(
@@ -31,7 +31,7 @@ export class CommonService {
     );
   }
 
-  public static getMultiple<T>(db: AngularFirestore, path: string, qFn: QueryFn): Observable<T[]> {
+  public static getMultiple<T>(db: AngularFirestore, path: string, qFn: QueryFn = (ref) => ref): Observable<T[]> {
     return db.collection<T>(path, qFn).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {

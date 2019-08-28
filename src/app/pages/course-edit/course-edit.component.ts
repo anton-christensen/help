@@ -76,12 +76,12 @@ export class CourseEditComponent implements OnInit {
 
     this.institutes$ = this.instituteService.getAll();
 
-    this.userService.getAll().subscribe(users => {
+    this.userService.getAll().subscribe((users) => {
       this.allUsers = users;
       this.assistants = this.getUsersFromIDs(this.assistantIDs);
     });
 
-    // Validate course slug when institute changes
+    // Validate course slug when department changes
     this.form.controls.instituteSlug.valueChanges
       .subscribe(() => {
         this.form.controls.courseSlug.updateValueAndValidity();
@@ -93,20 +93,20 @@ export class CourseEditComponent implements OnInit {
   }
 
   private getUsersFromIDs(ids: string[]): User[] {
-    return ids.map( id => this.allUsers.find( (user) => user.uid === id));
+    return ids.map((id) => this.allUsers.find((user) => user.id === id));
   }
 
   public userSearch(query: string) {
     query = query.toLowerCase();
     this.filteredUsers = this.allUsers
-      .filter((user) => !(this.assistantIDs.includes(user.uid)))
+      .filter((user) => !(this.assistantIDs.includes(user.id)))
       .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
     return this.filteredUsers;
   }
 
   public removeAssistant(assistantID: string) {
     const newListIDs = this.assistantIDs.filter((userID) => userID !== assistantID);
-    const newListUsers = this.getUsersFromIDs(this.assistantIDs);
+    const newListUsers = this.getUsersFromIDs(newListIDs);
 
     // if there are no admins or lecturer left in course
     if (newListUsers.findIndex((user) => ['admin', 'lecturer'].includes(user.role)) === -1) {
@@ -119,7 +119,7 @@ export class CourseEditComponent implements OnInit {
   }
 
   public attemptAddUser(userEmail) {
-    const user = this.allUsers.find((u) => u.email === userEmail );
+    const user = this.allUsers.find((u) => u.email === userEmail);
     if (user === undefined) {
       return;
     }
@@ -127,7 +127,8 @@ export class CourseEditComponent implements OnInit {
     if (user.role === 'student') {
       this.userService.setRole(user, 'assistant');
     }
-    this.assistantIDs.push(user.uid);
+
+    this.assistantIDs.push(user.id);
     this.assistantIDs = Array.from(new Set(this.assistantIDs));
     this.assistants = this.getUsersFromIDs(this.assistantIDs);
 
@@ -168,7 +169,7 @@ export class CourseEditComponent implements OnInit {
       userSearch: ''
     });
 
-    this.assistantIDs = [this.auth.user.uid];
+    this.assistantIDs = [this.auth.user.id];
     this.assistants = [this.auth.user];
   }
 

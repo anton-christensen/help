@@ -3,9 +3,10 @@ import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFirestore} from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 import {Observable, of} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import {Role, User, UserPath} from '../models/user';
 import {Course} from '../models/course';
+import {CommonService} from './common.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,12 +23,18 @@ export class AuthService {
         if (authUser) {
           if (authUser.isAnonymous) {
             return of({
-              uid: authUser.uid,
+              id: authUser.uid,
               anon: true,
               role: 'student',
             });
           } else {
-            return this.db.doc<User>(`${UserPath}/${authUser.uid}`).valueChanges();
+            return this.db.doc<User>(`${UserPath}/${authUser.uid}`).snapshotChanges().pipe(
+              map((action) => {
+                const data = action.payload.data() as any;
+                const id = action.payload.id;
+                return {id, ...data};
+              })
+            );
           }
         } else {
           return of(null);
@@ -76,11 +83,11 @@ export class AuthService {
   }
 
   public isLecturerInCourse(course: Course): boolean {
-    return this.user && (this.isLecturer() && course.associatedUserIDs.includes(this.user.uid));
+    return this.user && (this.isLecturer() && course.associatedUserIDs.includes(this.user.id));
   }
 
   public isAssistantInCourse(course: Course): boolean {
-    return this.user && (this.isAssistant() && course.associatedUserIDs.includes(this.user.uid));
+    return this.user && (this.isAssistant() && course.associatedUserIDs.includes(this.user.id));
   }
 
   public canAssistInCourse(course: Course): boolean {
@@ -106,7 +113,7 @@ export class AuthService {
         console.error('Error saving user:', err);
       })
       .then(() => {
-        user.uid = credentials.user.uid;
+        user.id = credentials.user.uid;
         return user;
       });
   }

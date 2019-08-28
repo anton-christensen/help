@@ -56,17 +56,17 @@ export class StudentComponent implements OnInit, OnDestroy {
           this.save(res.user.uid);
         });
     } else {
-      this.save(this.auth.user.uid);
+      this.save(this.auth.user.id);
     }
   }
 
-  private save(uid: string) {
+  private save(userID: string) {
     if (this.form.invalid) {
       console.error('You tried to save something invalid... How did you accomplish that?');
       return;
     }
 
-    this.trashCanService.addTrashCan(this.course, this.form.value.room, uid)
+    this.trashCanService.addTrashCan(this.course, this.form.value.room, userID)
       .then((tc) => {
         this.form.reset();
       });

@@ -28,7 +28,7 @@ export class CourseService {
   public getByLecturer(user: User): Observable<Course[]> {
     return this.getMultiple((ref) => {
       return ref
-        .where('associatedUserIDs', 'array-contains', user.uid);
+        .where('associatedUserIDs', 'array-contains', user.id);
     });
   }
 
