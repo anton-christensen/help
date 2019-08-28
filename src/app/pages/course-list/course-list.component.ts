@@ -15,10 +15,10 @@ export class CourseListComponent implements OnInit {
   public courses$: Observable<Course[]>;
 
   constructor(public auth: AuthService,
+    pub
               private route: ActivatedRoute,
               private session: SessionService,
-              private courseService: CourseService) {
-              }
+              private courseService: CourseService) {}
 
   ngOnInit() {
     this.session.getInstitute$().subscribe(institute => {

@@ -51,14 +51,14 @@ export class AuthService {
   public loginAAU(token: string) {
     return this.fireAuth.auth.signInWithCustomToken(token)
       .then((credentials: firebase.auth.UserCredential) => {
-        return this.createOrUpdateUser(credentials);
+        return this.createOrUpdateUser(credentials.user.uid);
       });
   }
 
   public loginGoogle(): Promise<User> {
     return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then((credentials: firebase.auth.UserCredential) => {
-        return this.createOrUpdateUser(credentials);
+        return this.createOrUpdateUser(credentials.user.uid);
       });
   }
 
@@ -94,14 +94,14 @@ export class AuthService {
     return this.user && (this.isAdmin() || this.isAssistantInCourse(course) || this.isLecturerInCourse(course));
   }
 
-  private createOrUpdateUser(credentials: firebase.auth.UserCredential): Promise<User> {
+  public createOrUpdateUser(email: string): Promise<User> {
     const user = {
-      email: credentials.user.uid,
+      email: email,
       anon: false,
       name: '',
       role: 'student',
     } as User;
-    const ref = this.db.firestore.collection(UserPath).doc(credentials.user.uid);
+    const ref = this.db.firestore.collection(UserPath).doc(email);
 
     return ref.get()
       .then((doc) => {
@@ -113,7 +113,7 @@ export class AuthService {
         console.error('Error saving user:', err);
       })
       .then(() => {
-        user.id = credentials.user.uid;
+        user.id = email;
         return user;
       });
   }

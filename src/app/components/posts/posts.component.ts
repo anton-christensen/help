@@ -47,14 +47,16 @@ export class PostsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.wysiwyg = new SimpleMDE({
-      forceSync: true,
-      spellChecker: false,
-      status: false,
-      placeholder: 'Write a post on the bulletin board.\nPosts can be styled by using markdown.\nClick the \'?\' to get an overview of what is possible.'
-    });
-    this.wysiwyg.codemirror.on('change', () => {
-      this.form.controls.content.setValue( this.wysiwyg.value() );
+    this.auth.user$.subscribe(me => {
+      this.wysiwyg = new SimpleMDE({
+        forceSync: true,
+        spellChecker: false,
+        status: false,
+        placeholder: 'Write a post on the bulletin board.\nPosts can be styled by using markdown.\nClick the \'?\' to get an overview of what is possible.'
+      });
+      this.wysiwyg.codemirror.on('change', () => {
+        this.form.controls.content.setValue( this.wysiwyg.value() );
+      });
     });
   }
 

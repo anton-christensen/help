@@ -12,6 +12,7 @@ import {User} from '../models/user';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
+  public pageSize: number = 10;
 
   public getAll(): Observable<Course[]> {
     return this.getMultiple((ref) => {
@@ -38,11 +39,13 @@ export class CourseService {
     });
   }
 
-  public getAllByInstitute(instituteSlug: string): Observable<Course[]> {
+  public getAllByInstitute(instituteSlug: string, pageNumber: number = 0): Observable<Course[]> {
     return this.getMultiple((ref) => {
       return ref
         .where('instituteSlug', '==', instituteSlug)
-        .orderBy('title', 'asc');
+        .orderBy('title', 'asc')
+        .startAt(pageNumber*this.pageSize)
+        .limit(this.pageSize);
     });
   }
 

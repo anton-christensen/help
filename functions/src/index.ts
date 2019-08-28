@@ -183,9 +183,6 @@ app.get('/login', (req, res) => {
 
         admin.auth().createCustomToken(userId, additionalClaims)
         .then(function(customToken) {
-          // res.cookie('fb-token', customToken);
-          // res.cookie('fb-test', "Ingen test uden hest");
-          // res.cookie('fb-email', body);
           if(typeof(req.query.target) === 'string') {
             res.redirect(req.query.target+`/authed?token=${customToken}&user=${userId}`);
           }
@@ -202,7 +199,6 @@ app.get('/login', (req, res) => {
       }
     });
   } else {
-    
     res.redirect(`${casUrl}/login?service=${encodeServiceURL(req.query.target)}`);
   }
 });

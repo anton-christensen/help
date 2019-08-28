@@ -146,6 +146,10 @@ label.visible {
   font-style: italic;
 }
 
+.tablefix-wrapper {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

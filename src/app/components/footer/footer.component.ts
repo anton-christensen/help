@@ -26,6 +26,18 @@ export class FooterComponent implements OnInit {
   }
 
   ngOnInit() {
+    // let createUser = (n) => {
+    //   if(n < 6600) {
+    //     let id = `${n}`;
+    //     while(id.length < 4) id = '0'+id;
+    //     console.log("attempting to create user: ", `${id}@testuser.aau.dk`);
+    //     this.auth.createOrUpdateUser(`${id}@testuser.aau.dk`).then(() => {
+    //       console.log("successfully created: ", `${id}@testuser.aau.dk `);
+    //       createUser(n+1);
+    //     });
+    //   }
+    // }
+    // createUser(2890);
   }
 
   public clickLogin() {

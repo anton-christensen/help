@@ -1,33 +1,34 @@
 <ng-container *ngIf="courses$ | async as courses; else loader">
   <h1>{{ auth.isAdmin() ? 'All' : 'Your' }} Courses</h1>
-
-  <table class="course-list">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Department</th>
-        <th>Shorthand</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let course of courses" class="course">
-        <td class="title">{{ course.title }}</td>
-        <td class="institute">{{ course.instituteSlug }}</td>
-        <td class="slug">{{ course.slug.toUpperCase() }}</td>
-        <td (click)="editCourse(course)" class="edit">
-          <i class="material-icons clickable">edit</i>
-        </td>
-        <td (click)="deleteCourse(course)" class="delete">
-          <i class="material-icons clickable">delete_forever</i>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="tablefix-wrapper">
+    <table class="course-list">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Department</th>
+          <th>Shorthand</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let course of courses" class="course">
+          <td class="title">{{ course.title }}</td>
+          <td class="institute">{{ course.instituteSlug }}</td>
+          <td class="slug">{{ course.slug.toUpperCase() }}</td>
+          <td (click)="editCourse(course)" class="edit">
+            <i class="material-icons clickable">edit</i>
+          </td>
+          <td (click)="deleteCourse(course)" class="delete">
+            <i class="material-icons clickable">delete_forever</i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="course-edit">
-    <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>
+    <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>    
     <form [formGroup]="form" (ngSubmit)="submitCourse()">
 
       <div class="form-field">
@@ -80,27 +81,29 @@
       </div>
 
       <label>Users associated with course</label>
-      <table class="user-list">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Role</th>
-            <th>Remove</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let assistant of assistants" class="user">
-            <td class="user">
-              <span class="block name">{{ assistant.name }}</span>
-              <span class="explanation email">{{ assistant.email }}</span>
-            </td>
-            <td class="role">{{ assistant.role }}</td>
-            <td (click)="removeAssistant(assistant.id)" class="delete">
-              <i class="material-icons clickable">delete_forever</i>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="tablefix-wrapper">
+        <table class="user-list">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let assistant of assistants" class="user">
+              <td class="user">
+                <span class="block name">{{ assistant.name }}</span>
+                <span class="explanation email">{{ assistant.email }}</span>
+              </td>
+              <td class="role">{{ assistant.role }}</td>
+              <td (click)="removeAssistant(assistant.id)" class="delete">
+                <i class="material-icons clickable">delete_forever</i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div [formGroup]="filterSearchForm">
         <label class="visible">Add user to course</label>

@@ -36,7 +36,7 @@
 
     <div class="bottom">
       <ng-container *ngIf="auth.isAdmin() || auth.isLecturer()">
-        <a class="menu-item" [routerLink]="['/admin']" routerLinkActive="active">
+        <a class="menu-item" (click)="closeMenu()" [routerLink]="['/admin']">
           <div class="floater fl">
             <label class="visible">Admin page</label>
             <label class="visible sublabel">Administrate the system</label>
