@@ -14,7 +14,11 @@ export class CourseService {
 
 
   public getAll(): Observable<Course[]> {
-    return this.getMultiple(ref => ref);
+    return this.getMultiple((ref) => {
+      return ref
+        .orderBy('instituteSlug', 'asc')
+        .orderBy('title', 'asc');
+    });
   }
 
   public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
@@ -28,13 +32,17 @@ export class CourseService {
   public getByLecturer(user: User): Observable<Course[]> {
     return this.getMultiple((ref) => {
       return ref
-        .where('associatedUserIDs', 'array-contains', user.id);
+        .where('associatedUserIDs', 'array-contains', user.id)
+        .orderBy('instituteSlug', 'asc')
+        .orderBy('title', 'asc');
     });
   }
 
   public getAllByInstitute(instituteSlug: string): Observable<Course[]> {
     return this.getMultiple((ref) => {
-      return ref.where('instituteSlug', '==', instituteSlug);
+      return ref
+        .where('instituteSlug', '==', instituteSlug)
+        .orderBy('title', 'asc');
     });
   }
 
