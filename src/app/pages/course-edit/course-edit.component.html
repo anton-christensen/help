@@ -1,4 +1,19 @@
-<ng-container *ngIf="courses$ | async as courses; else loader">
+<ng-container *ngIf="(auth.user$ | async).role == 'admin'; else lecturerCourses ">
+  is admin
+</ng-container>
+
+<ng-template #lecturerCourses>
+  is lecturer
+</ng-template>
+
+
+
+
+
+
+
+
+<ng-container *ngIf="coursesPager.data | async as courses; else loader">
   <h1>{{ auth.isAdmin() ? 'All' : 'Your' }} Courses</h1>
   <div class="tablefix-wrapper">
     <table class="course-list">

@@ -1,5 +1,5 @@
 import {Component, OnInit, AfterViewInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, combineLatest} from 'rxjs';
 import {Post} from 'src/app/models/post';
 import {AuthService} from 'src/app/services/auth.service';
 import {PostService} from 'src/app/services/post.service';
@@ -11,6 +11,7 @@ import {switchMap} from 'rxjs/operators';
 import {CommonService} from '../../services/common.service';
 import * as SimpleMDE from 'simplemde';
 import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
+import { User } from 'src/app/models/user';
 // declare var SimpleMDE : any;
 
 @Component({
@@ -20,6 +21,8 @@ import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
 })
 export class PostsComponent implements OnInit, AfterViewInit {
   public course$: Observable<Course>;
+  public course: Course;
+  public user: User;
   public posts$: Observable<Post[]>;
   public editing = false;
   private wysiwyg: SimpleMDE;
@@ -46,8 +49,17 @@ export class PostsComponent implements OnInit, AfterViewInit {
     );
   }
 
+  private reInitEditor() {
+    
+  }
+
   ngAfterViewInit() {
-    this.auth.user$.subscribe(me => {
+    combineLatest(this.auth.user$, this.course$).subscribe((val) => {
+      let user = val[0];
+      let course = val[1];
+      if(!user || !course || this.wysiwyg) return;
+      if(!course.associatedUserIDs.includes(user.id)) return;
+      
       this.wysiwyg = new SimpleMDE({
         forceSync: true,
         spellChecker: false,

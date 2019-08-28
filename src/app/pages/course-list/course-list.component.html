@@ -1,8 +1,8 @@
 <ng-template #loading>
   <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </ng-template>
-
-<ng-container *ngIf="courses$ | async as courses; else loading">
+<ng-container *ngIf="coursePager && coursePager.data | async as courses; else loading">
+<!-- <ng-container *ngIf="courses$ | async as courses; else loading"> -->
 
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
@@ -11,35 +11,28 @@
 
   <ng-template #admin>
     <app-emphasized><h1>All courses</h1></app-emphasized>
-    <ul>
-      <li *ngFor="let course of courses">
-        <app-course-link [course]="course"></app-course-link>
-      </li>
-    </ul>
   </ng-template>
 
   <ng-template #assistant>
     <app-emphasized><h1>Your courses</h1></app-emphasized>
-    <ul>
-      <li *ngFor="let course of relevantCourses(courses)">
-        <app-course-link [course]="course"></app-course-link>
-      </li>
-    </ul>
   </ng-template>
 
   <ng-template #student>
-    <app-emphasized><h1>Active courses</h1></app-emphasized>
-    <ul>
-      <li *ngFor="let course of activeCourses(courses)">
-        <app-course-link [course]="course"></app-course-link>
-      </li>
-    </ul>
-
-    <ng-container *ngIf="!activeCourses(courses).length">
-      <h2>There are no exercise sessions... in session</h2>
-      <h4>Please check back later or ask your TA to enable the course</h4>
-    </ng-container>
+      <app-emphasized><h1>Active courses</h1></app-emphasized>
+      <ng-container *ngIf="!courses.length">
+        <h2>There are no exercise sessions... in session</h2>
+        <h4>Please check back later or ask your TA to enable the course</h4>
+      </ng-container>
   </ng-template>
+
+  <ul>
+    <li *ngFor="let course of courses">
+      <app-course-link [course]="course"></app-course-link>
+    </li>
+  </ul>
+
+  <button class="btn" *ngIf="!(coursePager.done | async)" (click)="getMoreCourses()">Load more courses</button>
+  <ng-container *ngIf="(coursePager.loading | async); then loading"></ng-container>
 
 </ng-container>
 

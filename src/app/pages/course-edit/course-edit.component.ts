@@ -1,16 +1,17 @@
-import {InstituteService} from '../../services/institute.service';
-import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
-import {first, map, switchMap} from 'rxjs/operators';
-import {CourseService} from '../../services/course.service';
-import {Observable, of, timer} from 'rxjs';
-import {Component, OnInit} from '@angular/core';
-import {Institute} from '../../models/institute';
-import {AuthService} from '../../services/auth.service';
-import {ModalService} from '../../services/modal.service';
-import {Course} from '../../models/course';
-import {User} from 'src/app/models/user';
-import {UserService} from 'src/app/services/user.service';
-import {ToastService} from 'src/app/services/toasts.service';
+import { Component, OnInit } from '@angular/core';
+import { Pager, CourseService } from 'src/app/services/course.service';
+import { Observable, timer, of } from 'rxjs';
+import { Course } from 'src/app/models/course';
+import { Institute } from 'src/app/models/institute';
+import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
+import { ModalService } from 'src/app/services/modal.service';
+import { ToastService } from 'src/app/services/toasts.service';
+import { InstituteService } from 'src/app/services/institute.service';
+import { UserService } from 'src/app/services/user.service';
+import { switchMap, map, first } from 'rxjs/operators';
+import { User } from 'src/app/models/user';
+
 
 @Component({
   selector: 'app-course-edit',
@@ -18,6 +19,7 @@ import {ToastService} from 'src/app/services/toasts.service';
   styleUrls: ['./course-edit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
+  public coursesPager: Pager;
   public courses$: Observable<Course[]>;
   public institutes$: Observable<Institute[]>;
 
@@ -60,26 +62,21 @@ export class CourseEditComponent implements OnInit {
   ngOnInit() {
     this.resetForm();
 
-    this.courses$ = this.auth.user$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of([]);
-        } else {
-          if (user.role === 'admin') {
-            return this.courseService.getAll();
-          } else {
-            return this.courseService.getByLecturer(user);
-          }
-        }
-      })
-    );
+    this.auth.user$.subscribe(user => {
+      if(!user)
+        this.coursesPager = null;
+      else if(user.role === 'admin')
+        this.coursesPager = this.courseService.getAll();
+      else 
+        this.coursesPager = this.courseService.getAllByLecturer(user);
+    });
 
     this.institutes$ = this.instituteService.getAll();
 
-    this.userService.getAll().subscribe((users) => {
-      this.allUsers = users;
-      this.assistants = this.getUsersFromIDs(this.assistantIDs);
-    });
+    // this.userService.getAll().subscribe((users) => {
+    //   this.allUsers = users;
+    //   this.assistants = this.getUsersFromIDs(this.assistantIDs);
+    // });
 
     // Validate course slug when department changes
     this.form.controls.instituteSlug.valueChanges

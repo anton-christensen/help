@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CourseService } from 'src/app/services/course.service';
+import { CourseService, Pager } from 'src/app/services/course.service';
 import { Observable } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import {AuthService} from '../../services/auth.service';
@@ -13,17 +13,30 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class CourseListComponent implements OnInit {
   public courses$: Observable<Course[]>;
+  public coursePager: Pager;
 
   constructor(public auth: AuthService,
-
-              private route: ActivatedRoute,
               private session: SessionService,
               private courseService: CourseService) {}
 
   ngOnInit() {
     this.session.getInstitute$().subscribe(institute => {
-      this.courses$ = this.courseService.getAllByInstitute(institute.slug);
+      this.auth.user$.subscribe((user) => {
+        if(!user || user.role == 'student') {
+          this.coursePager = this.courseService.getAllActiveByInstitute(institute.slug);
+        }
+        else if(user.role == 'admin') {
+          this.coursePager = this.courseService.getAllByInstitute(institute.slug);
+        }
+        else if(user.role == 'TA' || user.role == 'lecturer') {
+          this.coursePager = this.courseService.getAllByLecturerAndInstitute(user, institute.slug);
+        }
+      });
     });
+  }
+
+  getMoreCourses() {
+    this.coursePager.more();
   }
 
   activeCourses(courses: Course[]): Course[] {
