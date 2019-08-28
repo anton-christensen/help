@@ -13,11 +13,10 @@ export class UserService {
   constructor(private afStore: AngularFirestore) {}
 
   public getAll(): Observable<User[]> {
-    return this.getMultiple(ref => ref);
-  }
-
-  public getWithIDs(): Observable<User[]> {
-    return this.getMultiple(ref => ref);
+    return this.getMultiple((ref) => {
+      return ref
+        .orderBy('email', 'asc');
+    });
   }
 
   public setRole(user: User, role: Role) {
