@@ -1,4 +1,4 @@
 <footer>
   <p *ngIf="auth.loggedIn()">Are you not a TA? <span (click)="auth.logout()">log out</span> to access less options</p>
-  <p *ngIf="!auth.loggedIn()">Are you a TA? <a href="https://help.aau.dk/login?target={{returnTarget}}"><span>log in</span></a> to access more options</p>
+  <p *ngIf="!auth.loggedIn()">Are you a TA? <span (click)="clickLogin()">log in</span> to access more options</p>
 </footer>

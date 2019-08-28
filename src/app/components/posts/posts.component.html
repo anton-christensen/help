@@ -1,7 +1,7 @@
 <ng-container *ngIf="course$ | async as course">
   <ng-container *ngIf="auth.canAssistInCourse(course)">
       <div class="post-edit">
-        <h3>Write a post for the bulletin board</h3>
+        <h3 id="editor-header">Write a post for the bulletin board</h3>
         <form [formGroup]="form" (ngSubmit)="submitPost(course)" class="no-detail">
           <label for="post">Post</label>
           <textarea
@@ -9,8 +9,8 @@
             class="form-control"
             required
             formControlName="content"></textarea>
-            <button [disabled]="form.invalid" [class.fullscreen-editor]="wysiwyg && wysiwyg.isFullscreenActive()" (click)="cancelEdit()" class="btn btn-danger cancel">Cancel</button>
-            <button [disabled]="form.invalid" [class.fullscreen-editor]="wysiwyg && wysiwyg.isFullscreenActive()" type="submit" class="btn submit">{{ editing ? 'Update' : 'Post' }}</button>
+            <button [disabled]="form.invalid" [class.fullscreen-editor]="(wysiwyg ? true : false) && wysiwyg.isFullscreenActive()" (click)="cancelEdit()" class="btn btn-danger cancel">Cancel</button>
+            <button [disabled]="form.invalid" [class.fullscreen-editor]="(wysiwyg ? true : false) && wysiwyg.isFullscreenActive()" type="submit" class="btn submit">{{ editing ? 'Update' : 'Post' }}</button>
           </form>
       </div>
     </ng-container>

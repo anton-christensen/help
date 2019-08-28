@@ -6,6 +6,7 @@ import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireMessagingModule} from '@angular/fire/messaging';
 import {MarkdownModule} from 'ngx-markdown';
+import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
@@ -59,7 +60,8 @@ import { HandleSuccessfullAuthComponent } from './components/handle-successfull-
     AngularFireMessagingModule,
     AngularFirestoreModule,
     AngularFireAuthModule,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
+    ScrollToModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

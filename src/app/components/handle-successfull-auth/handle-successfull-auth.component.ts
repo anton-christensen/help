@@ -23,7 +23,7 @@ export class HandleSuccessfullAuthComponent implements OnInit {
       console.log("Email: ", userEmail);
       this.auth.loginAAU(authToken).then(() => {
         this.ngZone.run(() => {
-          this.router.navigateByUrl("/");
+          this.router.navigateByUrl(localStorage.getItem('pre-login-path'));
         });
       });
     });
