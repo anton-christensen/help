@@ -1,20 +1,19 @@
-<ng-container *ngIf="(auth.user$ | async).role == 'admin'; else lecturerCourses ">
-  is admin
-</ng-container>
-
-<ng-template #lecturerCourses>
-  is lecturer
-</ng-template>
-
-
-
-
-
-
-
-
-<ng-container *ngIf="coursesPager.data | async as courses; else loader">
-  <h1>{{ auth.isAdmin() ? 'All' : 'Your' }} Courses</h1>
+<h1>{{ auth.isAdmin() ? '' : 'Your' }} Courses</h1>
+<h3>Select department to edit course from</h3>
+<form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
+  <select
+  id="instituteSlug"
+  class="form-control"
+  formControlName="instituteSlug"
+  required>
+  
+  <option value="" disabled selected>Select an department</option>
+  <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
+    {{ institute.title }}
+  </option>
+</select>
+</form>
+<ng-container *ngIf="coursesPager && coursesPager.data | async as courses">
   <div class="tablefix-wrapper">
     <table class="course-list">
       <thead>
@@ -41,103 +40,102 @@
       </tbody>
     </table>
   </div>
-
-  <div class="course-edit">
-    <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>    
-    <form [formGroup]="form" (ngSubmit)="submitCourse()">
-
-      <div class="form-field">
-        <label for="title" class="visible">Title</label>
-        <input
-          placeholder="E.g. Principles of Operating Systems and Concurrency"
-          type="text"
-          id="title"
-          name="course-title"
-          class="form-control"
-          formControlName="title"
-          required />
-        <div *ngIf="f.title.dirty && f.title.errors" class="invalid-feedback">
-          <div *ngIf="f.title.errors.required">Title is required</div>
-        </div>
-      </div>
-
-      <div class="form-field">
-        <label for="instituteSlug" class="visible">Department</label>
-        <select
-          id="instituteSlug"
-          class="form-control"
-          formControlName="instituteSlug"
-          required>
-
-          <option value="" disabled selected>Select an department</option>
-          <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
-            {{ institute.title }}
-          </option>
-
-        </select>
-      </div>
-
-      <div class="form-field">
-        <label for="courseSlug" class="visible">Shorthand</label>
-        <input
-          placeholder="E.g. PSS"
-          type="text"
-          id="courseSlug"
-          name="course-slug"
-          class="form-control"
-          formControlName="courseSlug"
-          required />
-        <div *ngIf="f.courseSlug.dirty && f.courseSlug.errors" class="invalid-feedback">
-          <div *ngIf="f.courseSlug.errors.required">Shorthand is required</div>
-          <div *ngIf="f.courseSlug.errors.minlength">Shorthand must be at least 2 characters</div>
-          <div *ngIf="f.courseSlug.errors.maxlength">Shorthand must be less than 6 characters</div>
-          <div *ngIf="f.courseSlug.errors.courseSlugTaken">Shorthand must be unique in the department</div>
-        </div>
-      </div>
-
-      <label>Users associated with course</label>
-      <div class="tablefix-wrapper">
-        <table class="user-list">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Role</th>
-              <th>Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let assistant of assistants" class="user">
-              <td class="user">
-                <span class="block name">{{ assistant.name }}</span>
-                <span class="explanation email">{{ assistant.email }}</span>
-              </td>
-              <td class="role">{{ assistant.role }}</td>
-              <td (click)="removeAssistant(assistant.id)" class="delete">
-                <i class="material-icons clickable">delete_forever</i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div [formGroup]="filterSearchForm">
-        <label class="visible">Add user to course</label>
-        <input placeholder="Search for user by name or email"
-               formControlName="userSearch"
-               type="text"
-               (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value)"
-               list="userOptions">
-        <datalist id="userOptions">
-          <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>
-        </datalist>
-      </div>
-
-      <button *ngIf="editing" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
-      <button [disabled]="form.invalid || form.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
-    </form>
-  </div>
-
+  <button class="btn" *ngIf="!(coursesPager.done | async)" (click)="loadMoreCourses()">Load more</button>
 </ng-container>
+<div class="course-edit">
+  <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>    
+  <form [formGroup]="courseEdit" (ngSubmit)="submitCourse()">
+
+    <div class="form-field">
+      <label for="title" class="visible">Title</label>
+      <input
+        placeholder="E.g. Principles of Operating Systems and Concurrency"
+        type="text"
+        id="title"
+        name="course-title"
+        class="form-control"
+        formControlName="title"
+        required />
+      <div *ngIf="f.title.dirty && f.title.errors" class="invalid-feedback">
+        <div *ngIf="f.title.errors.required">Title is required</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="instituteSlug" class="visible">Department</label>
+      <select
+        id="instituteSlug"
+        class="form-control"
+        formControlName="instituteSlug"
+        required>
+
+        <option value="" disabled selected>Select an department</option>
+        <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
+          {{ institute.title }}
+        </option>
+
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="courseSlug" class="visible">Shorthand</label>
+      <input
+        placeholder="E.g. PSS"
+        type="text"
+        id="courseSlug"
+        name="course-slug"
+        class="form-control"
+        formControlName="courseSlug"
+        required />
+      <div *ngIf="f.courseSlug.dirty && f.courseSlug.errors" class="invalid-feedback">
+        <div *ngIf="f.courseSlug.errors.required">Shorthand is required</div>
+        <div *ngIf="f.courseSlug.errors.minlength">Shorthand must be at least 2 characters</div>
+        <div *ngIf="f.courseSlug.errors.maxlength">Shorthand must be less than 6 characters</div>
+        <div *ngIf="f.courseSlug.errors.courseSlugTaken">Shorthand must be unique in the department</div>
+      </div>
+    </div>
+
+    <label>Users associated with course</label>
+    <div class="tablefix-wrapper">
+      <table class="user-list">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let assistant of assistants" class="user">
+            <td class="user">
+              <span class="block name">{{ assistant.name }}</span>
+              <span class="explanation email">{{ assistant.email }}</span>
+            </td>
+            <td class="role">{{ assistant.role }}</td>
+            <td (click)="removeAssistant(assistant.id)" class="delete">
+              <i class="material-icons clickable">delete_forever</i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div [formGroup]="filterSearchForm">
+      <label class="visible">Add user to course</label>
+      <input placeholder="Search for user by name or email"
+              formControlName="userSearch"
+              type="text"
+              (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value)"
+              list="userOptions">
+      <datalist id="userOptions">
+        <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>
+      </datalist>
+    </div>
+
+    <button *ngIf="editing" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
+    <button [disabled]="form.invalid || form.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
+  </form>
+</div>
 
 <ng-template #loader>
   <app-loader></app-loader>

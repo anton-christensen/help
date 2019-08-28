@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Pager, CourseService } from 'src/app/services/course.service';
-import { Observable, timer, of } from 'rxjs';
+import { Observable, timer, of, combineLatest } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import { Institute } from 'src/app/models/institute';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -31,7 +31,13 @@ export class CourseEditComponent implements OnInit {
   public editing = false;
   private courseBeingEdited: Course;
 
-  public form = new FormGroup({
+  public coursesFilterForm = new FormGroup({
+    instituteSlug: new FormControl('', [
+      Validators.required
+    ]),
+  });
+
+  public courseEdit = new FormGroup({
     id: new FormControl(),
     title: new FormControl('', [
       Validators.required,
@@ -61,12 +67,19 @@ export class CourseEditComponent implements OnInit {
 
   ngOnInit() {
     this.resetForm();
+    this.coursesFilterForm.controls.instituteSlug.valueChanges
+      .subscribe((instituteSlug) => {
+        if(this.auth.user && this.auth.user.role === 'admin') {
+          this.coursesPager = this.courseService.getAllByInstitute(instituteSlug);
+        }
+      });
 
     this.auth.user$.subscribe(user => {
       if(!user)
         this.coursesPager = null;
-      else if(user.role === 'admin')
-        this.coursesPager = this.courseService.getAll();
+      else if(user.role === 'admin') {
+        // ... 
+      }
       else 
         this.coursesPager = this.courseService.getAllByLecturer(user);
     });
@@ -78,15 +91,20 @@ export class CourseEditComponent implements OnInit {
     //   this.assistants = this.getUsersFromIDs(this.assistantIDs);
     // });
 
+
     // Validate course slug when department changes
-    this.form.controls.instituteSlug.valueChanges
+    this.courseEdit.controls.instituteSlug.valueChanges
       .subscribe(() => {
-        this.form.controls.courseSlug.updateValueAndValidity();
+        this.courseEdit.controls.courseSlug.updateValueAndValidity();
       });
   }
 
+  public loadMoreCourses() {
+    this.coursesPager.more();
+  }
+
   public get f() {
-    return this.form.controls;
+    return this.courseEdit.controls;
   }
 
   private getUsersFromIDs(ids: string[]): User[] {
@@ -135,7 +153,7 @@ export class CourseEditComponent implements OnInit {
   }
 
   public editCourse(course: Course) {
-    this.form.setValue({
+    this.courseEdit.setValue({
       id: course.id,
       title: course.title,
       instituteSlug: course.instituteSlug,
@@ -156,7 +174,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited = null;
     this.editing = false;
 
-    this.form.reset({
+    this.courseEdit.reset({
       id: '',
       title: '',
       instituteSlug: '',
@@ -181,14 +199,14 @@ export class CourseEditComponent implements OnInit {
   }
 
   private createCourse() {
-    const val = this.form.value;
+    const val = this.courseEdit.value;
     const course = new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase());
 
     this.courseService.createOrUpdateCourse(course);
   }
 
   private updateCourse() {
-    const val = this.form.value;
+    const val = this.courseEdit.value;
     this.courseBeingEdited.title = val.title;
     this.courseBeingEdited.instituteSlug = val.instituteSlug;
     this.courseBeingEdited.slug = val.courseSlug.toLowerCase();
@@ -211,13 +229,13 @@ export class CourseEditComponent implements OnInit {
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {
     return timer(300).pipe(
       switchMap(() => {
-        const instituteSlug = this.form.value.instituteSlug;
+        const instituteSlug = this.courseEdit.value.instituteSlug;
         const courseSlug = control.value.toLowerCase();
 
         return this.courseService.getBySlug(instituteSlug, courseSlug).pipe(
           map((result) => {
             if (result) {
-              if (this.form.value.id === result.id) {
+              if (this.courseEdit.value.id === result.id) {
                 return null;
               } else {
                 return {courseSlugTaken: true};

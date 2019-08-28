@@ -149,8 +149,8 @@ export class Pager {
 
     // Create the observable array for consumption in components
     this.data = this._data.asObservable().pipe(
-      scan( (acc, val) => { 
-        return this.query.prepend ? val.concat(acc) : acc.concat(val)
+      scan( (acc: any[], val: any[]) => { 
+        return this.query.prepend ? val.map(val => val.data()).concat(acc) : acc.concat(val.map(val => val.data()))
       })
     );
   }
@@ -158,11 +158,11 @@ export class Pager {
   // Retrieves additional data from firestore
   public more() {
     const cursor = this.getCursor()
-
+    console.log("paging cursor: ", cursor);
     const more = this.afs.collection(this.query.path, ref => {
       return this.query.queryFunction(ref)
                        .limit(this.query.limit)
-                       .startAfter(cursor)
+                       .startAfter(cursor);
     })
     this.mapAndUpdate(more)
   }
@@ -172,7 +172,7 @@ export class Pager {
   private getCursor() {
     const current = this._data.value
     if (current.length) {
-      return this.query.prepend ? current[0].doc : current[current.length - 1].doc 
+      return this.query.prepend ? current[0] : current[current.length - 1]
     }
     return null
   }
@@ -189,13 +189,12 @@ export class Pager {
     // Map snapshot with doc ref (needed for cursor)
     return col.get({source: "server"}).pipe(
       tap(arr => {
-        let values = arr.docs.map(snap => {
-          return snap.data()
-        })
+        let values = arr.docs;
   
         // If prepending, reverse the batch order
         values = this.query.prepend ? values.reverse() : values
 
+        console.log("new paged values: ", values);
         // update source with new values, done loading
         this._data.next(values)
         this._loading.next(false)
