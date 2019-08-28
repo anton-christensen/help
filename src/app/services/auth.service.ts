@@ -100,8 +100,6 @@ export class AuthService {
       .then((doc) => {
         if (!doc.exists) {
           return ref.set(user);
-        } else {
-          return ref.update(user);
         }
       })
       .catch((err) => {
