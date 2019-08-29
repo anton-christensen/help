@@ -159,43 +159,56 @@ const helpUrl = 'https://help.aau.dk/login';
 // var error = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n<cas:authenticationFailure code='INVALID_TICKET'>\nticket &#039;ST-25250-s64agWia4mUUs0scpSfV-cas&#039; not recognized\n</cas:authenticationFailure>\n</cas:serviceResponse>";
 
 function encodeServiceURL(target) {
-  return encodeURIComponent(`${helpUrl}${typeof(target) === 'string' ? '?target='+encodeURIComponent(target) : ''}`);
+  return encodeURIComponent(`${helpUrl}${typeof(target) === 'string' ? '?target=' + encodeURIComponent(target) : ''}`);
 }
 
 app.get('/login', (req, res) => {
   if (typeof(req.query.ticket) === 'string') {
     request(`${casUrl}/serviceValidate?service=${encodeServiceURL(req.query.target)}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
       if (err) {
-        res.send("CAS validate error: " + err);
-      }
-      else {
-        if(!body.includes("<cas:authenticationSuccess>")) {
-          res.send("CAS authentication error\n"+body);
-          return;
+        res.send('CAS validate error: ' + err);
+      } else {
+        if (!body.includes('<cas:authenticationSuccess>')) {
+          res.send('CAS authentication error\n' + body);
+          return ;
+        } else {
+          body = body.substring(body.indexOf('<cas:user>') + 10, body.indexOf('</cas:user>'));
         }
-        else {
-          body = body.substring(body.indexOf("<cas:user>")+10, body.indexOf("</cas:user>"))
-        }
-        let userId = body;
-        let additionalClaims = {
-          email: userId
-        };
 
-        admin.auth().createCustomToken(userId, additionalClaims)
-        .then(function(customToken) {
-          if(typeof(req.query.target) === 'string') {
-            res.redirect(req.query.target+`/authed?token=${customToken}&user=${userId}`);
-          }
-          else {
-            res.redirect(`https://help.aau.dk/authed?token=${customToken}&user=${userId}`);
-          }
-          
-        })
-        .catch(function(error) {
-          console.log('Error creating custom token:', error);
-          res.send(error);
-          
-        });
+        const email = body;
+
+        admin.firestore().collection('users')
+          .where('email', '==', email).get()
+          .then((userQuerySnapshot) => {
+            if (userQuerySnapshot.empty) {
+              // New user: Save it in the database
+              const newUser = {
+                email,
+                anon: false,
+                name: '',
+                role: 'student'
+              };
+
+              return admin.firestore().collection('users').add(newUser);
+            } else {
+              // Returning user: Grab ID
+              return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+            }
+          })
+          .then((user: {id: string}) => {
+            admin.auth().createCustomToken(user.id)
+              .then((customToken) => {
+                if (typeof(req.query.target) === 'string') {
+                  res.redirect(req.query.target + `/authed?token=${customToken}`);
+                } else {
+                  res.redirect(`https://help.aau.dk/authed?token=${customToken}`);
+                }
+              })
+              .catch((error) => {
+                console.log('Error creating custom token:', error);
+                res.send(error);
+              });
+          });
       }
     });
   } else {
