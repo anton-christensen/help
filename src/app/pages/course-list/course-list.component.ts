@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CourseService, Pager } from 'src/app/services/course.service';
+import { CourseService, CoursePager } from 'src/app/services/course.service';
 import { Observable } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import {AuthService} from '../../services/auth.service';
@@ -13,7 +13,7 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class CourseListComponent implements OnInit {
   public courses$: Observable<Course[]>;
-  public coursePager: Pager;
+  public coursePager: CoursePager;
 
   constructor(public auth: AuthService,
               private session: SessionService,

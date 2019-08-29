@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Pager, CourseService } from 'src/app/services/course.service';
+import { CoursePager, CourseService } from 'src/app/services/course.service';
 import { Observable, timer, of, combineLatest, Subject } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import { Institute } from 'src/app/models/institute';
@@ -19,7 +19,7 @@ import { User } from 'src/app/models/user';
   styleUrls: ['./course-edit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
-  public coursesPager: Pager;
+  public coursesPager: CoursePager;
   public institutes$: Observable<Institute[]>;
 
   public coursesFilterForm = new FormGroup({
@@ -238,6 +238,7 @@ export class CourseEditComponent implements OnInit {
   public deleteCourse(course: Course) {
     // Warn before delete
     this.modalService.add('Are you sure you want to delete ' + course.title, 'Delete', 'Cancel').then(() => {
+      this.coursesPager.removeOneHack(course);
       this.courseService.deleteCourse(course).then(() => {
         if (this.editing && this.courseBeingEdited.id === course.id) {
           this.resetForm();

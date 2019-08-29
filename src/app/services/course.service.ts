@@ -5,6 +5,7 @@ import {Course, CoursePath} from '../models/course';
 import {CommonService} from './common.service';
 import {map, scan, tap, take} from 'rxjs/operators';
 import {User} from '../models/user';
+import { filter } from 'minimatch';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +13,10 @@ import {User} from '../models/user';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
-  public pageSize = 3;
+  public pageSize = 15;
 
-  public getAll(): Pager {
-    return new Pager(this.afStore,
+  public getAll(): CoursePager {
+    return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.orderBy('instituteSlug', 'asc')
                   .orderBy('title', 'asc'),
@@ -31,8 +32,8 @@ export class CourseService {
     });
   }
 
-  public getAllByLecturer(user: User): Pager {
-    return new Pager(this.afStore, 'courses', (ref) => {
+  public getAllByLecturer(user: User): CoursePager {
+    return new CoursePager(this.afStore, 'courses', (ref) => {
       return ref
         .where('associatedUserIDs', 'array-contains', user.id)
         .orderBy('instituteSlug', 'asc')
@@ -42,8 +43,8 @@ export class CourseService {
     );
   }
 
-  public getAllByInstitute(instituteSlug: string): Pager {
-    return new Pager(this.afStore,
+  public getAllByInstitute(instituteSlug: string): CoursePager {
+    return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('instituteSlug', '==', instituteSlug)
                   .orderBy('title', 'asc'),
@@ -51,8 +52,8 @@ export class CourseService {
     );
   }
 
-  public getAllByLecturerAndInstitute(user: User, instituteSlug: string): Pager {
-    return new Pager(this.afStore,
+  public getAllByLecturerAndInstitute(user: User, instituteSlug: string): CoursePager {
+    return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('instituteSlug', '==', instituteSlug)
                   .where('associatedUserIDs', 'array-contains', user.id)
@@ -61,8 +62,8 @@ export class CourseService {
     );
   }
 
-  public getAllActiveByInstitute(instituteSlug: string): Pager {
-    return new Pager(this.afStore,
+  public getAllActiveByInstitute(instituteSlug: string): CoursePager {
+    return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('enabled', '==', true)
                   .where('instituteSlug', '==', instituteSlug)
@@ -116,7 +117,7 @@ interface QueryConfig {
   prepend: boolean; // prepend to source?
 }
 
-export class Pager {
+export class CoursePager {
 
   // Source data
   private _done = new BehaviorSubject(false);
@@ -144,23 +145,54 @@ export class Pager {
 
     const first = this.afs.collection(this.query.path, (ref) => {
       return this.query.queryFunction(ref)
-        .limit(this.query.limit);
+                       .limit(this.query.limit);
     });
 
     this.mapAndUpdate(first);
 
     // Create the observable array for consumption in components
     this.data = this._data.asObservable().pipe(
-      scan( (acc: any[], val: any[]) => {
-        return this.query.prepend ? val.map((val) => val.data()).concat(acc) : acc.concat(val.map((val) => val.data()));
+      scan( (acc: any[], val: any[]) => { 
+        let newvals = [];
+        for(let i = 0; i < val.length; i++) {
+          let index = acc.findIndex( accItem => accItem.id == val[i].id);
+          if(val[i].type === 'removed' && index !== -1) {
+            acc.splice(index,1);
+          }
+          else if(index == -1) {
+            newvals.push(val[i]);
+          }
+          else {
+            acc[index] = val[i];
+          }
+        }
+
+        let result = (this.query.prepend ? newvals.concat(acc) : acc.concat(newvals))
+          .map(item => { 
+            return {
+              id: item.id,
+              title: item.title, 
+              slug: item.slug, 
+              instituteSlug: item.instituteSlug, 
+              enabled: item.enabled, 
+              associatedUserIDs: item.associatedUserIDs
+            } as Course;
+          });
+        return result;
       })
     );
+
+  }
+
+  public removeOneHack(removedCourse: Course) {
+    let c = this._data.value.find(course => course.id === removedCourse.id);
+    c.type = 'removed';
+    this._data.next([c]);
   }
 
   // Retrieves additional data from firestore
   public more() {
     const cursor = this.getCursor();
-    console.log('paging cursor: ', cursor);
     const more = this.afs.collection(this.query.path, (ref) => {
       return this.query.queryFunction(ref)
                        .limit(this.query.limit)
@@ -170,13 +202,13 @@ export class Pager {
   }
 
 
-  // Determines the doc snapshot to paginate query
+  // Determines the doc snapshot to paginate query 
   private getCursor() {
-    const current = this._data.value;
+    const current = this._data.value
     if (current.length) {
-      return this.query.prepend ? current[0] : current[current.length - 1];
+      return this.query.prepend ? current[0].doc : current[current.length - 1].doc 
     }
-    return null;
+    return null
   }
 
 
@@ -188,24 +220,29 @@ export class Pager {
     this._loading.next(true);
 
     // Map snapshot with doc ref (needed for cursor)
-    return col.get({source: 'server'}).pipe(
-      tap((arr) => {
-        let values = arr.docs;
-
+    return col.snapshotChanges().pipe(
+      tap( arr => {
+        let values = arr.map(snap => {
+          const data = snap.payload.doc.data();
+          // const data = snap.payload.doc.ref.get({source: 'server'});
+          const doc = snap.payload.doc;
+          const id = snap.payload.doc.id;
+          const type = snap.type;
+          return { ...data, doc, id, type };
+        });
+        
         // If prepending, reverse the batch order
         values = this.query.prepend ? values.reverse() : values;
 
-        console.log('new paged values: ', values);
         // update source with new values, done loading
         this._data.next(values);
         this._loading.next(false);
 
         // no more values, mark done
-        if (values.length < this.query.limit) {
+        if (values.length < this.query.limit && values.length !== 1) {
           this._done.next(true);
         }
-      }),
-      take(1)
+      })
     ).subscribe();
   }
 

@@ -24,7 +24,6 @@ export class SessionService {
       filter(event => {return event instanceof NavigationEnd;})
     )
       .subscribe((event) => {
-        console.log();
         this.currentRoute$.next(this.router.routerState.snapshot.root.firstChild.routeConfig.path);
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
         const instituteSlug = paramMap.get('institute');

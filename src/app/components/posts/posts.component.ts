@@ -58,7 +58,7 @@ export class PostsComponent implements OnInit, AfterViewInit {
       let user = val[0];
       let course = val[1];
       if(!user || !course || this.wysiwyg) return;
-      if(!course.associatedUserIDs.includes(user.id)) return;
+      if(!course.associatedUserIDs.includes(user.id) && user.role !== 'admin') return;
       
       this.wysiwyg = new SimpleMDE({
         forceSync: true,

@@ -51,7 +51,7 @@ export class StudentComponent implements OnInit, OnDestroy {
     if (!this.auth.user) {
       this.auth.anonymousSignIn()
         .then((res) => {
-          console.log(res);
+          console.log('anonymous signin: ', res);
           this.save(res.user.uid);
         });
     } else {
