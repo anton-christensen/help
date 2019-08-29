@@ -17,6 +17,7 @@
 }
 
 :host /deep/ :not(.fill-line) {
+  -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background: white;
   display: block;
@@ -26,3 +27,13 @@
   padding: 0 2rem;
   margin: 0;
 }
+
+@media screen and (max-width: 700px) {
+  :host /deep/ :not(.fill-line) {
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    left: 0;
+    right:0;
+  }
+}
+

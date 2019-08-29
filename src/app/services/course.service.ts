@@ -13,7 +13,7 @@ import { filter } from 'minimatch';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
-  public pageSize = 1;
+  public pageSize = 15;
 
   public getAll(): CoursePager {
     return new CoursePager(this.afStore,
