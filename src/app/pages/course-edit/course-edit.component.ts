@@ -48,7 +48,7 @@ export class CourseEditComponent implements OnInit {
     return this.courseForm.controls;
   }
   public editing = false;
-  private courseBeingEdited: Course;
+  public courseBeingEdited: Course;
 
   public usersForm = new FormGroup({
     email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])

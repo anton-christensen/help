@@ -1,6 +1,6 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import {Router, ActivatedRoute, Params} from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
+import {Component, OnInit, NgZone} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
+import {AuthService} from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-handle-successfull-auth',
@@ -17,10 +17,7 @@ export class HandleSuccessfullAuthComponent implements OnInit {
   ngOnInit() {
     // Note: Below 'queryParams' can be replaced with 'params' depending on your requirements
     this.activatedRoute.queryParams.subscribe(params => {
-      const authToken = params['token'];
-      const userEmail = params['user'];
-      console.log("Token: ", authToken);
-      console.log("Email: ", userEmail);
+      const authToken = params.token;
       this.auth.loginAAU(authToken).then(() => {
         this.ngZone.run(() => {
           this.router.navigateByUrl(localStorage.getItem('pre-login-path'));
