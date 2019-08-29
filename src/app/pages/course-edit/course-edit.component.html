@@ -1,14 +1,16 @@
 <h1>{{ auth.isAdmin() ? '' : 'Your' }} Courses</h1>
 
-<h3>Select department to edit course from</h3>
-<ng-container *ngIf="(auth.user$ | async).role === 'admin'">
+<ng-container *ngIf="(auth.user$ | async)?.role === 'admin'">
+  <h3>Select department to edit course from</h3>
   <form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
+    <label for="instituteFilterSlug">
+      Select department
+    </label>
     <select
       id="instituteFilterSlug"
       class="form-control"
       formControlName="instituteSlug"
       required>
-      
       <option value="" disabled selected>Select an department</option>
       <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
         {{ institute.title }}
@@ -49,7 +51,7 @@
 
 <div class="course-edit">
   <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>
-  <form [formGroup]="courseEdit" (ngSubmit)="submitCourse()">
+  <form [formGroup]="courseForm" (ngSubmit)="submitCourse()">
 
     <div class="form-field">
       <label for="title" class="visible">Title</label>
@@ -110,7 +112,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let user of usersInCourse$ | async" class="user">
+        <tr *ngFor="let user of associatedUsers" class="user">
           <td class="user">
             <span class="block name">{{ user.name }}</span>
             <span class="explanation email">{{ user.email }}</span>
@@ -124,7 +126,7 @@
       </table>
     </div>
 
-    <form class="no-detail"
+    <form class="no-detail inline-button"
           [formGroup]="usersForm"
           (ngSubmit)="onUserFormSubmit()">
       <label for="email">
@@ -140,12 +142,17 @@
       <button *ngIf="!gettingUser && !(user$ | async) && usersForm.valid"
               type="submit"
               class="btn">
+        Create and add
+      </button>
+      <button *ngIf="!gettingUser && (user$ | async) && usersForm.valid"
+              type="submit"
+              class="btn">
         Add
       </button>
 
       <div *ngIf="(!gettingUser && !(user$ | async) && usersForm.valid) || (usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email)" class="info">
           <span *ngIf="!gettingUser && !(user$ | async) && usersForm.valid">
-            This user does not exist in the system yet, but can be added
+            This user does not exist in the system yet, but can be created and then added to the course
           </span>
 
         <span *ngIf="usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email">
@@ -154,20 +161,8 @@
       </div>
     </form>
 
-    <!--      <div [formGroup]="usersForm">-->
-    <!--        <label class="visible">Add user to course</label>-->
-    <!--        <input placeholder="Search for user by name or email"-->
-    <!--               formControlName="userSearch"-->
-    <!--               type="text"-->
-    <!--               (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value)"-->
-    <!--               list="userOptions">-->
-    <!--        <datalist id="userOptions">-->
-    <!--          <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>-->
-    <!--        </datalist>-->
-    <!--      </div>-->
-
     <button *ngIf="editing" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
-    <button [disabled]="usersForm.invalid || usersForm.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
+    <button [disabled]="courseForm.invalid || courseForm.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
   </form>
 </div>
 

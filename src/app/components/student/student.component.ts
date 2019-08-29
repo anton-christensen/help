@@ -42,7 +42,6 @@ export class StudentComponent implements OnInit, OnDestroy {
 
         this.trashCan$ = this.trashCanService.getOwnedByCourse(course);
       });
-
   }
 
   ngOnDestroy(): void {
@@ -66,10 +65,7 @@ export class StudentComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.trashCanService.addTrashCan(this.course, this.form.value.room, userID)
-      .then((tc) => {
-        this.form.reset();
-      });
+    this.trashCanService.addTrashCan(this.course, this.form.value.room, userID);
   }
 
   public retractTrashCan(trashCan): Promise<any> {

@@ -10,22 +10,7 @@
   }
 
   form {
-    width: 17rem;
-    margin: 0 auto;
-
-    input, button {
-      display: inline-block;
-      margin: 0;
-    }
-
-    button {
-      width: 5rem;
-      float: right;
-    }
-
-    input {
-      width: 12rem;
-    }
+    max-width: 16rem;
   }
 
   .retract-trash-can {

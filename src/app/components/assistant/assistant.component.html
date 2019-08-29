@@ -12,26 +12,32 @@
   <ng-container *ngIf="trashCans.length > 0; then trashCansPresent; else noTrashCans"></ng-container>
 
   <ng-template #trashCansPresent>
-    <table class="trash-cans">
-      <tr>
-        <th>Room number</th>
-        <th>Posted at</th>
-        <th>Resolve</th>
-      </tr>
-      <tr *ngFor="let trashCan of trashCans" class="trash-can">
-        <td class="room">
-          {{ trashCan.room }}
-        </td>
-        <td *ngIf="hasCreatedDate(trashCan);" class="created">
-          {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d' }}
-        </td>
-        <td class="delete">
-          <i (click)="deleteTrashCan(trashCan)" class="material-icons clickable">
-            delete_forever
-          </i>
-        </td>
-      </tr>
-    </table>
+    <div class="tablefix-wrapper">
+      <table class="trash-cans">
+        <thead>
+        <tr>
+          <th>Room number</th>
+          <th>Posted at</th>
+          <th>Resolve</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let trashCan of trashCans" class="trash-can">
+            <td class="room">
+              {{ trashCan.room }}
+            </td>
+            <td *ngIf="hasCreatedDate(trashCan);" class="created">
+              {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d' }}
+            </td>
+            <td class="delete">
+              <i (click)="deleteTrashCan(trashCan)" class="material-icons clickable">
+                delete_forever
+              </i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </ng-template>
 
   <ng-template #noTrashCans>

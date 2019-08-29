@@ -9,7 +9,7 @@ import { ModalService } from 'src/app/services/modal.service';
 import { ToastService } from 'src/app/services/toasts.service';
 import { InstituteService } from 'src/app/services/institute.service';
 import { UserService } from 'src/app/services/user.service';
-import { switchMap, map, first } from 'rxjs/operators';
+import {switchMap, map, first, take} from 'rxjs/operators';
 import { User } from 'src/app/models/user';
 
 
@@ -20,16 +20,7 @@ import { User } from 'src/app/models/user';
 })
 export class CourseEditComponent implements OnInit {
   public coursesPager: Pager;
-  public courses$: Observable<Course[]>;
   public institutes$: Observable<Institute[]>;
-
-  // private allUsers: User[] = [];
-  // private filteredUsers: User[] = [];
-  // public assistants: User[] = [];
-  // private assistantIDs: string[] = [];
-
-  public editing = false;
-  private courseBeingEdited: Course;
 
   public coursesFilterForm = new FormGroup({
     instituteSlug: new FormControl('', [
@@ -37,7 +28,7 @@ export class CourseEditComponent implements OnInit {
     ]),
   });
 
-  public courseEdit = new FormGroup({
+  public courseForm = new FormGroup({
     id: new FormControl(''),
     title: new FormControl('', [
       Validators.required,
@@ -53,17 +44,20 @@ export class CourseEditComponent implements OnInit {
       this.courseSlugValidator.bind(this),
     ]),
   });
-
-  private email$ = new Subject<string>();
-  public user$: Observable<User>;
-  private user: User;
-  public gettingUser = false;
+  public get f() {
+    return this.courseForm.controls;
+  }
+  public editing = false;
+  private courseBeingEdited: Course;
 
   public usersForm = new FormGroup({
     email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
-
-  public usersInCourse$: Observable<User[]>;
+  private email$ = new Subject<string>();
+  public user$: Observable<User>;
+  private user: User;
+  public gettingUser = false;
+  public associatedUsers: User[];
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -76,7 +70,7 @@ export class CourseEditComponent implements OnInit {
     this.resetForm();
     this.coursesFilterForm.controls.instituteSlug.valueChanges
       .subscribe((instituteSlug) => {
-        if(this.auth.user && this.auth.user.role === 'admin') {
+        if (this.auth.user && this.auth.user.role === 'admin') {
           this.coursesPager = this.courseService.getAllByInstitute(instituteSlug);
         }
       });
@@ -93,16 +87,10 @@ export class CourseEditComponent implements OnInit {
 
     this.institutes$ = this.instituteService.getAll();
 
-    // this.userService.getAll().subscribe((users) => {
-    //   this.allUsers = users;
-    //   this.assistants = this.getUsersFromIDs(this.assistantIDs);
-    // });
-
-
     // Validate course slug when department changes
-    this.courseEdit.controls.instituteSlug.valueChanges
+    this.courseForm.controls.instituteSlug.valueChanges
       .subscribe(() => {
-        this.courseEdit.controls.courseSlug.updateValueAndValidity();
+        this.courseForm.controls.courseSlug.updateValueAndValidity();
       });
 
     this.user$ = this.email$.pipe(
@@ -128,15 +116,20 @@ export class CourseEditComponent implements OnInit {
     this.coursesPager.more();
   }
 
-  onUserFormSubmit() {
-    if (this.courseEdit.invalid) {
+  public onUserFormSubmit() {
+    if (this.usersForm.invalid) {
       return;
     }
 
-    this.userService.createUserWithEmail(this.courseEdit.controls.email.value)
-      .then(() => {
-        this.findUser(this.courseEdit.controls.email.value);
-      });
+    if (this.user) {
+      this.addUserToCourse(this.user);
+    } else {
+      this.userService.createUserWithEmail(this.usersForm.controls.email.value)
+        .then((user) => {
+          this.addUserToCourse(user);
+          this.findUser(user.email);
+        });
+    }
   }
 
   private findUser(email: string) {
@@ -145,62 +138,36 @@ export class CourseEditComponent implements OnInit {
     }
   }
 
-  public get f() {
-    return this.courseEdit.controls;
+  private addUserToCourse(user: User) {
+    // Check if user is already in course
+    if (this.associatedUsers.find((u) => u.id === user.id)) {
+      this.toastService.add('User is already in this course');
+    } else {
+      if (user.role === 'student') {
+        this.userService.setRole(user, 'TA');
+        user.role = 'TA';
+      }
+      this.associatedUsers.push(user);
+
+      this.usersForm.reset({
+        email: ''
+      });
+    }
   }
 
-  // private getUsersFromIDs(ids: string[]): User[] {
-  //   return ids.map((id) => this.allUsers.find((user) => user.id === id));
-  // }
-
-  // public userSearch(query: string) {
-  //   query = query.toLowerCase();
-  //   this.filteredUsers = this.allUsers
-  //     .filter((user) => !(this.assistantIDs.includes(user.id)))
-  //     .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
-  //   return this.filteredUsers;
-  // }
-
   public removeUserFromCourse(user: User) {
-    const newAssociatedUsers = this.courseBeingEdited.associatedUsers.filter((u) => u.id !== user.id);
+    const newAssociatedUsers = this.associatedUsers.filter((u) => u.id !== user.id);
 
-    // const newListIDs = this.assistantIDs.filter((userID) => userID !== assistantID);
-    // const newListUsers = this.getUsersFromIDs(newListIDs);
-
-    // if there are no admins or lecturer left in course
+    // Check if this removal means there are no admins og lecturers left
     if (!newAssociatedUsers.find((u) => u.role === 'admin' || u.role === 'lecturer')) {
       this.toastService.add('There must be at least one admin or lecturer associated with every course');
     } else {
-      this.courseBeingEdited.associatedUsers = newAssociatedUsers;
-      this.courseBeingEdited.associatedUserIDs = newAssociatedUsers.map((u) => user.id);
+      this.associatedUsers = newAssociatedUsers;
     }
-
-    // this.assistantIDs = newListIDs;
-    // this.assistants = newListUsers;
   }
 
-  // public attemptAddUser(userEmail) {
-  //   const user = this.allUsers.find((u) => u.email === userEmail);
-  //   if (user === undefined) {
-  //     return;
-  //   }
-  //
-  //   if (user.role === 'student') {
-  //     this.userService.setRole(user, 'TA');
-  //   }
-  //
-  //   this.assistantIDs.push(user.id);
-  //   this.assistantIDs = Array.from(new Set(this.assistantIDs));
-  //   this.assistants = this.getUsersFromIDs(this.assistantIDs);
-  //
-  //   this.usersForm.reset({
-  //     email: ''
-  //   });
-  // }
-
   public editCourse(course: Course) {
-    console.log(course);
-    this.courseEdit.setValue({
+    this.courseForm.setValue({
       id: course.id,
       title: course.title,
       instituteSlug: course.instituteSlug,
@@ -210,14 +177,11 @@ export class CourseEditComponent implements OnInit {
       email: ''
     });
 
-    this.usersInCourse$ = this.userService.getAllByID(course.associatedUserIDs);
-    this.usersInCourse$
-      .subscribe((users) => {
-        course.associatedUsers = users;
-      });
-
-    // this.assistantIDs = course.associatedUserIDs;
-    // this.assistants   = this.getUsersFromIDs(this.assistantIDs);
+    this.userService.getAllByID(course.associatedUserIDs).pipe(
+      first()
+    ).subscribe((users) => {
+      this.associatedUsers = users;
+    });
 
     this.courseBeingEdited = course;
     this.editing = true;
@@ -225,9 +189,10 @@ export class CourseEditComponent implements OnInit {
 
   public resetForm() {
     this.courseBeingEdited = null;
+    this.associatedUsers = [this.auth.user];
     this.editing = false;
 
-    this.courseEdit.reset({
+    this.courseForm.reset({
       id: '',
       title: '',
       instituteSlug: '',
@@ -236,9 +201,6 @@ export class CourseEditComponent implements OnInit {
     this.usersForm.reset({
       email: ''
     });
-
-    // this.assistantIDs = [this.auth.user.id];
-    // this.assistants = [this.auth.user];
   }
 
   public submitCourse() {
@@ -252,18 +214,23 @@ export class CourseEditComponent implements OnInit {
   }
 
   private createCourse() {
-    const val = this.courseEdit.value;
-    const course = new Course(val.id, val.title, val.instituteSlug, val.courseSlug.toLowerCase());
+    const course: Course = {
+      id: this.courseForm.value.id,
+      title: this.courseForm.value.title,
+      instituteSlug: this.courseForm.value.instituteSlug,
+      slug: this.courseForm.value.courseSlug.toLowerCase(),
+      enabled: false,
+      associatedUserIDs: this.associatedUsers.map((u) => u.id)
+    };
 
     this.courseService.createOrUpdateCourse(course);
   }
 
   private updateCourse() {
-    const val = this.courseEdit.value;
-    this.courseBeingEdited.title = val.title;
-    this.courseBeingEdited.instituteSlug = val.instituteSlug;
-    this.courseBeingEdited.slug = val.courseSlug.toLowerCase();
-    // this.courseBeingEdited.associatedUserIDs = this.assistantIDs;
+    this.courseBeingEdited.title = this.courseForm.value.title;
+    this.courseBeingEdited.instituteSlug = this.courseForm.value.instituteSlug;
+    this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
+    this.courseBeingEdited.associatedUserIDs = this.associatedUsers.map((u) => u.id);
 
     this.courseService.createOrUpdateCourse(this.courseBeingEdited);
   }
@@ -282,13 +249,13 @@ export class CourseEditComponent implements OnInit {
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {
     return timer(300).pipe(
       switchMap(() => {
-        const instituteSlug = this.courseEdit.value.instituteSlug;
+        const instituteSlug = this.courseForm.value.instituteSlug;
         const courseSlug = control.value.toLowerCase();
 
         return this.courseService.getBySlug(instituteSlug, courseSlug).pipe(
           map((result) => {
             if (result) {
-              if (this.courseEdit.value.id === result.id) {
+              if (this.courseForm.value.id === result.id) {
                 return null;
               } else {
                 return {courseSlugTaken: true};
