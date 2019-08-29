@@ -10,8 +10,8 @@
       <ng-container *ngIf="auth.canAssistInCourse(course)">
         <div class="menu-item" (click)="toggleCourseEnabled(course)">
           <div class="floater fl">
-            <label class="visible" for="course-enable-switch">Exercise session</label>
-            <label class="visible sublabel" for="course-enable-switch">Let students ask for help</label>
+            <label class="visible">Exercise session</label>
+            <label class="visible sublabel">Let students ask for help</label>
           </div>
           <div class="switch">
             <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
@@ -22,8 +22,8 @@
         <!-- Enable-trashcan-notifications switch -->
         <div class="menu-item" (click)="toggleNotificationsEnabled(course)">
           <div class="floater fl">
-            <label class="visible" for="notifications-enable-switch">Notifications</label>
-            <label class="visible sublabel" for="notifications-enable-switch">On this device, for this course</label>
+            <label class="visible">Notifications</label>
+            <label class="visible sublabel">On this device, for this course</label>
           </div>
     
           <div class="switch">
