@@ -43,11 +43,6 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // open menu by default if window is wide
-    if (window.innerWidth >= 1300) {
-      this.open = true;
-    }
-
     this.afMessaging.messages
       .subscribe((message) => {
         console.log('Notification: ', message);

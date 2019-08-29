@@ -178,7 +178,7 @@ export class CourseEditComponent implements OnInit {
     });
 
     this.userService.getAllByID(course.associatedUserIDs).pipe(
-      first()
+      take(1)
     ).subscribe((users) => {
       this.associatedUsers = users;
     });

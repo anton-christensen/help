@@ -46,8 +46,12 @@
       </tbody>
     </table>
   </div>
-  <button class="btn" *ngIf="!(coursesPager.done | async)" (click)="loadMoreCourses()">Load more</button>
+  <div class="text-centered" *ngIf="!(coursesPager.loading | async) && !(coursesPager.done | async)">
+    <button class="btn inline-block" (click)="loadMoreCourses()">Load more</button>
+  </div>
+  <app-loader  *ngIf="coursesPager.loading | async"></app-loader>
 </ng-container>
+<app-loader></app-loader>
 
 <div class="course-edit">
   <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>
