@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Pager, CourseService } from 'src/app/services/course.service';
-import { Observable, timer, of, combineLatest } from 'rxjs';
+import { Observable, timer, of, combineLatest, Subject } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import { Institute } from 'src/app/models/institute';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -23,10 +23,10 @@ export class CourseEditComponent implements OnInit {
   public courses$: Observable<Course[]>;
   public institutes$: Observable<Institute[]>;
 
-  private allUsers: User[] = [];
-  private filteredUsers: User[] = [];
-  public assistants: User[] = [];
-  private assistantIDs: string[] = [];
+  // private allUsers: User[] = [];
+  // private filteredUsers: User[] = [];
+  // public assistants: User[] = [];
+  // private assistantIDs: string[] = [];
 
   public editing = false;
   private courseBeingEdited: Course;
@@ -38,7 +38,7 @@ export class CourseEditComponent implements OnInit {
   });
 
   public courseEdit = new FormGroup({
-    id: new FormControl(),
+    id: new FormControl(''),
     title: new FormControl('', [
       Validators.required,
     ]),
@@ -54,9 +54,16 @@ export class CourseEditComponent implements OnInit {
     ]),
   });
 
-  public filterSearchForm = new FormGroup({
-    userSearch: new FormControl('')
+  private email$ = new Subject<string>();
+  public user$: Observable<User>;
+  private user: User;
+  public gettingUser = false;
+
+  public usersForm = new FormGroup({
+    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
+
+  public usersInCourse$: Observable<User[]>;
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -75,13 +82,13 @@ export class CourseEditComponent implements OnInit {
       });
 
     this.auth.user$.subscribe(user => {
-      if(!user)
+      if (!user) {
         this.coursesPager = null;
-      else if(user.role === 'admin') {
-        // ... 
-      }
-      else 
+      } else if (user.role === 'admin') {
+        // ...
+      } else {
         this.coursesPager = this.courseService.getAllByLecturer(user);
+      }
     });
 
     this.institutes$ = this.instituteService.getAll();
@@ -97,74 +104,120 @@ export class CourseEditComponent implements OnInit {
       .subscribe(() => {
         this.courseEdit.controls.courseSlug.updateValueAndValidity();
       });
+
+    this.user$ = this.email$.pipe(
+      switchMap((email: string) => {
+        this.gettingUser = true;
+        return this.userService.getByEmail(email);
+      })
+    );
+
+    this.user$
+      .subscribe((user) => {
+        this.gettingUser = false;
+        this.user = user;
+      });
+
+    this.usersForm.controls.email.valueChanges
+      .subscribe((email) => {
+        this.findUser(email.trim());
+      });
   }
 
   public loadMoreCourses() {
     this.coursesPager.more();
   }
 
+  onUserFormSubmit() {
+    if (this.courseEdit.invalid) {
+      return;
+    }
+
+    this.userService.createUserWithEmail(this.courseEdit.controls.email.value)
+      .then(() => {
+        this.findUser(this.courseEdit.controls.email.value);
+      });
+  }
+
+  private findUser(email: string) {
+    if (this.user || /[.@]aau.dk$/.test(email.toLowerCase())) {
+      this.email$.next(email);
+    }
+  }
+
   public get f() {
     return this.courseEdit.controls;
   }
 
-  private getUsersFromIDs(ids: string[]): User[] {
-    return ids.map((id) => this.allUsers.find((user) => user.id === id));
-  }
+  // private getUsersFromIDs(ids: string[]): User[] {
+  //   return ids.map((id) => this.allUsers.find((user) => user.id === id));
+  // }
 
-  public userSearch(query: string) {
-    query = query.toLowerCase();
-    this.filteredUsers = this.allUsers
-      .filter((user) => !(this.assistantIDs.includes(user.id)))
-      .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
-    return this.filteredUsers;
-  }
+  // public userSearch(query: string) {
+  //   query = query.toLowerCase();
+  //   this.filteredUsers = this.allUsers
+  //     .filter((user) => !(this.assistantIDs.includes(user.id)))
+  //     .filter((user) => user.email.toLocaleLowerCase().includes(query) || user.name.toLocaleLowerCase().includes(query));
+  //   return this.filteredUsers;
+  // }
 
-  public removeAssistant(assistantID: string) {
-    const newListIDs = this.assistantIDs.filter((userID) => userID !== assistantID);
-    const newListUsers = this.getUsersFromIDs(newListIDs);
+  public removeUserFromCourse(user: User) {
+    const newAssociatedUsers = this.courseBeingEdited.associatedUsers.filter((u) => u.id !== user.id);
+
+    // const newListIDs = this.assistantIDs.filter((userID) => userID !== assistantID);
+    // const newListUsers = this.getUsersFromIDs(newListIDs);
 
     // if there are no admins or lecturer left in course
-    if (newListUsers.findIndex((user) => ['admin', 'lecturer'].includes(user.role)) === -1) {
+    if (!newAssociatedUsers.find((u) => u.role === 'admin' || u.role === 'lecturer')) {
       this.toastService.add('There must be at least one admin or lecturer associated with every course');
-      return;
+    } else {
+      this.courseBeingEdited.associatedUsers = newAssociatedUsers;
+      this.courseBeingEdited.associatedUserIDs = newAssociatedUsers.map((u) => user.id);
     }
 
-    this.assistantIDs = newListIDs;
-    this.assistants = newListUsers;
+    // this.assistantIDs = newListIDs;
+    // this.assistants = newListUsers;
   }
 
-  public attemptAddUser(userEmail) {
-    const user = this.allUsers.find((u) => u.email === userEmail);
-    if (user === undefined) {
-      return;
-    }
-
-    if (user.role === 'student') {
-      this.userService.setRole(user, 'TA');
-    }
-
-    this.assistantIDs.push(user.id);
-    this.assistantIDs = Array.from(new Set(this.assistantIDs));
-    this.assistants = this.getUsersFromIDs(this.assistantIDs);
-
-    this.filterSearchForm.reset({
-      userSearch: ''
-    });
-  }
+  // public attemptAddUser(userEmail) {
+  //   const user = this.allUsers.find((u) => u.email === userEmail);
+  //   if (user === undefined) {
+  //     return;
+  //   }
+  //
+  //   if (user.role === 'student') {
+  //     this.userService.setRole(user, 'TA');
+  //   }
+  //
+  //   this.assistantIDs.push(user.id);
+  //   this.assistantIDs = Array.from(new Set(this.assistantIDs));
+  //   this.assistants = this.getUsersFromIDs(this.assistantIDs);
+  //
+  //   this.usersForm.reset({
+  //     email: ''
+  //   });
+  // }
 
   public editCourse(course: Course) {
+    console.log(course);
     this.courseEdit.setValue({
       id: course.id,
       title: course.title,
       instituteSlug: course.instituteSlug,
       courseSlug: course.slug.toUpperCase(),
     });
-    this.filterSearchForm.setValue({
-      userSearch: ''
+    this.usersForm.reset({
+      email: ''
     });
 
-    this.assistantIDs = course.associatedUserIDs;
-    this.assistants   = this.getUsersFromIDs(this.assistantIDs);
+    this.usersInCourse$ = this.userService.getAllByID(course.associatedUserIDs);
+    this.usersInCourse$
+      .subscribe((users) => {
+        course.associatedUsers = users;
+      });
+
+    // this.assistantIDs = course.associatedUserIDs;
+    // this.assistants   = this.getUsersFromIDs(this.assistantIDs);
 
     this.courseBeingEdited = course;
     this.editing = true;
@@ -180,12 +233,12 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: '',
       courseSlug: '',
     });
-    this.filterSearchForm.reset({
-      userSearch: ''
+    this.usersForm.reset({
+      email: ''
     });
 
-    this.assistantIDs = [this.auth.user.id];
-    this.assistants = [this.auth.user];
+    // this.assistantIDs = [this.auth.user.id];
+    // this.assistants = [this.auth.user];
   }
 
   public submitCourse() {
@@ -210,7 +263,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.title = val.title;
     this.courseBeingEdited.instituteSlug = val.instituteSlug;
     this.courseBeingEdited.slug = val.courseSlug.toLowerCase();
-    this.courseBeingEdited.associatedUserIDs = this.assistantIDs;
+    // this.courseBeingEdited.associatedUserIDs = this.assistantIDs;
 
     this.courseService.createOrUpdateCourse(this.courseBeingEdited);
   }

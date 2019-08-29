@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
-import { Observable, from, combineLatest } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import {User, Role, UserPath} from '../models/user';
 import { CommonService } from './common.service';
 import {map} from 'rxjs/operators';
-import {NotificationToken, NotificationTokenPath} from '../models/notification-token';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +27,15 @@ export class UserService {
         return {id, ...data};
       })
     );
+  }
+
+  public getAllByID(associatedUserIDs: string[]): Observable<User[]> {
+    const observables = [] as Observable<User>[];
+    for (const id of associatedUserIDs) {
+      observables.push(this.getByID(id));
+    }
+
+    return combineLatest(observables);
   }
 
   public getByEmail(email: string): Observable<User> {

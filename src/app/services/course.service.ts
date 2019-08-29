@@ -12,11 +12,11 @@ import {User} from '../models/user';
 export class CourseService {
   constructor(private afStore: AngularFirestore) {}
 
-  public pageSize: number = 3;
+  public pageSize = 3;
 
   public getAll(): Pager {
-    return new Pager(this.afStore, 
-      'courses', 
+    return new Pager(this.afStore,
+      'courses',
       (ref) => ref.orderBy('instituteSlug', 'asc')
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
@@ -32,18 +32,19 @@ export class CourseService {
   }
 
   public getAllByLecturer(user: User): Pager {
-    return new Pager(this.afStore, 
-      'courses', 
-      (ref) => ref.where('associatedUserIDs', 'array-contains', user.id)
-                  .orderBy('instituteSlug', 'asc')
-                  .orderBy('title', 'asc'),
-      { limit: this.pageSize }
+    return new Pager(this.afStore, 'courses', (ref) => {
+      return ref
+        .where('associatedUserIDs', 'array-contains', user.id)
+        .orderBy('instituteSlug', 'asc')
+        .orderBy('title', 'asc');
+      },
+      {limit: this.pageSize}
     );
   }
 
   public getAllByInstitute(instituteSlug: string): Pager {
-    return new Pager(this.afStore, 
-      'courses', 
+    return new Pager(this.afStore,
+      'courses',
       (ref) => ref.where('instituteSlug', '==', instituteSlug)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
@@ -51,8 +52,8 @@ export class CourseService {
   }
 
   public getAllByLecturerAndInstitute(user: User, instituteSlug: string): Pager {
-    return new Pager(this.afStore, 
-      'courses', 
+    return new Pager(this.afStore,
+      'courses',
       (ref) => ref.where('instituteSlug', '==', instituteSlug)
                   .where('associatedUserIDs', 'array-contains', user.id)
                   .orderBy('title', 'asc'),
@@ -61,8 +62,8 @@ export class CourseService {
   }
 
   public getAllActiveByInstitute(instituteSlug: string): Pager {
-    return new Pager(this.afStore, 
-      'courses', 
+    return new Pager(this.afStore,
+      'courses',
       (ref) => ref.where('enabled', '==', true)
                   .where('instituteSlug', '==', instituteSlug)
                   .orderBy('title', 'asc'),
@@ -108,11 +109,11 @@ export class CourseService {
 
 
 interface QueryConfig {
-  path: string, //  path to collection
-  queryFunction: QueryFn, // query function to order and select with
-  limit: number, // limit per query
-  reverse: boolean, // reverse order?
-  prepend: boolean // prepend to source?
+  path: string; //  path to collection
+  queryFunction: QueryFn; // query function to order and select with
+  limit: number; // limit per query
+  reverse: boolean; // reverse order?
+  prepend: boolean; // prepend to source?
 }
 
 export class Pager {
@@ -132,81 +133,80 @@ export class Pager {
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
   constructor(private afs: AngularFirestore, path: string, queryFunction: QueryFn, opts?: any) {
-    this.query = { 
+    this.query = {
       path,
       queryFunction,
       limit: 2,
       reverse: false,
       prepend: false,
       ...opts
-    }
+    };
 
-    const first = this.afs.collection(this.query.path, ref => {
-      return this.query.queryFunction(ref).limit(this.query.limit)
-    })
+    const first = this.afs.collection(this.query.path, (ref) => {
+      return this.query.queryFunction(ref)
+        .limit(this.query.limit);
+    });
 
-    this.mapAndUpdate(first)
+    this.mapAndUpdate(first);
 
     // Create the observable array for consumption in components
     this.data = this._data.asObservable().pipe(
-      scan( (acc: any[], val: any[]) => { 
-        return this.query.prepend ? val.map(val => val.data()).concat(acc) : acc.concat(val.map(val => val.data()))
+      scan( (acc: any[], val: any[]) => {
+        return this.query.prepend ? val.map((val) => val.data()).concat(acc) : acc.concat(val.map((val) => val.data()));
       })
     );
   }
 
   // Retrieves additional data from firestore
   public more() {
-    const cursor = this.getCursor()
-    console.log("paging cursor: ", cursor);
-    const more = this.afs.collection(this.query.path, ref => {
+    const cursor = this.getCursor();
+    console.log('paging cursor: ', cursor);
+    const more = this.afs.collection(this.query.path, (ref) => {
       return this.query.queryFunction(ref)
                        .limit(this.query.limit)
                        .startAfter(cursor);
-    })
-    this.mapAndUpdate(more)
+    });
+    this.mapAndUpdate(more);
   }
 
 
-  // Determines the doc snapshot to paginate query 
+  // Determines the doc snapshot to paginate query
   private getCursor() {
-    const current = this._data.value
+    const current = this._data.value;
     if (current.length) {
-      return this.query.prepend ? current[0] : current[current.length - 1]
+      return this.query.prepend ? current[0] : current[current.length - 1];
     }
-    return null
+    return null;
   }
 
 
   // Maps the snapshot to usable format the updates source
   private mapAndUpdate(col: AngularFirestoreCollection<any>) {
-
-    if (this._done.value || this._loading.value) { return };
+    if (this._done.value || this._loading.value) { return; }
 
     // loading
-    this._loading.next(true)
+    this._loading.next(true);
 
     // Map snapshot with doc ref (needed for cursor)
-    return col.get({source: "server"}).pipe(
-      tap(arr => {
+    return col.get({source: 'server'}).pipe(
+      tap((arr) => {
         let values = arr.docs;
-  
-        // If prepending, reverse the batch order
-        values = this.query.prepend ? values.reverse() : values
 
-        console.log("new paged values: ", values);
+        // If prepending, reverse the batch order
+        values = this.query.prepend ? values.reverse() : values;
+
+        console.log('new paged values: ', values);
         // update source with new values, done loading
-        this._data.next(values)
-        this._loading.next(false)
+        this._data.next(values);
+        this._loading.next(false);
 
         // no more values, mark done
         if (values.length < this.query.limit) {
-          this._done.next(true)
+          this._done.next(true);
         }
       }),
       take(1)
-    ).subscribe()
-
+    ).subscribe();
   }
 
 }

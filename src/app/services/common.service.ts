@@ -33,7 +33,7 @@ export class CommonService {
 
   public static getMultiple<T>(db: AngularFirestore, path: string, qFn: QueryFn = (ref) => ref): Observable<T[]> {
     return db.collection<T>(path, qFn).snapshotChanges().pipe(
-      map(actions => {
+      map((actions) => {
         return actions.map(a => {
           const data = a.payload.doc.data();
           const id = a.payload.doc.id;

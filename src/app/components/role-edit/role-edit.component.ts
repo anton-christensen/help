@@ -18,7 +18,7 @@ export class RoleEditComponent implements OnInit {
   public gettingUser = false;
 
   public form = new FormGroup({
-    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)]),
+    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
 
   constructor(private userService: UserService,

@@ -2,7 +2,7 @@
 <h3>Select department to edit course from</h3>
 <form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
   <select
-  id="instituteSlug"
+  id="instituteFilterSlug"
   class="form-control"
   formControlName="instituteSlug"
   required>
@@ -42,8 +42,9 @@
   </div>
   <button class="btn" *ngIf="!(coursesPager.done | async)" (click)="loadMoreCourses()">Load more</button>
 </ng-container>
+
 <div class="course-edit">
-  <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>    
+  <h3>{{ editing ? ('Edit the ' + courseBeingEdited.slug.toUpperCase() + ' course') : 'Add a new course'}}</h3>
   <form [formGroup]="courseEdit" (ngSubmit)="submitCourse()">
 
     <div class="form-field">
@@ -95,48 +96,82 @@
       </div>
     </div>
 
-    <label>Users associated with course</label>
     <div class="tablefix-wrapper">
       <table class="user-list">
         <thead>
-          <tr>
-            <th>User</th>
-            <th>Role</th>
-            <th>Remove</th>
-          </tr>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Remove</th>
+        </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let assistant of assistants" class="user">
-            <td class="user">
-              <span class="block name">{{ assistant.name }}</span>
-              <span class="explanation email">{{ assistant.email }}</span>
-            </td>
-            <td class="role">{{ assistant.role }}</td>
-            <td (click)="removeAssistant(assistant.id)" class="delete">
-              <i class="material-icons clickable">delete_forever</i>
-            </td>
-          </tr>
+        <tr *ngFor="let user of usersInCourse$ | async" class="user">
+          <td class="user">
+            <span class="block name">{{ user.name }}</span>
+            <span class="explanation email">{{ user.email }}</span>
+          </td>
+          <td class="role">{{ user.role }}</td>
+          <td (click)="removeUserFromCourse(user)" class="delete">
+            <i class="material-icons clickable">delete_forever</i>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
 
-    <div [formGroup]="filterSearchForm">
-      <label class="visible">Add user to course</label>
-      <input placeholder="Search for user by name or email"
-              formControlName="userSearch"
-              type="text"
-              (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value)"
-              list="userOptions">
-      <datalist id="userOptions">
-        <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>
-      </datalist>
-    </div>
+    <form class="no-detail"
+          [formGroup]="usersForm"
+          (ngSubmit)="onUserFormSubmit()">
+      <label for="email">
+        AAU email
+      </label>
+      <input type="text"
+             id="email"
+             name="aau-email"
+             autocomplete="off"
+             required
+             formControlName="email"
+             placeholder="Enter a valid AAU email">
+      <button *ngIf="!gettingUser && !(user$ | async) && usersForm.valid"
+              type="submit"
+              class="btn">
+        Add
+      </button>
+
+      <div *ngIf="(!gettingUser && !(user$ | async) && usersForm.valid) || (usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email)" class="info">
+          <span *ngIf="!gettingUser && !(user$ | async) && usersForm.valid">
+            This user does not exist in the system yet, but can be added
+          </span>
+
+        <span *ngIf="usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email">
+            Please enter a valid AAU email (ending in '.aau.dk')
+          </span>
+      </div>
+    </form>
+
+    <!--      <div [formGroup]="usersForm">-->
+    <!--        <label class="visible">Add user to course</label>-->
+    <!--        <input placeholder="Search for user by name or email"-->
+    <!--               formControlName="userSearch"-->
+    <!--               type="text"-->
+    <!--               (input)="(attemptAddUser($event.target.value) && $event.target.blur()) || userSearch($event.target.value)"-->
+    <!--               list="userOptions">-->
+    <!--        <datalist id="userOptions">-->
+    <!--          <option *ngFor="let user of filteredUsers" value="{{user.email}}">{{user.name}}</option>-->
+    <!--        </datalist>-->
+    <!--      </div>-->
 
     <button *ngIf="editing" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
-    <button [disabled]="form.invalid || form.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
+    <button [disabled]="usersForm.invalid || usersForm.pending" type="submit" class="btn fr">{{ editing ? 'Update' : 'Create' }}</button>
   </form>
 </div>
 
 <ng-template #loader>
   <app-loader></app-loader>
 </ng-template>
+
+
+
+
+
