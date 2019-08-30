@@ -164,18 +164,28 @@ function encodeServiceURL(target) {
 
 app.get('/login', (req, res) => {
   if (typeof(req.query.ticket) === 'string') {
-    request(`${casUrl}/serviceValidate?service=${encodeServiceURL(req.query.target)}&ticket=${req.query.ticket}`, {json: true}, (err, res2, body) => {
-      if (err) {
-        res.send('CAS validate error: ' + err);
-      } else {
-        if (!body.includes('<cas:authenticationSuccess>')) {
-          res.send('CAS authentication error\n' + body);
+    request.post(
+      `${casUrl}/samlValidate?TARGET=${encodeServiceURL(req.query.target)}`, 
+      { body: `<?xml version=\"1.0\" encoding=\"utf-8\"?><SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"><SOAP-ENV:Header/><SOAP-ENV:Body><samlp:Request xmlns:samlp=\"urn:oasis:names:tc:SAML:1.0:protocol\"  MajorVersion=\"1\" MinorVersion=\"1\"><samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact></samlp:Request></SOAP-ENV:Body></SOAP-ENV:Envelope>` },
+      (err, res2, body) => {
+        let email                 = "achri15@student.aau.dk";
+        let givenName             = "Anton";
+        let surname               = "Christensen";
+        // let aauUserClassification = "student";
+        // let aauUserStatus         = "active";
+        // let aauStudentID          = "123456";
+        if (!body.includes('samlp:Success')) {
+          res.send('CAS authentication error\n');
           return ;
         } else {
-          body = body.substring(body.indexOf('<cas:user>') + 10, body.indexOf('</cas:user>'));
+          email                 = new RegExp('<Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+          givenName             = new RegExp('<Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+          surname               = new RegExp('<Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+          // The following is available but unused          
+          // aauUserClassification = new RegExp('<Attribute AttributeName="aauUserClassification" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+          // aauUserStatus         = new RegExp('<Attribute AttributeName="aauUserStatus" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+          // aauStudentID          = new RegExp('<Attribute AttributeName="aauStudentID" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
         }
-
-        const email = body;
 
         admin.firestore().collection('users')
           .where('email', '==', email).get()
@@ -185,14 +195,21 @@ app.get('/login', (req, res) => {
               const newUser = {
                 email,
                 anon: false,
-                name: '',
+                name: `${givenName} ${surname}`,
                 role: 'student'
               };
 
               return admin.firestore().collection('users').add(newUser);
             } else {
-              // Returning user: Grab ID
-              return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+              // if name is falsy (empty)
+              if(!(userQuerySnapshot.docs[0].data().name)) {
+                return userQuerySnapshot.docs[0].ref.update({name: `${givenName} ${surname}`}).then(() => {
+                  return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+                });
+              } else {
+                // Returning user: Grab ID
+                return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+              }
             }
           })
           .then((user: {id: string}) => {
@@ -209,7 +226,6 @@ app.get('/login', (req, res) => {
                 res.send(error);
               });
           });
-      }
     });
   } else {
     res.redirect(`${casUrl}/login?service=${encodeServiceURL(req.query.target)}`);
