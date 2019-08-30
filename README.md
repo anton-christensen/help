@@ -45,6 +45,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 ### Deployment
 
 Run `ng build --prod && firebase deploy --only hosting` to build the project and push it to Google firebase
+Run `firebase deploy --only functions` to deploy the Google cloud functions (found in the functions folder)
 
 ### Database structure
 
