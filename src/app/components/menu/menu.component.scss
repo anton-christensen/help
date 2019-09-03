@@ -42,6 +42,10 @@
     overflow: hidden;
     color: white;
 
+    &:hover {
+      background: hsla(0, 0%, 45%, 1);
+    }
+
     &:last-child {
       border-bottom: none;
     }

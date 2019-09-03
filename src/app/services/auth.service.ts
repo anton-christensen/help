@@ -1,13 +1,14 @@
-import {Injectable} from '@angular/core';
+import {DOCUMENT } from '@angular/common';
+import {Injectable, Inject} from '@angular/core';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFirestore} from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
-import {Role, User, UserPath} from '../models/user';
+import {switchMap} from 'rxjs/operators';
+import {User} from '../models/user';
 import {Course} from '../models/course';
-import {CommonService} from './common.service';
 import {UserService} from './user.service';
+import {ModalService } from './modal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +16,16 @@ import {UserService} from './user.service';
 export class AuthService {
   public user$: Observable<User>;
   public user: User;
+  GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
+                The information can only be accessed by lecturers and administrators. They use it to identify the correct user to promote to a certain role.\n\n
+                If you only wish to use the system as a student there is no reason to log in (but you can still do so, and the same information is stored).\n\n
+                Do you accept this?`;
 
-  constructor(private fireAuth: AngularFireAuth,
+  constructor(@Inject(DOCUMENT) private document: Document,
+              private fireAuth: AngularFireAuth,
               private afStore: AngularFirestore,
-              private userService: UserService) {
+              private userService: UserService,
+              private modalService: ModalService) {
 
     this.user$ = this.fireAuth.authState.pipe(
       switchMap((authUser) => {
@@ -44,7 +51,16 @@ export class AuthService {
       });
   }
 
-  public loginAAU(token: string) {
+  public loginAAU() {
+    this.modalService.add(this.GDPRMessage, {text: 'No', type: 'negative'}, {text: 'Yes', type: 'positive'}).then((btn) => {
+      if (btn.type === 'positive') {
+        localStorage.setItem('pre-login-path', this.document.location.pathname);
+        this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
+      }
+    });
+  }
+
+  public verifyLoginAAU(token: string) {
     return this.fireAuth.auth.signInWithCustomToken(token)
       .then((credentials: firebase.auth.UserCredential) => {
         return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);

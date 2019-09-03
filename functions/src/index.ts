@@ -176,7 +176,7 @@ app.get('/login', (req, res) => {
         // let aauStudentID          = "123456";
         if (!body.includes('samlp:Success')) {
           res.send('CAS authentication error\n');
-          return ;
+          return;
         } else {
           email                 = new RegExp('<Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
           givenName             = new RegExp('<Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];

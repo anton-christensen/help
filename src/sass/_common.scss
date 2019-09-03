@@ -390,17 +390,17 @@ input:checked + .slider:before {
 
 /**** COURSE COMPONENT CHILD STUFF, should be inherited... ****/
 
-.course-notice {
-  padding: 0.5rem;
-  border-radius: 0.2rem;
-  text-align: center;
-
-  &.danger {
-    background-color: $danger;
-    color: white;
-  }
-  &.notice {
-    background-color: $active;
-    color: white;
-  }
-}
+//.course-notice {
+//  padding: 0.5rem;
+//  border-radius: 0.2rem;
+//  text-align: center;
+//
+//  &.danger {
+//    background-color: $danger;
+//    color: white;
+//  }
+//  &.notice {
+//    background-color: $active;
+//    color: white;
+//  }
+//}

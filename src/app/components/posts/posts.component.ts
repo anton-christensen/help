@@ -50,16 +50,20 @@ export class PostsComponent implements OnInit, AfterViewInit {
   }
 
   private reInitEditor() {
-    
+
   }
 
   ngAfterViewInit() {
     combineLatest(this.auth.user$, this.course$).subscribe((val) => {
-      let user = val[0];
-      let course = val[1];
-      if(!user || !course || this.wysiwyg) return;
-      if(!course.associatedUserIDs.includes(user.id) && user.role !== 'admin') return;
-      
+      const user = val[0];
+      const course = val[1];
+      if (!user || !course || this.wysiwyg) {
+        return;
+      }
+      if (!course.associatedUserIDs.includes(user.id) && user.role !== 'admin') {
+        return;
+      }
+
       this.wysiwyg = new SimpleMDE({
         forceSync: true,
         spellChecker: false,
@@ -91,12 +95,12 @@ export class PostsComponent implements OnInit, AfterViewInit {
     this.wysiwyg.value(post.content);
 
     this.editing = true;
-    
+
     this._scrollToService.scrollTo({target: 'editor-header', duration: 250});
   }
 
   public deletePost(post: Post) {
-    this.modalService.add('Are you sure you want to delete this post?')
+    this.modalService.add('Are you sure you want to delete this post?', {text: 'No', type: 'neutral'}, {text: 'Yes', type: 'negative'})
       .then(() => {
         this.postService.deletePost(post);
       })
@@ -104,11 +108,11 @@ export class PostsComponent implements OnInit, AfterViewInit {
   }
 
   public cancelEdit() {
-    this.wysiwyg.value("");
+    this.wysiwyg.value('');
     this.form.reset();
     this.editing = false;
 
-    if(this.wysiwyg.isFullscreenActive()) {
+    if (this.wysiwyg.isFullscreenActive()) {
       SimpleMDE.toggleFullScreen(this.wysiwyg);
     }
   }

@@ -18,7 +18,7 @@ export class HandleSuccessfullAuthComponent implements OnInit {
     // Note: Below 'queryParams' can be replaced with 'params' depending on your requirements
     this.activatedRoute.queryParams.subscribe(params => {
       const authToken = params.token;
-      this.auth.loginAAU(authToken).then(() => {
+      this.auth.verifyLoginAAU(authToken).then(() => {
         this.ngZone.run(() => {
           this.router.navigateByUrl(localStorage.getItem('pre-login-path'));
         });

@@ -1,39 +1,44 @@
 import {Injectable} from '@angular/core';
 
+interface ModalBtn {
+  text: string;
+  type: 'positive' | 'negative' | 'neutral';
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class ModalService {
-    modal: {
+    public modal: {
         message: string,
-        acceptText: string
-        cancelText: string
+        leftSide: ModalBtn
+        rightSide: ModalBtn
     };
-    resolve: any;
-    reject: any;
+    private _resolve: any;
+    private _reject: any;
 
     constructor() { }
 
-    add(message: string, acceptText = 'Yes', cancelText = 'No'): Promise<boolean> {
+    add(message: string, leftSide: ModalBtn, rightSide: ModalBtn): Promise<ModalBtn> {
         this.modal = {
-            message: message,
-            acceptText: acceptText,
-            cancelText: cancelText,
+          message,
+          leftSide,
+          rightSide,
         };
 
-        return new Promise<boolean>((resolve, reject) => {
-            this.resolve = resolve;
-            this.reject = reject;
+        return new Promise<ModalBtn>((resolve, reject) => {
+            this._resolve = resolve;
+            this._reject = reject;
         });
     }
 
-    accept(): void {
-        this.resolve();
+    public resolve(btn: ModalBtn): void {
+        this._resolve(btn);
         this.modal = null;
     }
 
-    cancel(): void {
-        this.reject();
+    public cancel(btn: ModalBtn): void {
+        this._reject(btn);
         this.modal = null;
     }
 }

@@ -3,11 +3,12 @@
       <span>{{ modalService.modal.message }}</span>
       <div>
 
-        <button class="btn btn-danger" type="button" (click)="modalService.accept()">
-            {{ modalService.modal.acceptText }}
+        <button class="btn" [ngClass]="modalService.modal.leftSide.type" type="button" (click)="modalService.resolve(modalService.modal.leftSide)">
+            {{ modalService.modal.leftSide.text }}
         </button>
-        <button class="btn" type="button" (click)="modalService.cancel()">
-            {{ modalService.modal.cancelText }}
+
+        <button class="btn" [ngClass]="modalService.modal.rightSide.text" type="button" (click)="modalService.cancel(modalService.modal.rightSide)">
+          {{ modalService.modal.rightSide.text }}
         </button>
       </div>
   </div>
