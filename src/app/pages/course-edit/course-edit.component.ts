@@ -237,14 +237,23 @@ export class CourseEditComponent implements OnInit {
 
   public deleteCourse(course: Course) {
     // Warn before delete
-    this.modalService.add('Are you sure you want to delete ' + course.title, 'Delete', 'Cancel').then(() => {
-      this.coursesPager.removeOneHack(course);
-      this.courseService.deleteCourse(course).then(() => {
-        if (this.editing && this.courseBeingEdited.id === course.id) {
-          this.resetForm();
+    this.modalService.add(
+      'Are you sure you want to delete the course ' + course.title,
+      {text: 'Yes, delete', type: 'negative'},
+      {text: 'No, keep it', type: 'neutral'})
+      .then((btn) => {
+        if (btn.type !== 'negative') {
+          return;
         }
-      });
-    }).catch();
+
+        this.coursesPager.removeOneHack(course);
+        this.courseService.deleteCourse(course).then(() => {
+          if (this.editing && this.courseBeingEdited.id === course.id) {
+            this.resetForm();
+          }
+        });
+      })
+      .catch();
   }
 
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {

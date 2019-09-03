@@ -18,7 +18,7 @@ export class AuthService {
   public user: User;
   GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
                 The information can only be accessed by lecturers and administrators. They use it to identify the correct user to promote to a certain role.\n\n
-                If you only wish to use the system as a student there is no reason to log in (but you can still do so, and the same information is stored).\n\n
+                If you only wish to use the system as a student there is no reason to log in (you can still do so, and the same information is stored).\n\n
                 Do you accept this?`;
 
   constructor(@Inject(DOCUMENT) private document: Document,
@@ -52,12 +52,17 @@ export class AuthService {
   }
 
   public loginAAU() {
-    this.modalService.add(this.GDPRMessage, {text: 'No', type: 'negative'}, {text: 'Yes', type: 'positive'}).then((btn) => {
-      if (btn.type === 'positive') {
-        localStorage.setItem('pre-login-path', this.document.location.pathname);
-        this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
-      }
-    });
+    this.modalService.add(
+      this.GDPRMessage,
+      {text: 'Yes', type: 'positive'},
+      {text: 'No', type: 'negative'})
+        .then((btn) => {
+          if (btn.type === 'positive') {
+            localStorage.setItem('pre-login-path', this.document.location.pathname);
+            this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
+          }
+        })
+        .catch();
   }
 
   public verifyLoginAAU(token: string) {

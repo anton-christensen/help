@@ -97,7 +97,7 @@ label.visible {
 
 .inline-block {
   display: inline-block;
-}    
+}
 .text-centered {
   text-align: center;
 }
@@ -116,7 +116,6 @@ label.visible {
 
   transition: all 300ms ease-out;
 
-
   &:hover {
     background-color: $pri-col-hover;
   }
@@ -132,14 +131,14 @@ label.visible {
   }
 
   &.btn-danger {
-    background-color: $danger;
+    background-color: $bg-neg;
 
     &:hover {
-      background-color: $danger-hover;
+      background-color: $bg-neg-hover;
     }
 
     &:active {
-      background-color: $danger-active;
+      background-color: $bg-neg-active;
     }
   }
 }
@@ -292,7 +291,7 @@ form {
 
   .error {
     width: 17rem;
-    color: $danger;
+    color: $bg-neg;
     font-size: 0.8rem;
     font-weight: bold;
     padding: 0.5rem;

@@ -100,11 +100,17 @@ export class PostsComponent implements OnInit, AfterViewInit {
   }
 
   public deletePost(post: Post) {
-    this.modalService.add('Are you sure you want to delete this post?', {text: 'No', type: 'neutral'}, {text: 'Yes', type: 'negative'})
-      .then(() => {
+    this.modalService.add(
+      'Are you sure you want to delete this post?',
+      {text: 'Yes, delete', type: 'negative'},
+      {text: 'No, keep it', type: 'neutral'})
+      .then((btn) => {
+        if (btn.type !== 'negative') {
+          return;
+        }
         this.postService.deletePost(post);
       })
-      .catch(() => {});
+      .catch();
   }
 
   public cancelEdit() {
