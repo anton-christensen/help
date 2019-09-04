@@ -72,20 +72,20 @@ export class AuthService {
       });
   }
 
-  public loginGoogle(): Promise<User> {
-    return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then((credentials: firebase.auth.UserCredential) => {
-        return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
-      });
-  }
+  // public loginGoogle(): Promise<User> {
+  //   return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+  //     .then((credentials: firebase.auth.UserCredential) => {
+  //       return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
+  //     });
+  // }
 
   public logout(): Promise<void> {
     return this.fireAuth.auth.signOut();
   }
 
-  public isPromotedUser(): boolean {
-    return this.isAdmin() || this.isLecturer() || this.isAssistant();
-  }
+  // public isPromotedUser(): boolean {
+  //   return this.isAdmin() || this.isLecturer() || this.isAssistant();
+  // }
 
   public isAdmin(): boolean {
     return this.user && this.user.role === 'admin';

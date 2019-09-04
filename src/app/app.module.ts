@@ -6,13 +6,10 @@ import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireMessagingModule} from '@angular/fire/messaging';
 import {MarkdownModule} from 'ngx-markdown';
-import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
-
+import {ScrollToModule} from '@nicky-lenaers/ngx-scroll-to';
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
 import {environment} from '../environments/environment';
-
-
 import {ToastsComponent} from './components/toasts/toasts.component';
 import {FooterComponent} from './components/footer/footer.component';
 import {CourseListComponent} from './pages/course-list/course-list.component';
@@ -23,13 +20,13 @@ import {PostsComponent} from './components/posts/posts.component';
 import {CourseLinkComponent} from './components/course-link/course-link.component';
 import {LoaderComponent} from './components/loader/loader.component';
 import {AdminComponent} from './pages/admin/admin.component';
-import { ModalComponent } from './components/modal/modal.component';
-import { CourseEditComponent } from './pages/course-edit/course-edit.component';
-import { InstituteListComponent } from './pages/institute-list/institute-list.component';
-import { MenuComponent } from './components/menu/menu.component';
-import { EmphasizedComponent } from './components/emphasized/emphasized.component';
-import { RoleEditComponent } from './components/role-edit/role-edit.component';
-import { HandleSuccessfullAuthComponent } from './components/handle-successfull-auth/handle-successfull-auth.component';
+import {ModalComponent} from './components/modal/modal.component';
+import {CourseEditComponent} from './pages/course-edit/course-edit.component';
+import {InstituteListComponent} from './pages/institute-list/institute-list.component';
+import {MenuComponent} from './components/menu/menu.component';
+import {EmphasizedComponent} from './components/emphasized/emphasized.component';
+import {RoleEditComponent} from './components/role-edit/role-edit.component';
+import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
 
 @NgModule({
   declarations: [
@@ -56,12 +53,12 @@ import { HandleSuccessfullAuthComponent } from './components/handle-successfull-
     BrowserModule,
     ReactiveFormsModule,
     AppRoutingModule,
+    MarkdownModule.forRoot(),
+    ScrollToModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
     AngularFirestoreModule,
-    AngularFireAuthModule,
-    MarkdownModule.forRoot(),
-    ScrollToModule.forRoot()
+    AngularFireAuthModule
   ],
   providers: [],
   bootstrap: [AppComponent]
