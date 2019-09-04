@@ -1,4 +1,3 @@
-<h2>Welcome {{ (auth.user$ | async)?.name }}</h2>
 <ng-container *ngIf="course$ | async as course">
   <ng-container *ngIf="!course.enabled">
     <div class="course-notice notice">

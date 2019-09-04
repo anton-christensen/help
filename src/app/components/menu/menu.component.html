@@ -1,10 +1,7 @@
 <div class="burger-button" (click)="openMenu()">☰</div>
 
 <div class="burger-bar {{open ? 'open' : ''}}">
-
-
   <div class="top">
-
     <div class="name"
          *ngIf="auth.user && !auth.user.anon && auth.user$ | async as user">
       <div class="fl">
@@ -25,9 +22,7 @@
         </label>
       </div>
     </div>
-
   </div>
-
 
   <!-- If we're on a course page -->
   <ng-container *ngIf="sessionService.getCourse$() | async as course">
@@ -67,7 +62,6 @@
       </div>
     </ng-container>
   </ng-container>
-
 
   <div class="bottom">
     <a class="menu-item"

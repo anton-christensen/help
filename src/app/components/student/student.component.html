@@ -37,9 +37,8 @@
 
   </ng-container>
 
-  <ng-container *ngIf="!course.enabled">
-    <h3 class="course-notice danger">
-      Course is not currently in session
-    </h3>
-  </ng-container>
+  <div class="course-notice danger" *ngIf="!course.enabled">
+    <h3>Course is not currently in session</h3>
+    <p>Ask a TA or your lecturer to enable it</p>
+  </div>
 </div>

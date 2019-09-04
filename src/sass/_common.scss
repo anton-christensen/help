@@ -50,8 +50,12 @@ h5 {
 }
 
 a {
-  color: #2979ff;
+  color: $pri-col-active;
   text-decoration: none;
+
+  &:hover {
+    color: $pri-col;
+  }
 }
 
 a:hover {
@@ -386,20 +390,19 @@ input:checked + .slider:before {
   transform: translateX(16px);
 }
 
+// This is used in both app-student and app-assistant
+.course-notice {
+  padding: 0.5rem;
+  border-radius: 0.2rem;
+  text-align: center;
 
-/**** COURSE COMPONENT CHILD STUFF, should be inherited... ****/
+  &.danger {
+    background-color: $bg-neg;
+    color: white;
+  }
 
-//.course-notice {
-//  padding: 0.5rem;
-//  border-radius: 0.2rem;
-//  text-align: center;
-//
-//  &.danger {
-//    background-color: $danger;
-//    color: white;
-//  }
-//  &.notice {
-//    background-color: $active;
-//    color: white;
-//  }
-//}
+  &.notice {
+    background-color: $active;
+    color: white;
+  }
+}
