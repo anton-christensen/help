@@ -13,10 +13,10 @@ export class CourseComponent implements OnInit {
   public course$: Observable<Course>;
 
   constructor(public auth: AuthService,
-              private session: SessionService) { }
+              private sessionService: SessionService) { }
 
   ngOnInit() {
-    this.course$ = this.session.getCourse$(); 
+    this.course$ = this.sessionService.getCourse$();
   }
 
 }

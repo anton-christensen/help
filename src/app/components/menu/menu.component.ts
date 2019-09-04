@@ -11,6 +11,7 @@ import { CourseService } from 'src/app/services/course.service';
 import { Subscription, Observable } from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {ToastService} from '../../services/toasts.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -26,12 +27,13 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   constructor(public auth: AuthService,
               public sessionService: SessionService,
-              private notificationService: NotificationService,
-              private toastService: ToastService,
+              private afMessaging: AngularFireMessaging,
+              private router: Router,
               private courseService: CourseService,
-              private afMessaging: AngularFireMessaging) {
+              private notificationService: NotificationService,
+              private toastService: ToastService) {
 
-    // Get notificationTokens when a course appears
+    // Get notificationToken when a course appears
     this.notificationToken$ = this.sessionService.getCourse$().pipe(
       switchMap((course: Course) => {
         return notificationService.getToken(course);
@@ -62,9 +64,9 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.open = false;
   }
 
-  public toggleCourseEnabled(course: Course) {
+  public toggleCourseEnabled(course: Course): Promise<void> {
     course.enabled = !course.enabled;
-    this.courseService.setCourseEnabled(course);
+    return this.courseService.setCourseEnabled(course);
   }
 
   public toggleNotificationsEnabled(course: Course) {
@@ -72,10 +74,14 @@ export class MenuComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.tokenToggleBusy = true;
+
     if (this.notificationToken) {
-      this.notificationService.deleteToken(this.notificationToken);
+      this.notificationService.deleteToken(this.notificationToken)
+        .then(() => {
+          this.tokenToggleBusy = false;
+        });
     } else {
-      this.tokenToggleBusy = true;
       this.notificationService.generateAndSaveToken(course)
         .then(() => {
           this.tokenToggleBusy = false;
@@ -83,7 +89,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  public bugClicked() {
+  public reportBugClicked() {
     this.toastService.add('Opening your email client...');
   }
 }

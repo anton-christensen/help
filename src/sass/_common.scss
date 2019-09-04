@@ -24,11 +24,8 @@ hr {
 
 h1 {
   font-size: $font-size-h1;
-}
-
-h1 {
   color: #636363;
-  margin: 0 0 1rem;
+  margin: 0 0 2rem;
   position: relative;
   text-align: center;
 }
@@ -392,6 +389,7 @@ input:checked + .slider:before {
 
 // This is used in both app-student and app-assistant
 .course-notice {
+  margin-bottom: 1rem;
   padding: 0.5rem;
   border-radius: 0.2rem;
   text-align: center;

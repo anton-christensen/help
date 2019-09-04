@@ -1,3 +1,5 @@
-<a class="course-link {{course.enabled ? 'enabled' : 'disabled'}}" [routerLink]="['/departments', course.instituteSlug, 'courses', course.slug]">
+<a class="course-link"
+   [ngClass]="{enabled: course.enabled, disabled: !course.enabled}"
+   [routerLink]="['/departments', course.instituteSlug, 'courses', course.slug]">
   {{ course.title }} ({{ course.slug | uppercase }})
 </a>

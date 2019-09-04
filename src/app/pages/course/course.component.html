@@ -3,9 +3,7 @@
 </ng-template>
 
 <ng-container *ngIf="course$ | async as course; else loading">
-  <app-emphasized>
-    <h1 class="course-title">{{ course.title }}</h1>
-  </app-emphasized>
+  <h1 class="course-title">{{ course.title }}</h1>
 
   <ng-container *ngIf="auth.canAssistInCourse(course); then assistant; else student"></ng-container>
 

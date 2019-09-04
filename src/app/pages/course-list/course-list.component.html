@@ -2,26 +2,24 @@
   <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </ng-template>
 <ng-container *ngIf="coursePager && coursePager.data | async as courses; else loading">
-<!-- <ng-container *ngIf="courses$ | async as courses; else loading"> -->
-
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
     <ng-container *ngIf="auth.isLecturer() || auth.isAssistant(); then assistant; else student"></ng-container>
   </ng-template>
 
   <ng-template #admin>
-    <app-emphasized><h1>All courses</h1></app-emphasized>
+    <h1>All courses</h1>
   </ng-template>
 
   <ng-template #assistant>
-    <app-emphasized><h1>Your courses</h1></app-emphasized>
+    <h1>Your courses</h1>
   </ng-template>
 
   <ng-template #student>
-      <app-emphasized><h1>Active courses</h1></app-emphasized>
-      <ng-container *ngIf="!courses.length">
-        <h2>There are no exercise sessions... in session</h2>
-        <h4>Please check back later or ask your TA to enable the course</h4>
+    <h1>Active courses</h1>
+    <ng-container *ngIf="!courses.length">
+        <h2>There are no courses with active exercise sessions</h2>
+        <h4>Please check back later or ask a TA or your lecturer to activate the course</h4>
       </ng-container>
   </ng-template>
 

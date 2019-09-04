@@ -15,7 +15,7 @@
     }
 
     &.disabled:after {
-        content: "not in session";
+        content: "not active";
         float: right;
         font-weight: normal;
         font-size: 0.6rem;

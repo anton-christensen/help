@@ -24,16 +24,13 @@
     </div>
   </div>
 
-  <!-- If we're on a course page -->
   <ng-container *ngIf="sessionService.getCourse$() | async as course">
-    <!-- If is TA or Lecturer on course -->
     <ng-container *ngIf="auth.canAssistInCourse(course)">
-
-      <!-- Enable-course switch -->
-      <div class="menu-item" (click)="toggleCourseEnabled(course)">
+      <div class="menu-item"
+           (click)="toggleCourseEnabled(course)">
         <div class="fl">
           <label>
-            Exercise session
+            Course active
           </label>
           <label class="sublabel">
             Let students ask for help
@@ -45,8 +42,8 @@
         </div>
       </div>
 
-      <!-- Enable-trashcan-notifications switch -->
-      <div class="menu-item" (click)="toggleNotificationsEnabled(course)">
+      <div class="menu-item"
+           (click)="toggleNotificationsEnabled(course)">
         <div class="fl">
           <label>
             Notifications
@@ -86,13 +83,13 @@
           Help with help.aau.dk
         </label>
         <label class="sublabel">
-          Write us if something isn't working
+          Guide to using the system
         </label>
       </div>
     </a>
 
     <a class="menu-item"
-       (click)="bugClicked()"
+       (click)="reportBugClicked()"
        href="mailto:achri15@student.aau.dk, hsaren14@student.aau.dk?subject=[help.aau.dk][Bugs]%20"
        target="_blank">
       <div class="fl">

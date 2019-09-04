@@ -3,8 +3,12 @@
 </ng-template>
 
 <div class="request-help-container" *ngIf="course$ | async as course; else loading">
-  <ng-container *ngIf="course.enabled">
+  <div class="course-notice notice" *ngIf="!course.enabled">
+    <h3>Course is not currently active</h3>
+    <p>Ask a TA or your lecturer to activate it during exercise sessions</p>
+  </div>
 
+  <ng-container *ngIf="course.enabled">
     <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
       <h2>Your trash can is out, help is on the way</h2>
       <div class="retract-trash-can">
@@ -34,11 +38,5 @@
         </div>
       </form>
     </ng-template>
-
   </ng-container>
-
-  <div class="course-notice danger" *ngIf="!course.enabled">
-    <h3>Course is not currently in session</h3>
-    <p>Ask a TA or your lecturer to enable it</p>
-  </div>
 </div>

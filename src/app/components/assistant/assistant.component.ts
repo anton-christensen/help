@@ -35,7 +35,7 @@ export class AssistantComponent implements OnInit {
     this.trashCanService.deleteTrashCan(can);
   }
 
-  hasCreatedDate(trashCan: any): boolean {
+  public hasCreatedDate(trashCan: any): boolean {
     return CommonService.documentIsCreatedDatePresent(trashCan);
   }
 }
