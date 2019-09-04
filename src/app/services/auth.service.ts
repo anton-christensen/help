@@ -16,9 +16,11 @@ import {ModalService } from './modal.service';
 export class AuthService {
   public user$: Observable<User>;
   public user: User;
-  GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
-                The information can only be accessed by lecturers and administrators. They use it to identify the correct user to promote to a certain role.\n\n
-                If you only wish to use the system as a student there is no reason to log in (you can still do so, and the same information is stored).\n\n
+  private GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
+                The information can only be accessed by lecturers and administrators.
+                They use it to identify the correct user to promote to a certain role.\n\n
+                If you only wish to use the system as a student there is no reason to log in, but if you do so
+                your information will also be stored and requests for help are associated with it.\n\n
                 Do you accept this?`;
 
   constructor(@Inject(DOCUMENT) private document: Document,
@@ -52,32 +54,36 @@ export class AuthService {
   }
 
   public loginAAU() {
-    this.modalService.add(
-      this.GDPRMessage,
-      {text: 'Yes', type: 'positive'},
-      {text: 'No', type: 'negative'})
+    const previouslyAccepted = localStorage.getItem('acceptedLogInConditions');
+
+    if (previouslyAccepted) {
+      this.redirectToAAU();
+    } else {
+      this.modalService.add(
+        this.GDPRMessage,
+        {text: 'Yes', type: 'positive'},
+        {text: 'No', type: 'negative'})
         .then((btn) => {
           if (btn.type === 'positive') {
-            localStorage.setItem('pre-login-path', this.document.location.pathname);
-            this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
+            localStorage.setItem('acceptedLogInConditions', 'true');
+            this.redirectToAAU();
           }
         })
         .catch();
+    }
   }
 
-  public verifyLoginAAU(token: string) {
+  private redirectToAAU() {
+    localStorage.setItem('preLoginPath', this.document.location.pathname);
+    this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
+  }
+
+  public verifyLoginAAU(token: string): Promise<User> {
     return this.fireAuth.auth.signInWithCustomToken(token)
       .then((credentials: firebase.auth.UserCredential) => {
-        return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
+        return this.userService.createOrGetUserWithID(credentials.user.uid, credentials.user.email);
       });
   }
-
-  // public loginGoogle(): Promise<User> {
-  //   return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-  //     .then((credentials: firebase.auth.UserCredential) => {
-  //       return this.userService.createUserWithID(credentials.user.uid, credentials.user.email);
-  //     });
-  // }
 
   public logout(): Promise<void> {
     return this.fireAuth.auth.signOut();
@@ -111,7 +117,7 @@ export class AuthService {
     return this.user && (this.isAdmin() || this.isAssistantInCourse(course) || this.isLecturerInCourse(course));
   }
 
-  loggedIn(): boolean {
+  public loggedIn(): boolean {
     return this.user && !this.user.anon;
   }
 

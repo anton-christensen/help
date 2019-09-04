@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Course } from 'src/app/models/course';
 
 import { AuthService } from 'src/app/services/auth.service';
@@ -9,7 +9,8 @@ import { NotificationToken } from 'src/app/models/notification-token';
 import { SessionService } from 'src/app/services/session.service';
 import { CourseService } from 'src/app/services/course.service';
 import { Subscription, Observable } from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {switchMap} from 'rxjs/operators';
+import {ToastService} from '../../services/toasts.service';
 
 @Component({
   selector: 'app-menu',
@@ -26,6 +27,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService,
               public sessionService: SessionService,
               private notificationService: NotificationService,
+              private toastService: ToastService,
               private courseService: CourseService,
               private afMessaging: AngularFireMessaging) {
 
@@ -79,5 +81,9 @@ export class MenuComponent implements OnInit, OnDestroy {
           this.tokenToggleBusy = false;
         });
     }
+  }
+
+  public bugClicked() {
+    this.toastService.add('Opening your email client...');
   }
 }

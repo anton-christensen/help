@@ -1,8 +1,5 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { PlatformLocation } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
-import { Router, NavigationEnd } from '@angular/router';
-import { DOCUMENT } from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-footer',
@@ -10,12 +7,9 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent implements OnInit {
-  public returnTarget = 'https://help.aau.dk';
-  private currentPath = '/';
 
   constructor(public auth: AuthService) {}
 
   ngOnInit() {}
-
 
 }

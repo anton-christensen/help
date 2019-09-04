@@ -45,19 +45,19 @@ export class UserService {
     });
   }
 
-  public getByRole(role: Role): Observable<User[]> {
-    return this.getMultiple((ref) => {
-      return ref
-        .where('role', '==', role);
-    });
-  }
+  // public getByRole(role: Role): Observable<User[]> {
+  //   return this.getMultiple((ref) => {
+  //     return ref
+  //       .where('role', '==', role);
+  //   });
+  // }
 
   public createUserWithEmail(email: string): Promise<User> {
     const id = this.afStore.collection<User>(UserPath).ref.doc().id;
-    return this.createUserWithID(id, email);
+    return this.createOrGetUserWithID(id, email);
   }
 
-  public createUserWithID(id: string, email: string): Promise<User> {
+  public createOrGetUserWithID(id: string, email: string): Promise<User> {
     const user = {
       email,
       anon: false,
@@ -70,14 +70,21 @@ export class UserService {
       .then((doc) => {
         if (!doc.exists) {
           return ref.set(user);
+        } else {
+          const data = doc.data() as any;
+          return {id, ...data};
         }
       })
       .catch((err) => {
         console.error('Error saving user:', err);
       })
-      .then(() => {
-        user.id = id;
-        return user;
+      .then((existingUser) => {
+        if (existingUser) {
+          return existingUser;
+        } else {
+          user.id = id;
+          return user;
+        }
       });
   }
 

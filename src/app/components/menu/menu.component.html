@@ -1,17 +1,48 @@
 <div class="burger-button" (click)="openMenu()">☰</div>
 
 <div class="burger-bar {{open ? 'open' : ''}}">
-  <div class="close menu-item" (click)="closeMenu()">×</div>
+
+
+  <div class="top">
+
+    <div class="name"
+         *ngIf="auth.user && !auth.user.anon && auth.user$ | async as user">
+      <div class="fl">
+        <label>
+          {{ user.name }}
+        </label>
+        <label class="sublabel">
+          {{ user.role === 'TA' ? 'Teaching assistant' : user.role }}
+        </label>
+      </div>
+    </div>
+
+    <div class="close"
+         (click)="closeMenu()">
+      <div class="fr">
+        <label>
+          ×
+        </label>
+      </div>
+    </div>
+
+  </div>
+
 
   <!-- If we're on a course page -->
   <ng-container *ngIf="sessionService.getCourse$() | async as course">
     <!-- If is TA or Lecturer on course -->
     <ng-container *ngIf="auth.canAssistInCourse(course)">
+
       <!-- Enable-course switch -->
       <div class="menu-item" (click)="toggleCourseEnabled(course)">
-        <div class="floater fl">
-          <label class="visible">Exercise session</label>
-          <label class="visible sublabel">Let students ask for help</label>
+        <div class="fl">
+          <label>
+            Exercise session
+          </label>
+          <label class="sublabel">
+            Let students ask for help
+          </label>
         </div>
         <div class="switch">
           <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
@@ -21,9 +52,13 @@
 
       <!-- Enable-trashcan-notifications switch -->
       <div class="menu-item" (click)="toggleNotificationsEnabled(course)">
-        <div class="floater fl">
-          <label class="visible">Notifications</label>
-          <label class="visible sublabel">On this device, for this course</label>
+        <div class="fl">
+          <label>
+            Notifications
+          </label>
+          <label class="sublabel">
+            On this device, for this course
+          </label>
         </div>
         <div class="switch">
           <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
@@ -35,47 +70,69 @@
 
 
   <div class="bottom">
-    <ng-container *ngIf="auth.isAdmin() || auth.isLecturer()">
-      <a class="menu-item" (click)="closeMenu()" [routerLink]="['/admin']">
-        <div class="floater fl">
-          <label class="visible">Admin page</label>
-          <label class="visible sublabel">Administrate the system</label>
-        </div>
-      </a>
-    </ng-container>
-
-    <a class="menu-item" href="/assets/help/{{(auth.user$ | async)?.role !== 'student' ? 'non-' : ''}}students.pdf" target="_blank">
-      <div class="floater fl">
-        <label class="visible">Help with help.aau.dk</label>
-        <label class="visible sublabel">Write us if something isn't working</label>
+    <a class="menu-item"
+       *ngIf="auth.isAdmin() || auth.isLecturer()"
+       (click)="closeMenu()"
+       [routerLink]="['/admin']">
+      <div class="fl">
+        <label>
+          Admin panel
+        </label>
+        <label class="sublabel">
+          Administrate the system
+        </label>
       </div>
     </a>
 
-    <a class="menu-item" href="mailto:achri15@student.aau.dk, hsaren14@student.aau.dk?subject=[help.aau.dk][Bugs]%20">
-      <div class="floater fl">
-        <label class="visible">Report a bug</label>
-        <label class="visible sublabel">Write us if something isn't working</label>
+    <a class="menu-item"
+       href="/assets/help/{{(auth.user$ | async)?.role !== 'student' ? 'non-' : ''}}students.pdf"
+       target="_blank">
+      <div class="fl">
+        <label>
+          Help with help.aau.dk
+        </label>
+        <label class="sublabel">
+          Write us if something isn't working
+        </label>
       </div>
     </a>
 
-    <ng-container *ngIf="auth.loggedIn(); then logOut; else logIn"></ng-container>
-
-    <ng-template #logOut>
-      <div class="menu-item" (click)="auth.logout()">
-        <div class="floater fl">
-          <label class="visible">Log out</label>
-        </div>
+    <a class="menu-item"
+       (click)="bugClicked()"
+       href="mailto:achri15@student.aau.dk, hsaren14@student.aau.dk?subject=[help.aau.dk][Bugs]%20"
+       target="_blank">
+      <div class="fl">
+        <label>
+          Report a bug
+        </label>
+        <label class="sublabel">
+          Write us if something isn't working
+        </label>
       </div>
-    </ng-template>
+    </a>
 
-    <ng-template #logIn>
-      <div class="menu-item" (click)="auth.loginAAU()">
-        <div class="floater fl">
-          <label class="visible">Log In</label>
-          <label class="visible sublabel">For TAs, lecturers and administrators only</label>
-        </div>
+    <div class="menu-item"
+         *ngIf="auth.loggedIn();"
+         (click)="auth.logout()">
+      <div class="fl">
+        <label>
+          Log out
+        </label>
       </div>
-    </ng-template>
+    </div>
+
+    <div class="menu-item"
+         *ngIf="!auth.loggedIn();"
+         (click)="auth.loginAAU()">
+      <div class="fl">
+        <label>
+          Log In
+        </label>
+        <label class="sublabel">
+          For TAs, lecturers and administrators only
+        </label>
+      </div>
+    </div>
   </div>
 
 </div>
