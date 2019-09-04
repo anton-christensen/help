@@ -37,8 +37,8 @@ export class ModalService {
         this.modal = null;
     }
 
-    public cancel(btn: ModalBtn): void {
-        this._reject(btn);
+    public reject(): void {
+        this._reject();
         this.modal = null;
     }
 }

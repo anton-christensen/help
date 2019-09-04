@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, OnDestroy, Inject, ViewChild, ElementRef} from '@angular/core';
 import { Course } from 'src/app/models/course';
 
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,6 +12,7 @@ import { Subscription, Observable } from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {ToastService} from '../../services/toasts.service';
 import {Router} from '@angular/router';
+import {DOCUMENT} from "@angular/common";
 
 @Component({
   selector: 'app-menu',
@@ -25,7 +26,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   public notificationToken: NotificationToken;
   public tokenToggleBusy = false;
 
-  constructor(public auth: AuthService,
+  constructor(@Inject(DOCUMENT) private document: Document,
+              public auth: AuthService,
               public sessionService: SessionService,
               private afMessaging: AngularFireMessaging,
               private router: Router,
@@ -91,5 +93,9 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   public reportBugClicked() {
     this.toastService.add('Opening your email client...');
+  }
+
+  clicked($event: MouseEvent) {
+
   }
 }

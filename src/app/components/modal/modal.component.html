@@ -1,4 +1,4 @@
-<div class="modal-wrapper" *ngIf="modalService.modal">
+<div class="modal-wrapper" *ngIf="modalService.modal" (click)="clicked($event)">
   <div class="modal">
       <p *ngFor="let paragraph of modalService.modal.message.split('\n')">
         {{ paragraph }}

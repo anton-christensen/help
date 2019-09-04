@@ -1,6 +1,6 @@
 <div class="burger-button" (click)="openMenu()">☰</div>
 
-<div class="burger-bar {{open ? 'open' : ''}}">
+<div class="menu" [ngClass]="{open: open}">
   <div class="top">
     <div class="name"
          *ngIf="auth.user && !auth.user.anon && auth.user$ | async as user">

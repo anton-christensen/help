@@ -69,7 +69,7 @@ export class AuthService {
             this.redirectToAAU();
           }
         })
-        .catch();
+        .catch(() => {});
     }
   }
 
