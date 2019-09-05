@@ -18,6 +18,7 @@ export class InstituteListComponent implements OnInit {
 
   ngOnInit() {
     this.commonService.setTitle('Departments');
+    this.commonService.currentLocation = 'instituteList';
 
     this.institutes$ = this.instituteService.getAllWithCourses();
     this.institutes$

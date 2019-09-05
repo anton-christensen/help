@@ -8,10 +8,6 @@
     ],
     "rewrites": [
       {
-        "source": "/login",
-        "function": "casLogin"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }

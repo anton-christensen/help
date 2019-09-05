@@ -16,6 +16,9 @@ import {ModalService } from './modal.service';
 export class AuthService {
   public user$: Observable<User>;
   public user: User;
+
+  private casUrl = 'https://login.aau.dk/cas';
+  private cloudFunctionUrl = 'https://us-central1-help-67ad0.cloudfunctions.net/casLogin/login';
   private GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
                 The information can only be accessed by lecturers and administrators.
                 They use it to identify the correct user to promote to a certain role.\n\n
@@ -53,29 +56,39 @@ export class AuthService {
       });
   }
 
-  public loginAAU() {
-    const previouslyAccepted = localStorage.getItem('acceptedLogInConditions');
+  public previouslyAcceptedLogInConditions(): boolean {
+    return !!localStorage.getItem('acceptedLogInConditions');
+  }
 
-    if (previouslyAccepted) {
-      this.redirectToAAU();
-    } else {
-      this.modalService.add(
-        this.GDPRMessage,
-        {text: 'Yes', type: 'positive'},
-        {text: 'No', type: 'negative'})
-        .then((btn) => {
-          if (btn.type === 'positive') {
-            localStorage.setItem('acceptedLogInConditions', 'true');
-            this.redirectToAAU();
-          }
-        })
-        .catch(() => {});
-    }
+  public showLogInConditionsAndRedirect() {
+    this.modalService.add(
+      this.GDPRMessage,
+      {text: 'Yes', type: 'positive'},
+      {text: 'No', type: 'negative'})
+      .then((btn) => {
+        if (btn.type === 'positive') {
+          localStorage.setItem('acceptedLogInConditions', 'true');
+          this.redirectToAAU();
+        }
+      })
+      .catch(() => {});
+  }
+
+  public getLoginURL(): string {
+    const returnTargetUrl = `${this.document.location.origin}/auth`;
+    const service = encodeURI(`${this.cloudFunctionUrl}?target=${returnTargetUrl}`);
+
+    return encodeURI(`${this.casUrl}/login?service=${service}`);
+  }
+
+  public saveCurrentPath() {
+    localStorage.setItem('preLoginPath', this.document.location.pathname);
   }
 
   private redirectToAAU() {
-    localStorage.setItem('preLoginPath', this.document.location.pathname);
-    this.document.location.href = `https://help.aau.dk/login?target=${this.document.location.origin}`;
+    this.saveCurrentPath();
+
+    this.document.location.href = this.getLoginURL();
   }
 
   public verifyLoginAAU(token: string): Promise<User> {

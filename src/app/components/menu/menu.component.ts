@@ -13,6 +13,7 @@ import {switchMap} from 'rxjs/operators';
 import {ToastService} from '../../services/toasts.service';
 import {Router} from '@angular/router';
 import {DOCUMENT} from "@angular/common";
+import {CommonService} from '../../services/common.service';
 
 @Component({
   selector: 'app-menu',
@@ -29,6 +30,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   constructor(@Inject(DOCUMENT) private document: Document,
               public auth: AuthService,
               public sessionService: SessionService,
+              public commonService: CommonService,
               private afMessaging: AngularFireMessaging,
               private router: Router,
               private courseService: CourseService,
@@ -95,7 +97,17 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.toastService.add('Opening your email client...');
   }
 
-  clicked($event: MouseEvent) {
+  public isPWA(): boolean {
+    return window.matchMedia('(display-mode: standalone)').matches;
+  }
 
+  public back() {
+    const current = this.commonService.currentLocation;
+
+    if (current === 'admin' || 'courseList') {
+      this.router.navigateByUrl('/departments');
+    } else {
+      this.router.navigateByUrl('/departments/cs');
+    }
   }
 }

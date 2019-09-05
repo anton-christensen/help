@@ -15,7 +15,6 @@ export class SessionService {
   private instituteSubscription: Subscription = new Subscription();
   private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
   private courseSubscription: Subscription = new Subscription();
-  private currentRoute$: Subject<string> = new Subject<string>();
 
   constructor(private router: Router,
               private instituteService: InstituteService,
@@ -24,7 +23,6 @@ export class SessionService {
       filter(event => {return event instanceof NavigationEnd;})
     )
       .subscribe((event) => {
-        this.currentRoute$.next(this.router.routerState.snapshot.root.firstChild.routeConfig.path);
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
         const instituteSlug = paramMap.get('institute');
         const courseSlug = paramMap.get('course');
@@ -49,9 +47,5 @@ export class SessionService {
 
   public getCourse$(): Observable<Course> {
     return this.course$;
-  }
-
-  public getRoute() {
-    return this.currentRoute$;
   }
 }

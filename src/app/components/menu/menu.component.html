@@ -1,4 +1,13 @@
-<div class="menu-button" (click)="openMenu()">☰</div>
+<!--<div class="back-button"-->
+<!--     *ngIf="commonService.currentLocation !== 'instituteList'"-->
+<!--     (click)="back()">-->
+<!--  ↶-->
+<!--</div>-->
+
+<div class="menu-button"
+     (click)="openMenu()">
+  ☰
+</div>
 
 <div class="menu" [ngClass]="{open: open}">
   <div class="top">
@@ -91,7 +100,7 @@
     <a class="menu-item"
        (click)="reportBugClicked()"
        href="mailto:achri15@student.aau.dk, hsaren14@student.aau.dk?subject=[help.aau.dk][Bugs]%20"
-       target="_blank">
+       [target]="isPWA() ? '' : '_blank'">
       <div class="fl">
         <label>
           Report a bug
@@ -102,28 +111,49 @@
       </div>
     </a>
 
-    <div class="menu-item"
-         *ngIf="auth.loggedIn();"
-         (click)="auth.logout()">
-      <div class="fl">
-        <label>
-          Log out
-        </label>
-      </div>
-    </div>
+    <ng-container *ngIf="auth.loggedIn(); then loggedIn; else loggedOut;"></ng-container>
 
-    <div class="menu-item"
-         *ngIf="!auth.loggedIn();"
-         (click)="auth.loginAAU()">
-      <div class="fl">
-        <label>
-          Log In
-        </label>
-        <label class="sublabel">
-          For TAs, lecturers and administrators only
-        </label>
+    <ng-template #loggedIn>
+      <div class="menu-item"
+           (click)="auth.logout()">
+        <div class="fl">
+          <label>
+            Log out
+          </label>
+        </div>
       </div>
-    </div>
+    </ng-template>
+
+    <ng-template #loggedOut>
+      <ng-container *ngIf="auth.previouslyAcceptedLogInConditions(); then directLink; else askPermission;"></ng-container>
+
+      <ng-template #directLink>
+        <a class="menu-item" [href]="auth.getLoginURL()" (click)="auth.saveCurrentPath()">
+          <div class="fl">
+            <label>
+              Log In
+            </label>
+            <label class="sublabel">
+              For TAs, lecturers and administrators only
+            </label>
+          </div>
+        </a>
+      </ng-template>
+
+      <ng-template #askPermission>
+        <div class="menu-item"
+             (click)="auth.showLogInConditionsAndRedirect()">
+          <div class="fl">
+            <label>
+              Log In
+            </label>
+            <label class="sublabel">
+              For TAs, lecturers and administrators only
+            </label>
+          </div>
+        </div>
+      </ng-template>
+    </ng-template>
+
   </div>
-
 </div>

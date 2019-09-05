@@ -224,84 +224,60 @@ export const onUserDelete = functions.firestore
 import * as express from 'express';
 import * as request from 'request';
 const app = express();
-const casUrl = 'https://login.aau.dk/cas';
-const helpUrl = 'https://help.aau.dk/login';
-
-// var success = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n<cas:authenticationSuccess>\n<cas:user>achri15@student.aau.dk</cas:user>\n</cas:authenticationSuccess>\n</cas:serviceResponse>";
-// var error = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n<cas:authenticationFailure code='INVALID_TICKET'>\nticket &#039;ST-25250-s64agWia4mUUs0scpSfV-cas&#039; not recognized\n</cas:authenticationFailure>\n</cas:serviceResponse>";
-
-function encodeServiceURL(target) {
-  return encodeURIComponent(`${helpUrl}${typeof(target) === 'string' ? '?target=' + encodeURIComponent(target) : ''}`);
-}
 
 app.get('/login', (req, res) => {
-  if (typeof(req.query.ticket) === 'string') {
-    request.post(
-      `${casUrl}/samlValidate?TARGET=${encodeServiceURL(req.query.target)}`, 
-      { body: `<?xml version=\"1.0\" encoding=\"utf-8\"?><SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"><SOAP-ENV:Header/><SOAP-ENV:Body><samlp:Request xmlns:samlp=\"urn:oasis:names:tc:SAML:1.0:protocol\"  MajorVersion=\"1\" MinorVersion=\"1\"><samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact></samlp:Request></SOAP-ENV:Body></SOAP-ENV:Envelope>` },
-      (err, res2, body) => {
-        let email                 = "achri15@student.aau.dk";
-        let givenName             = "Anton";
-        let surname               = "Christensen";
-        // let aauUserClassification = "student";
-        // let aauUserStatus         = "active";
-        // let aauStudentID          = "123456";
-        if (!body.includes('samlp:Success')) {
-          res.send('CAS authentication error\n');
-          return;
-        } else {
-          email                 = new RegExp('<Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-          givenName             = new RegExp('<Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-          surname               = new RegExp('<Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-          // The following is available but unused          
-          // aauUserClassification = new RegExp('<Attribute AttributeName="aauUserClassification" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-          // aauUserStatus         = new RegExp('<Attribute AttributeName="aauUserStatus" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-          // aauStudentID          = new RegExp('<Attribute AttributeName="aauStudentID" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
-        }
-
-        admin.firestore().collection('users')
-          .where('email', '==', email).get()
-          .then((userQuerySnapshot) => {
-            if (userQuerySnapshot.empty) {
-              // New user: Save it in the database
-              const newUser = {
-                email,
-                anon: false,
-                name: `${givenName} ${surname}`,
-                role: 'student'
-              };
-
-              return admin.firestore().collection('users').add(newUser);
-            } else {
-              // if name is falsy (empty)
-              if(!(userQuerySnapshot.docs[0].data().name)) {
-                return userQuerySnapshot.docs[0].ref.update({name: `${givenName} ${surname}`}).then(() => {
-                  return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
-                });
-              } else {
-                // Returning user: Grab ID
-                return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
-              }
-            }
-          })
-          .then((user: {id: string}) => {
-            admin.auth().createCustomToken(user.id)
-              .then((customToken) => {
-                if (typeof(req.query.target) === 'string') {
-                  res.redirect(req.query.target + `/authed?token=${customToken}`);
-                } else {
-                  res.redirect(`https://help.aau.dk/authed?token=${customToken}`);
-                }
-              })
-              .catch((error) => {
-                console.log('Error creating custom token:', error);
-                res.send(error);
-              });
-          });
-    });
-  } else {
-    res.redirect(`${casUrl}/login?service=${encodeServiceURL(req.query.target)}`);
+  if (typeof(req.query.ticket) !== 'string') {
+    return null;
   }
+
+  request.post(
+    `https://login.aau.dk/cas/samlValidate?TARGET=${encodeURI(req.query.target)}`,
+    { body: `<?xml version=\"1.0\" encoding=\"utf-8\"?><SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"><SOAP-ENV:Header/><SOAP-ENV:Body><samlp:Request xmlns:samlp=\"urn:oasis:names:tc:SAML:1.0:protocol\"  MajorVersion=\"1\" MinorVersion=\"1\"><samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact></samlp:Request></SOAP-ENV:Body></SOAP-ENV:Envelope>` },
+    (err, res2, body) => {
+      if (!body.includes('samlp:Success')) {
+        res.send('CAS authentication error\n');
+        return null;
+      }
+      const email = new RegExp('<Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+      const firstName = new RegExp('<Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+      const lastName = new RegExp('<Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body)[1];
+
+      admin.firestore().collection('users')
+        .where('email', '==', email).get()
+        .then((userQuerySnapshot) => {
+          if (userQuerySnapshot.empty) {
+            // New user: Save it in the database
+            const newUser = {
+              email,
+              anon: false,
+              name: `${firstName} ${lastName}`,
+              role: 'student'
+            };
+
+            return admin.firestore().collection('users').add(newUser);
+          } else {
+            // if name is falsy (empty)
+            if(!(userQuerySnapshot.docs[0].data().name)) {
+              return userQuerySnapshot.docs[0].ref.update({name: `${firstName} ${lastName}`}).then(() => {
+                return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+              });
+            } else {
+              // Returning user: Grab ID
+              return new Promise(((resolve) => resolve(userQuerySnapshot.docs[0])));
+            }
+          }
+        })
+        .then((user: {id: string}) => {
+          admin.auth().createCustomToken(user.id)
+            .then((customToken) => {
+              res.redirect(`${req.query.target}?token=${customToken}`);
+            })
+            .catch((error) => {
+              console.log('Error creating custom token:', error);
+              res.send(error);
+            });
+        });
+  });
 });
 
 export const casLogin = functions.https.onRequest(app);

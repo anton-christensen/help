@@ -27,6 +27,7 @@ import {MenuComponent} from './components/menu/menu.component';
 import {EmphasizedComponent} from './components/emphasized/emphasized.component';
 import {RoleEditComponent} from './components/role-edit/role-edit.component';
 import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import {HandleSuccessfullAuthComponent} from './components/handle-successfull-au
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
     AngularFirestoreModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [],
   bootstrap: [AppComponent]

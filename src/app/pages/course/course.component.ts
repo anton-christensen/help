@@ -18,6 +18,8 @@ export class CourseComponent implements OnInit {
               private sessionService: SessionService) { }
 
   ngOnInit() {
+    this.commonService.currentLocation = 'course';
+
     this.course$ = this.sessionService.getCourse$();
   }
 

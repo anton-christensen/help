@@ -1,5 +1,20 @@
 @import '~src/sass/variables';
 
+.back-button {
+  user-select: none;
+  font-size: 1.5rem;
+  left: 0;
+  top: 0;
+  cursor: pointer;
+  padding: 1rem;
+  z-index: 2;
+  position: fixed;
+
+  &:hover {
+    color: $bg-grey-dark-hover;
+  }
+}
+
 .menu-button {
   user-select: none;
   font-size: 1.5rem;

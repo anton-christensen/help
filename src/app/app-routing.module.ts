@@ -9,22 +9,8 @@ import {InstituteListComponent} from './pages/institute-list/institute-list.comp
 import {InstituteExistsGuard} from './guards/institute-exists.guard';
 import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
 
-/*
-/ -> /departments
-/departments (institute-list)
-/departments/:institute -> /institiutes/:institute/courses
-/departments/:institute/courses (courses-list)
-/departments/:institute/courses/:course (course)
-
-/admin
- # promote users to professors (professors are attached to an institute)
- # add courses to institutes
-   # add users as TAs
-*/
-// https://help.aau.dk/authed?token=${customToken}&user=${userId}
-// { path: 'admin/courses', component: CourseEditComponent, canActivate: [IsLecturerGuard]},
 const routes: Routes = [
-  {path: 'authed', component: HandleSuccessfullAuthComponent},
+  {path: 'auth', component: HandleSuccessfullAuthComponent},
   {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
   {path: 'departments/:institute/courses/:course', component: CourseComponent, canActivate: [InstituteExistsGuard, CourseExistsGuard]},
   {path: 'departments/:institute/courses', component: CourseListComponent, canActivate: [InstituteExistsGuard]},
