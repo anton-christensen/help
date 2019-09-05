@@ -3,12 +3,21 @@ import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
 import {Observable} from 'rxjs';
 import {Course} from '../models/course';
 import {map, mergeMap} from 'rxjs/operators';
+import {Title} from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommonService {
-  constructor() { }
+  constructor(private title: Title) { }
+
+  public setTitle(title: string) {
+    if (title) {
+      this.title.setTitle(`${title} – Help`);
+    } else {
+      this.title.setTitle('Help');
+    }
+  }
 
   public static documentIsCreatedDatePresent(document: {created: {seconds}}): boolean {
     return document && document.created && document.created.seconds;

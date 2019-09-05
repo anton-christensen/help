@@ -3,15 +3,12 @@
 </ng-template>
 
 <div *ngIf="institutes && institutes.length; else loading">
-  <h1 class="course-title">Departments</h1>
+  <h1 class="course-title">Departments with Courses</h1>
 
   <ul>
     <li *ngFor="let institute of institutes">
       <a [routerLink]="['/', 'departments', institute.slug , 'courses']" class="institute-link">
         {{ institute.title }}
-        <span class="after">
-          {{ institute.numCourses }} courses
-        </span>
       </a>
     </li>
   </ul>

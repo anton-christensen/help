@@ -6,6 +6,7 @@ import {TrashCan} from '../../models/trash-can';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import { Observable } from 'rxjs';
+import {CommonService} from '../../services/common.service';
 
 @Component({
   selector: 'app-student',
@@ -26,6 +27,7 @@ export class StudentComponent implements OnInit, OnDestroy {
   });
 
   constructor(private auth: AuthService,
+              private commonService: CommonService,
               private session: SessionService,
               private trashCanService: TrashCanService) { }
 
@@ -41,6 +43,8 @@ export class StudentComponent implements OnInit, OnDestroy {
         this.course = course;
 
         this.trashCan$ = this.trashCanService.getOwnedByCourse(course);
+
+        this.commonService.setTitle(`${course.slug.toUpperCase()}`);
       });
   }
 
