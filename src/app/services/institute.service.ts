@@ -14,7 +14,15 @@ export class InstituteService {
 
   public getAll(): Observable<Institute[]> {
     return this.getMultiple((ref) => {
-      return ref.orderBy('title', 'asc');
+      return ref
+        .orderBy('title', 'asc');
+    });
+  }
+
+  public getAllWithCourses(): Observable<Institute[]> {
+    return this.getMultiple((ref) => {
+      return ref
+        .where('numCourses', '>', 0);
     });
   }
 

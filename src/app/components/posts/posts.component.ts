@@ -12,7 +12,7 @@ import {CommonService} from '../../services/common.service';
 import * as SimpleMDE from 'simplemde';
 import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
 import { User } from 'src/app/models/user';
-// declare var SimpleMDE : any;
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-posts',
@@ -81,7 +81,13 @@ export class PostsComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const post = new Post(this.form.value.id, course.id, this.form.value.content);
+    const post: Post = {
+      id: this.form.value.id,
+      content: this.form.value.content,
+      courseID: course.id,
+      created: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
     this.postService.createOrUpdatePost(post).then(() => {
       this.cancelEdit();
     });

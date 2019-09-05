@@ -14,7 +14,7 @@
         background-color: $bg-grey-light-hover;
     }
 
-    &.disabled:after {
+    &.disabled::after {
         content: "not active";
         float: right;
         font-weight: normal;

@@ -13,4 +13,12 @@
   &:hover {
     background-color: $bg-grey-light-hover;
   }
+
+  .after {
+    float: right;
+    font-weight: normal;
+    font-size: 0.6rem;
+    position: relative;
+    top: 0.3rem;
+  }
 }

@@ -2,6 +2,14 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 admin.initializeApp();
 
+// Delete user in database, when they are deleted in auth
+exports.removeUser = functions.auth.user()
+  .onDelete((user) => {
+    return  admin.firestore().doc(`users/${user.uid}`).delete();
+  });
+
+
+// Send notification to proper topic when a trashcan appears
 export const onNewTrashCan = functions.firestore
   .document('trashCans/{id}').onCreate((snap) => {
     const trashCan = snap.data();
@@ -22,12 +30,14 @@ export const onNewTrashCan = functions.firestore
   });
 
 
+// Subscribe notification tokens to trash cans from their course
 export const onNewNotificationToken = functions.firestore
   .document('notificationTokens/{id}').onCreate((snap) => {
     const data = snap.data();
     return admin.messaging().subscribeToTopic(data.token, `TrashCan-${data.courseID}`);
   });
 
+// Handle notification token subscriptions on updates
 export const onUpdatedNotificationToken = functions.firestore
   .document('notificationTokens/{id}').onUpdate((snap) => {
     const oldData = snap.before.data();
@@ -39,6 +49,7 @@ export const onUpdatedNotificationToken = functions.firestore
       });
   });
 
+// Unsubscribe when tokens are removed
 export const onDeleteNotificationToken = functions.firestore
   .document('notificationTokens/{id}').onDelete((snap) => {
   const data = snap.data();
@@ -46,7 +57,74 @@ export const onDeleteNotificationToken = functions.firestore
   return admin.messaging().unsubscribeFromTopic(data.token, `TrashCan-${data.courseID}`);
 });
 
+// Keep track of the number of courses per institute
+export const addCourseInInstitute = functions.firestore
+  .document('courses/{id}').onCreate((snap) => {
+    const instituteSlug = snap.data().instituteSlug;
+    // Get institute by slug
+    return admin.firestore().collection('institutes').where('slug', '==', instituteSlug).get()
+      .then((querySnap) => {
+        // If it exists update it
+        if (querySnap.empty) {
+          return null;
+        }
 
+        return querySnap.docs[0].ref.update('numCourses', admin.firestore.FieldValue.increment(1));
+      });
+  });
+
+export const updateCourseInInstitute = functions.firestore
+  .document('courses/{id}').onUpdate((snap) => {
+    // Check if there is a change in institute
+    const oldInstituteSlug = snap.before.data().instituteSlug;
+    const newInstituteSlug = snap.after.data().instituteSlug;
+    if (oldInstituteSlug === newInstituteSlug) {
+      return null;
+    }
+
+    // There was a change, decrement the old institute
+    const promises = [];
+    promises.push(admin.firestore().collection('institutes').where('slug', '==', oldInstituteSlug).get()
+      .then((querySnap) => {
+        // If it exists update it
+        if (querySnap.empty) {
+          return null;
+        }
+
+        return querySnap.docs[0].ref.update('numCourses', admin.firestore.FieldValue.increment(-1));
+      }));
+
+    // And increment the new one
+    promises.push(admin.firestore().collection('institutes').where('slug', '==', newInstituteSlug).get()
+      .then((querySnap) => {
+        // If it exists update it
+        if (querySnap.empty) {
+          return null;
+        }
+
+        return querySnap.docs[0].ref.update('numCourses', admin.firestore.FieldValue.increment(1));
+      }));
+
+    // Return when both complete
+    return Promise.all(promises);
+  });
+
+export const removeCourseInInstitute = functions.firestore
+  .document('courses/{id}').onDelete((snap) => {
+    const instituteSlug = snap.data().instituteSlug;
+    // Get institute by slug
+    return admin.firestore().collection('institutes').where('slug', '==', instituteSlug).get()
+      .then((querySnap) => {
+        // If it exists update it
+        if (querySnap.empty) {
+          return null;
+        }
+
+        return querySnap.docs[0].ref.update('numCourses', admin.firestore.FieldValue.increment(-1));
+      });
+  });
+
+// Remove notification tokens from users if the are removed from a course
 export const onUpdateCourse = functions.firestore
   .document('courses/{courseID}').onUpdate((snap, ctx) => {
     // Check if there was a change to associated users
@@ -60,7 +138,6 @@ export const onUpdateCourse = functions.firestore
     if (removedUsers.length === 0) {
       return null;
     }
-    console.log(`These users were removed from course ${ctx.params.courseID}:`, removedUsers);
 
     // Remove notification tokens for each removed user and this course
     const removedUsersPromises = [];
@@ -70,7 +147,6 @@ export const onUpdateCourse = functions.firestore
           .where('courseID', '==', ctx.params.courseID)
           .where('userID', '==', removedUser).get()
           .then((tokens) => {
-            console.log('Deleting these tokens:', tokens);
             const tokenPromises = [];
             tokens.forEach(token => {
               tokenPromises.push(token.ref.delete());
@@ -83,15 +159,13 @@ export const onUpdateCourse = functions.firestore
     return Promise.all(removedUsersPromises);
 });
 
+// Remove all notification tokens related to a deleted course
 export const onDeleteCourse = functions.firestore
 .document('courses/{courseID}').onDelete((snap, ctx) => {
-  console.log('Started course deletion');
-
   // Remove all notification tokens related to the course
   return admin.firestore().collection('notificationTokens')
     .where('courseID', '==', ctx.params.courseID).get()
     .then((tokens) => {
-      console.log('Deleting these tokens:', tokens);
       const promises = [];
       tokens.forEach(token => {
         promises.push(token.ref.delete());
@@ -100,12 +174,10 @@ export const onDeleteCourse = functions.firestore
     })
   // Remove all posts related to the course
     .then(() => {
-      console.log('Tokens deleted');
       return admin.firestore().collection('posts')
         .where('courseID', '==', ctx.params.courseID).get();
     })
     .then((posts) => {
-      console.log('Deleting these posts:', posts);
       const promises = [];
       posts.forEach(post => {
         promises.push(post.ref.delete());
@@ -114,7 +186,7 @@ export const onDeleteCourse = functions.firestore
     });
 });
 
-
+// Remove all notification tokens from users if they are demoted to students
 export const onUserUpdate = functions.firestore
   .document('users/{userID}').onUpdate((snap, ctx) => {
     if (snap.after.data().role !== 'student') {
@@ -125,7 +197,6 @@ export const onUserUpdate = functions.firestore
     return admin.firestore().collection('notificationTokens')
       .where('userID', '==', ctx.params.userID).get()
       .then((tokens) => {
-        console.log('Deleting these tokens:', tokens);
         const tokenPromises = [];
         tokens.forEach(token => {
           tokenPromises.push(token.ref.delete());
@@ -134,13 +205,13 @@ export const onUserUpdate = functions.firestore
       });
   });
 
+// Remove all notification tokens from users when they are deleted
 export const onUserDelete = functions.firestore
   .document('users/{userID}').onDelete((snap, ctx) => {
     // Delete all notification tokens related to this user
     return admin.firestore().collection('notificationTokens')
       .where('userID', '==', ctx.params.userID).get()
       .then((tokens) => {
-        console.log('Deleting these tokens:', tokens);
         const tokenPromises = [];
         tokens.forEach(token => {
           tokenPromises.push(token.ref.delete());
@@ -148,6 +219,7 @@ export const onUserDelete = functions.firestore
         return Promise.all(tokenPromises);
       });
   });
+
 
 import * as express from 'express';
 import * as request from 'request';
