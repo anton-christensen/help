@@ -125,4 +125,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     }
   }
 
+  menuClicked(e: MouseEvent) {
+    this.closeMenu();
+  }
 }

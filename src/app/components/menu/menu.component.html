@@ -11,6 +11,7 @@
   </div>
 </div>
 
+<div class="menu-bg" *ngIf="open" (click)="menuClicked($event)"></div>
 <div class="menu" [ngClass]="{open: open}">
   <div class="top">
     <div class="name"
