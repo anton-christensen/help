@@ -18,7 +18,7 @@ export class CourseListComponent implements OnInit {
               private courseService: CourseService) {}
 
   ngOnInit() {
-    this.commonService.currentLocation = 'course';
+    this.commonService.currentLocation = 'courseList';
 
     this.session.getInstitute$().subscribe(institute => {
       this.commonService.setTitle(`Courses at ${institute.slug.toUpperCase()}`);

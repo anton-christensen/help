@@ -1,12 +1,14 @@
-<!--<div class="back-button"-->
-<!--     *ngIf="commonService.currentLocation !== 'instituteList'"-->
-<!--     (click)="back()">-->
-<!--  ↶-->
-<!--</div>-->
+<div class="menu-bar">
+  <div class="button left material-icons"
+       *ngIf="commonService.currentLocation !== 'instituteList'"
+       (click)="back()">
+    arrow_back
+  </div>
 
-<div class="menu-button"
-     (click)="openMenu()">
-  ☰
+  <div class="button right material-icons"
+       (click)="openMenu()">
+    menu
+  </div>
 </div>
 
 <div class="menu" [ngClass]="{open: open}">
@@ -72,7 +74,7 @@
   <div class="bottom">
     <a class="menu-item"
        *ngIf="auth.isAdmin() || auth.isLecturer()"
-       (click)="closeMenu()"
+       (click)="adminClicked()"
        [routerLink]="['/admin']">
       <div class="fl">
         <label>

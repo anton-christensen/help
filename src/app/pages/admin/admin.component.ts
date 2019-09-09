@@ -13,6 +13,7 @@ export class AdminComponent implements OnInit {
               private commonService: CommonService) {}
 
   ngOnInit() {
+    this.commonService.currentLocation = 'admin';
     this.commonService.setTitle(`Admin panel`);
   }
 

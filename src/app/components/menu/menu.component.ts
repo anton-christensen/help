@@ -101,13 +101,28 @@ export class MenuComponent implements OnInit, OnDestroy {
     return window.matchMedia('(display-mode: standalone)').matches;
   }
 
+
+  public adminClicked() {
+    localStorage.setItem('preAdminLocation', this.document.location.pathname);
+    this.closeMenu();
+  }
+
   public back() {
     const current = this.commonService.currentLocation;
 
-    if (current === 'admin' || 'courseList') {
+    if (current === 'admin') {
+      const path = localStorage.getItem('preAdminLocation');
+      localStorage.removeItem('preAdminLocation');
+      this.router.navigateByUrl(path || '/');
+    }
+    else if (current === 'courseList') {
       this.router.navigateByUrl('/departments');
     } else {
-      this.router.navigateByUrl('/departments/cs');
+      console.log(this.document.location.pathname, this.commonService.currentLocation);
+      let departmentSlug = /\/departments\/([^\/]+)\/courses/.exec(this.document.location.pathname)[1];
+      console.log(departmentSlug);
+      this.router.navigateByUrl('/departments/'+departmentSlug);
     }
   }
+
 }
