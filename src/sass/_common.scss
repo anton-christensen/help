@@ -374,11 +374,11 @@ form.inline-button {
 }
 
 input:checked + .slider {
-  background-color: $active;
+  background-color: $pri-col;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px $active;
+  box-shadow: 0 0 1px $pri-col;
 }
 
 input:checked + .slider:before {
@@ -400,7 +400,7 @@ input:checked + .slider:before {
   }
 
   &.notice {
-    background-color: $active;
+    background-color: $pri-col;
     color: white;
   }
 }

@@ -20,9 +20,10 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/assets",
+              "src/robots.txt",
               "src/favicon.ico",
               "src/manifest.json",
-              "src/firebase-messaging-sw.js",
+              "src/firebase-messaging-sw.js"
             ],
             "styles": [
               "src/styles.scss",

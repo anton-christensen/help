@@ -2,7 +2,7 @@
   "gcm_sender_id": "103953800507",
   "name": "Help",
   "short_name": "Help",
-  "theme_color": "#1976d2",
+  "theme_color": "#2373C8",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "/",
