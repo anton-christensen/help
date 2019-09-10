@@ -1,11 +1,20 @@
-<app-modal></app-modal>
-<app-toasts></app-toasts>
+<ng-container *ngIf="online">
+  <app-modal></app-modal>
+  <app-toasts></app-toasts>
 
-<app-menu></app-menu>
-<div class="page">
-  <div class="container">
-    <router-outlet></router-outlet>
+  <app-menu></app-menu>
+  <div class="page">
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+    <app-footer></app-footer>
   </div>
-  <app-footer></app-footer>
-</div>
+</ng-container>
+
+<ng-container *ngIf="!online">
+  <h2 class="text-centered">
+    You appear to have no internet connection. This is required to use help.aau.dk
+  </h2>
+</ng-container>
+
 
