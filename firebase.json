@@ -11,6 +11,40 @@
         "source": "**",
         "destination": "/index.html"
       }
+    ],
+    "headers": [
+      {
+        "source": "/",
+        "headers": [{"key": "Link", "value": "</js/app.js>;rel=preload;as=script,</css/app.css>;rel=preload;as=style"}]
+      },
+      {
+        "source" : "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+        "headers" : [ {
+          "key" : "Access-Control-Allow-Origin",
+          "value" : "*"
+        }, {
+          "key": "Content-Encoding",
+          "value": "gzip"
+        }]
+      }, {
+        "source" : "**/*.@(js|css)",
+        "headers" : [ {
+          "key" : "Cache-Control",
+          "value" : "max-age=31536000"
+        }, {
+          "key": "Content-Encoding",
+          "value": "gzip"
+        }]
+      }, {
+        "source" : "**/*.@(jpg|jpeg|gif|png|svg)",
+        "headers" : [ {
+          "key" : "Cache-Control",
+          "value" : "max-age=604800"
+        }, {
+          "key": "Content-Encoding",
+          "value": "gzip"
+        }]
+      }
     ]
   },
   "functions": {
