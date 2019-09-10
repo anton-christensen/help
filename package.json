@@ -9,7 +9,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "ng serve",
-    "deploy": "ng build --prod && firebase deploy --only hosting"
+    "deploy": "ng build --prod && firebase deploy --only hosting",
+    "stats": "ng build --prod --stats-json && webpack-bundle-analyzer dist/help/stats-es2015.json"
   },
   "private": true,
   "dependencies": {
