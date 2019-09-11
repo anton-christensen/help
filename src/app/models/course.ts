@@ -7,4 +7,5 @@ export interface Course {
   instituteSlug: string;
   enabled: boolean;
   associatedUserIDs: string[];
+  numTrashCansThisSession: number;
 }

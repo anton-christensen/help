@@ -81,7 +81,7 @@ export class CourseService {
   }
 
   public setCourseEnabled(course: Course) {
-    return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: course.enabled});
+    return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: course.enabled, numTrashCansThisSession: 0});
   }
 
   public deleteCourse(course: Course) {

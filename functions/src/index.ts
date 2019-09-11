@@ -16,16 +16,21 @@ export const onNewTrashCan = functions.firestore
 
     return admin.firestore().doc(`courses/${trashCan.courseID}`).get()
       .then((doc) => {
+        const promises = [];
         const course = doc.data();
 
-        return admin.messaging().sendToTopic(`TrashCan-${trashCan.courseID}`, {
+        promises.push(admin.messaging().sendToTopic(`TrashCan-${trashCan.courseID}`, {
           notification: {
             title: `A ${course.slug.toUpperCase()} student needs help!`,
             body: `Room no. ${trashCan.room}`,
             clickAction: `https://help.aau.dk/departments/${course.instituteSlug}/courses/${course.slug}`,
             icon: `https://help.aau.dk/assets/icons/icon-128x128.png`
           }
-        });
+        }));
+
+        promises.push(doc.ref.update('numTrashCansThisSession', admin.firestore.FieldValue.increment(1)));
+
+        return Promise.all(promises);
     });
   });
 

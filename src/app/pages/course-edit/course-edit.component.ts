@@ -220,6 +220,7 @@ export class CourseEditComponent implements OnInit {
       instituteSlug: this.courseForm.value.instituteSlug,
       slug: this.courseForm.value.courseSlug.toLowerCase(),
       enabled: false,
+      numTrashCansThisSession: 0,
       associatedUserIDs: this.associatedUsers.map((u) => u.id)
     };
 
