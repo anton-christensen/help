@@ -7,6 +7,7 @@ import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import { Observable } from 'rxjs';
 import {CommonService} from '../../services/common.service';
+import {switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-student',
@@ -36,16 +37,18 @@ export class StudentComponent implements OnInit, OnDestroy {
       this.auth.anonymousSignIn();
     }
 
-    this.course$ = this.session.getCourse$();
-
-    this.course$
-      .subscribe((course) => {
+    this.course$ = this.session.getCourse$().pipe(
+      tap((course) => {
         this.course = course;
-
-        this.trashCan$ = this.trashCanService.getOwnedByCourse(course);
-
         this.commonService.setTitle(`${course.slug.toUpperCase()}`);
-      });
+      })
+    );
+
+    this.trashCan$ = this.course$.pipe(
+      switchMap((course) => {
+        return this.trashCanService.getOwnedByCourse(course);
+      }),
+    );
   }
 
   ngOnDestroy(): void {
