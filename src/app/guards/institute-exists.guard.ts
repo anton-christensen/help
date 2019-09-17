@@ -24,14 +24,11 @@ export class InstituteExistsGuard implements CanActivate {
   Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const instituteSlug = childRoute.paramMap.get('institute');
 
-    return this.instituteService.isActualInstitute(instituteSlug).pipe(
-      map((exists) => {
-        if (!exists) {
-          this.toastService.add('Institute not found', 5000);
-          return this.router.parseUrl('/institutes');
-        }
-
-        return exists;
-      }));
+    if (this.instituteService.isActualInstitute(instituteSlug)) {
+      return true;
+    } else {
+      this.toastService.add('Institute not found', 5000);
+      return this.router.parseUrl('/institutes');
+    }
   }
 }

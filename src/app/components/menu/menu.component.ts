@@ -70,6 +70,16 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   public toggleCourseEnabled(course: Course): Promise<void> {
     course.enabled = !course.enabled;
+
+    if (!course.enabled) {
+      if (course.numTrashCansThisSession > 0) {
+        if (course.numTrashCansThisSession === 1) {
+          this.toastService.add(`There was a total of ${course.numTrashCansThisSession} trashcan this session`);
+        } else {
+          this.toastService.add(`There were a total of ${course.numTrashCansThisSession} trashcans this session`);
+        }
+      }
+    }
     return this.courseService.setCourseEnabled(course);
   }
 
@@ -101,7 +111,6 @@ export class MenuComponent implements OnInit, OnDestroy {
     return window.matchMedia('(display-mode: standalone)').matches;
   }
 
-
   public adminClicked() {
     localStorage.setItem('preAdminLocation', this.document.location.pathname);
     this.closeMenu();
@@ -114,14 +123,13 @@ export class MenuComponent implements OnInit, OnDestroy {
       const path = localStorage.getItem('preAdminLocation');
       localStorage.removeItem('preAdminLocation');
       this.router.navigateByUrl(path || '/');
-    }
-    else if (current === 'courseList') {
+    } else if (current === 'courseList') {
       this.router.navigateByUrl('/departments');
     } else {
       console.log(this.document.location.pathname, this.commonService.currentLocation);
-      let departmentSlug = /\/departments\/([^\/]+)\/courses/.exec(this.document.location.pathname)[1];
+      const departmentSlug = /\/departments\/([^\/]+)\/courses/.exec(this.document.location.pathname)[1];
       console.log(departmentSlug);
-      this.router.navigateByUrl('/departments/'+departmentSlug);
+      this.router.navigateByUrl(`/departments/${departmentSlug}`);
     }
   }
 

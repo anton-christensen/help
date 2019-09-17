@@ -81,7 +81,11 @@ export class CourseService {
   }
 
   public setCourseEnabled(course: Course) {
-    return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: course.enabled, numTrashCansThisSession: 0});
+    if (course.enabled) {
+      return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: course.enabled, numTrashCansThisSession: 0});
+    } else {
+      return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: false});
+    }
   }
 
   public deleteCourse(course: Course) {
@@ -153,7 +157,7 @@ export class CoursePager {
 
     // Create the observable array for consumption in components
     this.data = this._data.asObservable().pipe(
-      scan( (acc: any[], val: any[]) => { 
+      scan( (acc: any[], val: any[]) => {
         let newvals = [];
         for(let i = 0; i < val.length; i++) {
           let index = acc.findIndex( accItem => accItem.id == val[i].id);
@@ -169,13 +173,13 @@ export class CoursePager {
         }
 
         let result = (this.query.prepend ? newvals.concat(acc) : acc.concat(newvals))
-          .map(item => { 
+          .map(item => {
             return {
               id: item.id,
-              title: item.title, 
-              slug: item.slug, 
-              instituteSlug: item.instituteSlug, 
-              enabled: item.enabled, 
+              title: item.title,
+              slug: item.slug,
+              instituteSlug: item.instituteSlug,
+              enabled: item.enabled,
               associatedUserIDs: item.associatedUserIDs
             } as Course;
           });
@@ -203,11 +207,11 @@ export class CoursePager {
   }
 
 
-  // Determines the doc snapshot to paginate query 
+  // Determines the doc snapshot to paginate query
   private getCursor() {
     const current = this._data.value
     if (current.length) {
-      return this.query.prepend ? current[0].doc : current[current.length - 1].doc 
+      return this.query.prepend ? current[0].doc : current[current.length - 1].doc
     }
     return null
   }
@@ -231,7 +235,7 @@ export class CoursePager {
           const type = snap.type;
           return { ...data, doc, id, type };
         });
-        
+
         // If prepending, reverse the batch order
         values = this.query.prepend ? values.reverse() : values;
 

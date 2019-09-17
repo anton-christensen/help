@@ -80,7 +80,7 @@
         required>
 
         <option value="" disabled selected>Select an department</option>
-        <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
+        <option *ngFor="let institute of institutes" [value]="institute.slug">
           {{ institute.title }}
         </option>
 

@@ -11,8 +11,7 @@ import {filter} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SessionService {
-  private institute$: ReplaySubject<Institute> = new ReplaySubject<Institute>(1);
-  private instituteSubscription: Subscription = new Subscription();
+  private institute;
   private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
   private courseSubscription: Subscription = new Subscription();
 
@@ -20,20 +19,19 @@ export class SessionService {
               private instituteService: InstituteService,
               private courseService: CourseService) {
     this.router.events.pipe(
-      filter(event => {return event instanceof NavigationEnd;})
+      filter((event) => event instanceof NavigationEnd)
     )
       .subscribe((event) => {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
         const instituteSlug = paramMap.get('institute');
         const courseSlug = paramMap.get('course');
 
+        this.courseSubscription.unsubscribe();
+
         if (instituteSlug) {
-          this.instituteSubscription.unsubscribe();
-          this.instituteSubscription = this.instituteService.getBySlug(instituteSlug)
-            .subscribe((institute) => this.institute$.next(institute));
+          this.institute = this.instituteService.getBySlug(instituteSlug);
 
           if (courseSlug) {
-            this.courseSubscription.unsubscribe();
             this.courseSubscription = this.courseService.getBySlug(instituteSlug, courseSlug)
               .subscribe((course) => this.course$.next(course));
           }
@@ -41,8 +39,8 @@ export class SessionService {
       });
   }
 
-  public getInstitute$(): Observable<Institute> {
-    return this.institute$;
+  public getInstitute(): Institute {
+    return this.institute;
   }
 
   public getCourse$(): Observable<Course> {
