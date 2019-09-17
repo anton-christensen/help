@@ -12,6 +12,7 @@ import {CommonService} from './common.service';
   providedIn: 'root'
 })
 export class TrashCanService {
+  private activeByCourse: {slug: string, obs: Observable<TrashCan[]>}[] = [];
 
   constructor(private afStore: AngularFirestore,
               private auth: AuthService) {}
@@ -42,12 +43,23 @@ export class TrashCanService {
   }
 
   public getActiveByCourse(course: Course): Observable<TrashCan[]> {
-    return this.getMultiple((ref) => {
-      return ref
-        .where('active', '==', true)
-        .where('courseID', '==', course.id)
-        .orderBy('created', 'desc');
-    });
+    let obj = this.activeByCourse.find(({slug}) => slug === course.slug);
+    if (obj) {
+      return obj.obs;
+    } else {
+      obj = {
+        slug: course.slug,
+        obs: this.getMultiple((ref) => {
+          return ref
+            .where('active', '==', true)
+            .where('courseID', '==', course.id)
+            .orderBy('created', 'desc');
+        })
+      };
+      this.activeByCourse.push(obj);
+    }
+
+    return obj.obs;
   }
 
   public addTrashCan(course: Course, room: string, uid: string): Promise<TrashCan> {

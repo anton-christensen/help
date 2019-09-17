@@ -21,7 +21,7 @@ export class SessionService {
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd)
     )
-      .subscribe((event) => {
+      .subscribe(() => {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
         const instituteSlug = paramMap.get('institute');
         const courseSlug = paramMap.get('course');
