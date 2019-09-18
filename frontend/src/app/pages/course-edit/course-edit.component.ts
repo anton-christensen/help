@@ -20,7 +20,7 @@ import { User } from 'src/app/models/user';
 })
 export class CourseEditComponent implements OnInit {
   public coursesPager: CoursePager;
-  public institutes: Institute[];
+  public institutes$: Observable<Institute[]>;
 
   public coursesFilterForm = new FormGroup({
     instituteSlug: new FormControl('', [
@@ -85,7 +85,7 @@ export class CourseEditComponent implements OnInit {
       }
     });
 
-    this.institutes = this.instituteService.getAll();
+    this.institutes$ = this.instituteService.getAll();
 
     // Validate course slug when department changes
     this.courseForm.controls.instituteSlug.valueChanges

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {InstituteService} from '../../services/institute.service';
 import {Institute} from '../../models/institute';
 import {CommonService} from '../../services/common.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-institute-list',
@@ -9,7 +10,7 @@ import {CommonService} from '../../services/common.service';
   styleUrls: ['./institute-list.component.scss']
 })
 export class InstituteListComponent implements OnInit {
-  public institutes: Institute[];
+  public institutes$: Observable<Institute[]>;
 
   constructor(private commonService: CommonService,
               private instituteService: InstituteService) {}
@@ -18,6 +19,6 @@ export class InstituteListComponent implements OnInit {
     this.commonService.setTitle('Departments');
     this.commonService.currentLocation = 'instituteList';
 
-    this.institutes = this.instituteService.getAll();
+    this.institutes$ = this.instituteService.getAll();
   }
 }

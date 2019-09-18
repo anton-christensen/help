@@ -8,5 +8,6 @@ export const environment = {
     storageBucket: '',
     messagingSenderId: '1067545049766',
     appId: "1:1067545049766:web:a552810612976999"
-  }
+  },
+  api: 'https://clipboard.antonchristensen.net/clip'
 };

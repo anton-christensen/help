@@ -24,10 +24,10 @@ import {ModalComponent} from './components/modal/modal.component';
 import {CourseEditComponent} from './pages/course-edit/course-edit.component';
 import {InstituteListComponent} from './pages/institute-list/institute-list.component';
 import {MenuComponent} from './components/menu/menu.component';
-import {EmphasizedComponent} from './components/emphasized/emphasized.component';
 import {RoleEditComponent} from './components/role-edit/role-edit.component';
 import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
+import {ServiceWorkerModule} from '@angular/service-worker';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -46,12 +46,12 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     CourseEditComponent,
     InstituteListComponent,
     MenuComponent,
-    EmphasizedComponent,
     RoleEditComponent,
     HandleSuccessfullAuthComponent,
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     ReactiveFormsModule,
     AppRoutingModule,
     MarkdownModule.forRoot(),

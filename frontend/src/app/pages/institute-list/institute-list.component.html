@@ -2,7 +2,7 @@
   <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </ng-template>
 
-<div *ngIf="institutes && institutes.length; else loading">
+<div *ngIf="institutes$ | async as institutes; else loading">
   <h1 class="course-title">Departments with Courses</h1>
 
   <ul>
