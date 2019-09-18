@@ -20,6 +20,10 @@ export class CourseExistsGuard implements CanActivate {
     const departmentSlug = next.paramMap.get('department');
     const courseSlug = next.paramMap.get('course');
 
+    //TODO REMOVE THIS!
+    return true;
+
+
     return this.courseService.isActualCourse(departmentSlug, courseSlug).pipe(
       map((exists) => {
         if (!exists) {

@@ -26,11 +26,11 @@ export class CourseListComponent implements OnInit {
 
       this.auth.user$.subscribe((user) => {
         if (!user || user.role === 'student') {
-          this.coursePager = this.courseService.getAllActiveByInstitute(department.slug);
+          this.coursePager = this.courseService.getAllActiveByDepartment(department.slug);
         } else if (user.role === 'admin') {
-          this.coursePager = this.courseService.getAllByInstitute(department.slug);
+          this.coursePager = this.courseService.getAllByDepartment(department.slug);
         } else if (user.role === 'TA' || user.role === 'lecturer') {
-          this.coursePager = this.courseService.getAllByLecturerAndInstitute(user, department.slug);
+          this.coursePager = this.courseService.getAllByLecturerAndDepartment(user, department.slug);
         }
       });
     });

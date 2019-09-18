@@ -11,9 +11,11 @@ import {filter} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SessionService {
-  private department$: Observable<Department>;
-  private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
-  private courseSubscription: Subscription = new Subscription();
+  private currentDepartmentSlug: string;
+  private department$: Observable<Department> = new Observable<Department>();
+
+  private currentCourseSlug: string;
+  private course$: Observable<Course> = new Observable<Course>();
 
   constructor(private router: Router,
               private departmentService: DepartmentService,
@@ -21,18 +23,17 @@ export class SessionService {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
+
         const departmentSlug = paramMap.get('department');
-        const courseSlug = paramMap.get('course');
-
-        this.courseSubscription.unsubscribe();
-
-        if (departmentSlug) {
+        if (departmentSlug !== this.currentDepartmentSlug) {
+          this.currentDepartmentSlug = departmentSlug;
           this.department$ = this.departmentService.getBySlug(departmentSlug);
+        }
 
-          if (courseSlug) {
-            this.courseSubscription = this.courseService.getBySlug(departmentSlug, courseSlug)
-              .subscribe((course) => this.course$.next(course));
-          }
+        const courseSlug = paramMap.get('course');
+        if (courseSlug !== this.currentCourseSlug) {
+          this.currentCourseSlug = courseSlug;
+          this.course$ = this.courseService.getBySlug(departmentSlug, courseSlug);
         }
       });
   }

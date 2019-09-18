@@ -71,7 +71,7 @@ export class CourseEditComponent implements OnInit {
     this.coursesFilterForm.controls.departmentSlug.valueChanges
       .subscribe((departmentSlug) => {
         if (this.auth.user && this.auth.user.role === 'admin') {
-          this.coursesPager = this.courseService.getAllByInstitute(departmentSlug);
+          this.coursesPager = this.courseService.getAllByDepartment(departmentSlug);
         }
       });
 

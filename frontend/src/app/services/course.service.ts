@@ -1,17 +1,20 @@
 import {Injectable} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection, QueryFn} from '@angular/fire/firestore';
-import {Observable, BehaviorSubject} from 'rxjs';
+import {Observable, BehaviorSubject, Subject} from 'rxjs';
 import {Course, CoursePath} from '../models/course';
 import {CommonService} from './common.service';
-import {map, scan, tap, take} from 'rxjs/operators';
+import {map, scan, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {User} from '../models/user';
-import { filter } from 'minimatch';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
-  constructor(private afStore: AngularFirestore) {}
+
+  constructor(private afStore: AngularFirestore,
+              private http: HttpClient) {}
 
   public pageSize = 15;
 
@@ -25,11 +28,10 @@ export class CourseService {
   }
 
   public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
-    return this.getSingle((ref) => {
-      return ref
-        .where('departmentSlug', '==', departmentSlug)
-        .where('slug', '==', courseSlug);
-    });
+    console.log('called');
+    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+      shareReplay(1)
+    );
   }
 
   public getAllByLecturer(user: User): CoursePager {
@@ -43,7 +45,7 @@ export class CourseService {
     );
   }
 
-  public getAllByInstitute(departmentSlug: string): CoursePager {
+  public getAllByDepartment(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('departmentSlug', '==', departmentSlug)
@@ -52,7 +54,7 @@ export class CourseService {
     );
   }
 
-  public getAllByLecturerAndInstitute(user: User, departmentSlug: string): CoursePager {
+  public getAllByLecturerAndDepartment(user: User, departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('departmentSlug', '==', departmentSlug)
@@ -62,7 +64,7 @@ export class CourseService {
     );
   }
 
-  public getAllActiveByInstitute(departmentSlug: string): CoursePager {
+  public getAllActiveByDepartment(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('enabled', '==', true)
