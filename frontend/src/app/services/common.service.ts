@@ -9,7 +9,7 @@ import {Title} from '@angular/platform-browser';
   providedIn: 'root'
 })
 export class CommonService {
-  public currentLocation: 'instituteList' | 'courseList' | 'course' | 'admin';
+  public currentLocation: 'departmentList' | 'courseList' | 'course' | 'admin';
   constructor(private title: Title) { }
 
   public setTitle(title: string) {

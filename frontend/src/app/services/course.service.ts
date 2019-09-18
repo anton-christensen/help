@@ -18,16 +18,16 @@ export class CourseService {
   public getAll(): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.orderBy('instituteSlug', 'asc')
+      (ref) => ref.orderBy('departmentSlug', 'asc')
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
+  public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
     return this.getSingle((ref) => {
       return ref
-        .where('instituteSlug', '==', instituteSlug)
+        .where('departmentSlug', '==', departmentSlug)
         .where('slug', '==', courseSlug);
     });
   }
@@ -36,44 +36,44 @@ export class CourseService {
     return new CoursePager(this.afStore, 'courses', (ref) => {
       return ref
         .where('associatedUserIDs', 'array-contains', user.id)
-        .orderBy('instituteSlug', 'asc')
+        .orderBy('departmentSlug', 'asc')
         .orderBy('title', 'asc');
       },
       {limit: this.pageSize}
     );
   }
 
-  public getAllByInstitute(instituteSlug: string): CoursePager {
+  public getAllByInstitute(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.where('instituteSlug', '==', instituteSlug)
+      (ref) => ref.where('departmentSlug', '==', departmentSlug)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getAllByLecturerAndInstitute(user: User, instituteSlug: string): CoursePager {
+  public getAllByLecturerAndInstitute(user: User, departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.where('instituteSlug', '==', instituteSlug)
+      (ref) => ref.where('departmentSlug', '==', departmentSlug)
                   .where('associatedUserIDs', 'array-contains', user.id)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getAllActiveByInstitute(instituteSlug: string): CoursePager {
+  public getAllActiveByInstitute(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('enabled', '==', true)
-                  .where('instituteSlug', '==', instituteSlug)
+                  .where('departmentSlug', '==', departmentSlug)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public isActualCourse(instituteSlug: string, courseSlug: string): Observable<boolean> {
-    return this.getBySlug(instituteSlug, courseSlug).pipe(
+  public isActualCourse(departmentSlug: string, courseSlug: string): Observable<boolean> {
+    return this.getBySlug(departmentSlug, courseSlug).pipe(
       map((course) => {
         return !!course;
       })
@@ -178,7 +178,7 @@ export class CoursePager {
               id: item.id,
               title: item.title,
               slug: item.slug,
-              instituteSlug: item.instituteSlug,
+              departmentSlug: item.departmentSlug,
               enabled: item.enabled,
               associatedUserIDs: item.associatedUserIDs
             } as Course;

@@ -1,9 +1,9 @@
 import {Injectable } from '@angular/core';
 import {CourseService} from './course.service';
-import {InstituteService} from './institute.service';
+import {DepartmentService} from './department.service';
 import {Observable, ReplaySubject, Subscription, Subject} from 'rxjs';
 import {Course} from '../models/course';
-import {Institute} from '../models/institute';
+import {Department} from '../models/department';
 import {Router, NavigationEnd} from '@angular/router';
 import {filter} from 'rxjs/operators';
 
@@ -11,34 +11,34 @@ import {filter} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SessionService {
-  private institute$: Observable<Institute>;
+  private department$: Observable<Department>;
   private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
   private courseSubscription: Subscription = new Subscription();
 
   constructor(private router: Router,
-              private instituteService: InstituteService,
+              private departmentService: DepartmentService,
               private courseService: CourseService) {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
-        const instituteSlug = paramMap.get('institute');
+        const departmentSlug = paramMap.get('department');
         const courseSlug = paramMap.get('course');
 
         this.courseSubscription.unsubscribe();
 
-        if (instituteSlug) {
-          this.institute$ = this.instituteService.getBySlug(instituteSlug);
+        if (departmentSlug) {
+          this.department$ = this.departmentService.getBySlug(departmentSlug);
 
           if (courseSlug) {
-            this.courseSubscription = this.courseService.getBySlug(instituteSlug, courseSlug)
+            this.courseSubscription = this.courseService.getBySlug(departmentSlug, courseSlug)
               .subscribe((course) => this.course$.next(course));
           }
         }
       });
   }
 
-  public getInstitute$(): Observable<Institute> {
-    return this.institute$;
+  public getDepartment(): Observable<Department> {
+    return this.department$;
   }
 
   public getCourse$(): Observable<Course> {

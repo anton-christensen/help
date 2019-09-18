@@ -21,16 +21,16 @@ export class CourseListComponent implements OnInit {
   ngOnInit() {
     this.commonService.currentLocation = 'courseList';
 
-    this.session.getInstitute$().subscribe(institute => {
-      this.commonService.setTitle(`Courses at ${institute.slug.toUpperCase()}`);
+    this.session.getDepartment().subscribe(department => {
+      this.commonService.setTitle(`Courses at ${department.slug.toUpperCase()}`);
 
       this.auth.user$.subscribe((user) => {
         if (!user || user.role === 'student') {
-          this.coursePager = this.courseService.getAllActiveByInstitute(institute.slug);
+          this.coursePager = this.courseService.getAllActiveByInstitute(department.slug);
         } else if (user.role === 'admin') {
-          this.coursePager = this.courseService.getAllByInstitute(institute.slug);
+          this.coursePager = this.courseService.getAllByInstitute(department.slug);
         } else if (user.role === 'TA' || user.role === 'lecturer') {
-          this.coursePager = this.courseService.getAllByLecturerAndInstitute(user, institute.slug);
+          this.coursePager = this.courseService.getAllByLecturerAndInstitute(user, department.slug);
         }
       });
     });

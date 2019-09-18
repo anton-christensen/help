@@ -2,13 +2,13 @@
   <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </ng-template>
 
-<div *ngIf="institutes$ | async as institutes; else loading">
+<div *ngIf="departments$ | async as departments; else loading">
   <h1 class="course-title">Departments with Courses</h1>
 
   <ul>
-    <li *ngFor="let institute of institutes">
-      <a [routerLink]="['/', 'departments', institute.slug , 'courses']" class="institute-link">
-        {{ institute.title }}
+    <li *ngFor="let department of departments">
+      <a [routerLink]="['/', 'departments', department.slug , 'courses']" class="department-link">
+        {{ department.title }}
       </a>
     </li>
   </ul>

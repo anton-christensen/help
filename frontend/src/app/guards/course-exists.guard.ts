@@ -3,7 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Rout
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import {ToastService} from '../services/toasts.service';
-import {InstituteService} from '../services/institute.service';
+import {DepartmentService} from '../services/department.service';
 import {map} from 'rxjs/operators';
 import {CourseService} from '../services/course.service';
 
@@ -17,10 +17,10 @@ export class CourseExistsGuard implements CanActivate {
 
   public canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    const instituteSlug = next.paramMap.get('institute');
+    const departmentSlug = next.paramMap.get('department');
     const courseSlug = next.paramMap.get('course');
 
-    return this.courseService.isActualCourse(instituteSlug, courseSlug).pipe(
+    return this.courseService.isActualCourse(departmentSlug, courseSlug).pipe(
       map((exists) => {
         if (!exists) {
           this.toastService.add('Course not found', 5000);

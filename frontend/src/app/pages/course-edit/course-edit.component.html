@@ -3,17 +3,17 @@
 <ng-container *ngIf="(auth.user$ | async)?.role === 'admin'">
   <h3>Select department to edit course from</h3>
   <form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
-    <label for="instituteFilterSlug">
+    <label for="departmentFilterSlug">
       Select department
     </label>
     <select
-      id="instituteFilterSlug"
+      id="departmentFilterSlug"
       class="form-control"
-      formControlName="instituteSlug"
+      formControlName="departmentSlug"
       required>
       <option value="" disabled selected>Select an department</option>
-      <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
-        {{ institute.title }}
+      <option *ngFor="let department of departments$ | async" [value]="department.slug">
+        {{ department.title }}
       </option>
     </select>
   </form>
@@ -34,7 +34,7 @@
       <tbody>
         <tr *ngFor="let course of courses" class="course">
           <td class="title">{{ course.title }}</td>
-          <td class="institute">{{ course.instituteSlug }}</td>
+          <td class="department">{{ course.departmentSlug }}</td>
           <td class="slug">{{ course.slug.toUpperCase() }}</td>
           <td (click)="editCourse(course)" class="edit">
             <i class="material-icons clickable">edit</i>
@@ -72,16 +72,16 @@
     </div>
 
     <div class="form-field">
-      <label for="instituteSlug" class="visible">Department</label>
+      <label for="departmentSlug" class="visible">Department</label>
       <select
-        id="instituteSlug"
+        id="departmentSlug"
         class="form-control"
-        formControlName="instituteSlug"
+        formControlName="departmentSlug"
         required>
 
         <option value="" disabled selected>Select an department</option>
-        <option *ngFor="let institute of institutes$ | async" [value]="institute.slug">
-          {{ institute.title }}
+        <option *ngFor="let department of departments$ | async" [value]="department.slug">
+          {{ department.title }}
         </option>
 
       </select>
