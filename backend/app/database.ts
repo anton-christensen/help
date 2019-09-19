@@ -19,8 +19,8 @@ export class Database {
   public static init(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.r.connect({
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT
+        host: process.env.DB_HOST ? process.env.DB_HOST : 'localhost',
+        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 28015
       }).then(conn => {
         conn.use(this.dbName);
         this._connection = conn;
