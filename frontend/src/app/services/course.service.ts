@@ -8,10 +8,45 @@ import {User} from '../models/user';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment.prod';
 
+class requestCache<T, T2> {
+  private readonly timeLimit = 750;
+  private readonly requestFunction: (T) => Observable<T2>;
+  private cache: {
+    key: T,
+    time: number,
+    observable: Observable<T2>
+  }[];
+
+  constructor(request: (T) => Observable<T2>) {
+    this.requestFunction = request;
+    this.cache = [];
+  }
+
+  public getObservable(query: T): Observable<T2> {
+    let found = this.cache.find((el) => JSON.stringify(el.key) === JSON.stringify(query));
+    if (!found || found.time < Date.now() - this.timeLimit) {
+      found = {
+        key: query,
+        time: Date.now(),
+        observable: this.requestFunction(query)
+      };
+
+      this.cache.push(found);
+    }
+
+    return found.observable;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
+  private bySlug = new requestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
+    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+      shareReplay(1)
+    );
+  });
 
   constructor(private afStore: AngularFirestore,
               private http: HttpClient) {}
@@ -28,49 +63,15 @@ export class CourseService {
   }
 
   public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
-    console.log('called');
-    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+    return this.bySlug.getObservable({departmentSlug, courseSlug}).pipe(
+      map((courses) => courses[0])
+    );
+  }
+
+  public getRelevantByDepartment(departmentSlug: string): Observable<Course[]> {
+    console.log('called get by department');
+    return this.http.get<Course[]>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
       shareReplay(1)
-    );
-  }
-
-  public getAllByLecturer(user: User): CoursePager {
-    return new CoursePager(this.afStore, 'courses', (ref) => {
-      return ref
-        .where('associatedUserIDs', 'array-contains', user.id)
-        .orderBy('departmentSlug', 'asc')
-        .orderBy('title', 'asc');
-      },
-      {limit: this.pageSize}
-    );
-  }
-
-  public getAllByDepartment(departmentSlug: string): CoursePager {
-    return new CoursePager(this.afStore,
-      'courses',
-      (ref) => ref.where('departmentSlug', '==', departmentSlug)
-                  .orderBy('title', 'asc'),
-      { limit: this.pageSize }
-    );
-  }
-
-  public getAllByLecturerAndDepartment(user: User, departmentSlug: string): CoursePager {
-    return new CoursePager(this.afStore,
-      'courses',
-      (ref) => ref.where('departmentSlug', '==', departmentSlug)
-                  .where('associatedUserIDs', 'array-contains', user.id)
-                  .orderBy('title', 'asc'),
-      { limit: this.pageSize }
-    );
-  }
-
-  public getAllActiveByDepartment(departmentSlug: string): CoursePager {
-    return new CoursePager(this.afStore,
-      'courses',
-      (ref) => ref.where('enabled', '==', true)
-                  .where('departmentSlug', '==', departmentSlug)
-                  .orderBy('title', 'asc'),
-      { limit: this.pageSize }
     );
   }
 
@@ -82,11 +83,16 @@ export class CourseService {
     );
   }
 
-  public setCourseEnabled(course: Course) {
-    if (course.enabled) {
-      return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: course.enabled, numTrashCansThisSession: 0});
+  public setCourseEnabled(course: Course, enabled: boolean) {
+    if (enabled) {
+      return this.http.put<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
+        enabled,
+        numTrashCansThisSession: 0
+      });
     } else {
-      return this.afStore.collection<Course>(CoursePath).doc(course.id).update({enabled: false});
+      return this.http.put<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
+        enabled,
+      });
     }
   }
 

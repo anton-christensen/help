@@ -4,11 +4,11 @@ import {AuthService} from 'src/app/services/auth.service';
 import {ToastService} from '../../services/toasts.service';
 
 @Component({
-  selector: 'app-handle-successfull-auth',
-  templateUrl: './handle-successfull-auth.component.html',
-  styleUrls: ['./handle-successfull-auth.component.scss']
+  selector: 'app-handle-successful-auth',
+  templateUrl: './handle-successful-auth.component.html',
+  styleUrls: ['./handle-successful-auth.component.scss']
 })
-export class HandleSuccessfullAuthComponent implements OnInit {
+export class HandleSuccessfulAuthComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -20,13 +20,12 @@ export class HandleSuccessfullAuthComponent implements OnInit {
     // Note: Below 'queryParams' can be replaced with 'params' depending on your requirements
     this.activatedRoute.queryParams.subscribe(params => {
       const authToken = params.token;
-      this.auth.verifyLoginAAU(authToken).then((user) => {
-        this.ngZone.run(() => {
-          this.toastService.add(`Logged in as ${user.role}`);
+      localStorage.setItem('token', authToken);
+      this.auth.getUser()
+        .subscribe(() => {
           const path = localStorage.getItem('preLoginPath');
           localStorage.removeItem('preLoginPath');
           this.router.navigateByUrl(path);
-        });
       });
     });
   }

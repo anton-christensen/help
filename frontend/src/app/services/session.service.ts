@@ -25,13 +25,13 @@ export class SessionService {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
 
         const departmentSlug = paramMap.get('department');
-        if (departmentSlug !== this.currentDepartmentSlug) {
+        if (departmentSlug && departmentSlug !== this.currentDepartmentSlug) {
           this.currentDepartmentSlug = departmentSlug;
           this.department$ = this.departmentService.getBySlug(departmentSlug);
         }
 
         const courseSlug = paramMap.get('course');
-        if (courseSlug !== this.currentCourseSlug) {
+        if (courseSlug && courseSlug !== this.currentCourseSlug) {
           this.currentCourseSlug = courseSlug;
           this.course$ = this.courseService.getBySlug(departmentSlug, courseSlug);
         }

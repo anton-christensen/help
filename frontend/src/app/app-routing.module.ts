@@ -7,10 +7,10 @@ import {CourseComponent} from './pages/course/course.component';
 import {IsLecturerGuard} from './guards/is-role.guard';
 import {DepartmentListComponent} from './pages/department-list/department-list.component';
 import {DepartmentExistsGuard} from './guards/department-exists-guard.service';
-import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
+import {HandleSuccessfulAuthComponent} from './components/handle-successful-auth/handle-successful-auth.component';
 
 const routes: Routes = [
-  {path: 'auth', component: HandleSuccessfullAuthComponent},
+  {path: 'auth', component: HandleSuccessfulAuthComponent},
   {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
   {path: 'departments/:department/courses/:course', component: CourseComponent, canActivate: [DepartmentExistsGuard, CourseExistsGuard]},
   {path: 'departments/:department/courses', component: CourseListComponent, canActivate: [DepartmentExistsGuard]},

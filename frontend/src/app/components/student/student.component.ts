@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, OnDestroy} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
@@ -7,14 +7,14 @@ import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import { Observable } from 'rxjs';
 import {CommonService} from '../../services/common.service';
-import {switchMap, tap} from 'rxjs/operators';
+import {first, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-student',
   templateUrl: './student.component.html',
   styleUrls: ['./student.component.scss']
 })
-export class StudentComponent implements OnInit, OnDestroy {
+export class StudentComponent implements OnInit {
   public course$: Observable<Course>;
   private course: Course;
   public trashCan$: Observable<TrashCan>;
@@ -33,10 +33,6 @@ export class StudentComponent implements OnInit, OnDestroy {
               private trashCanService: TrashCanService) { }
 
   ngOnInit() {
-    if (!this.auth.user) {
-      this.auth.anonymousSignIn();
-    }
-
     this.course$ = this.session.getCourse$().pipe(
       tap((course) => {
         this.course = course;
@@ -51,19 +47,10 @@ export class StudentComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
-  }
-
   public onSubmit(): void {
-    if (!this.auth.user) {
-      this.auth.anonymousSignIn()
-        .then((res) => {
-          console.log('anonymous signin: ', res);
-          this.save(res.user.uid);
-        });
-    } else {
-      this.save(this.auth.user.id);
-    }
+    this.auth.user$.pipe(
+      first()
+    ).subscribe((user) => this.save(user.id))
   }
 
   private save(userID: string) {
