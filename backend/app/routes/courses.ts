@@ -1,24 +1,35 @@
 import { r, Connection, RCursor } from 'rethinkdb-ts';
 import { Router } from 'express';
 import { Database } from '../database';
-const router = Router();
 
-router.get( '/', ( request, response ) => {
-    Database.courses.filter(
-    {
+export const courseRouter = Router();
+
+courseRouter
+.get('/courses', (request, response) => {
+    Database.courses
+    .run(Database.connection)
+    .then( result => {
+        response.send( result );
+    })
+    .catch(error => response.send(error));
+});
+
+courseRouter
+.get('/departments/:departmentSlug/courses', ( request, response ) => {
+    Database.courses.filter({
         departmentSlug: request.params.departmentSlug
     })
     .run(Database.connection)
     .then( result => {
         response.send( result );
     })
-    .catch( error => response.send( error ) );
+    .catch(error => response.send(error));
 });
 
 
-router.get( '/:courseSlug', ( request, response ) => {
-    Database.courses.filter(
-    {
+courseRouter
+.get('/departments/:departmentSlug/courses/:courseSlug', ( request, response ) => {
+    Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug
     })
@@ -29,7 +40,8 @@ router.get( '/:courseSlug', ( request, response ) => {
     .catch( error => response.send( error ) );
 });
 
-router.post('/', (request, response) => {
+courseRouter
+.post('/departments/:departmentSlug/courses/', (request, response) => {
     let data = request.body;
     Database.courses.insert(data)
     .run(Database.connection)
@@ -38,7 +50,8 @@ router.post('/', (request, response) => {
     });
 });
 
-router.put('/:courseSlug', (request, response) => {
+courseRouter
+.put('/departments/:departmentSlug/courses/:courseSlug', (request, response) => {
     let data = request.body;
     Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
@@ -50,7 +63,8 @@ router.put('/:courseSlug', (request, response) => {
     });
 });
 
-router.delete('/:courseSlug', (request, response) => {
+courseRouter
+.delete('/departments/:departmentSlug/courses/:courseSlug', (request, response) => {
     Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug
@@ -61,5 +75,3 @@ router.delete('/:courseSlug', (request, response) => {
         response.send(result);
     })
 });
-
-module.exports = router;
