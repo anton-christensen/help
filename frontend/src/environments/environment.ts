@@ -11,7 +11,8 @@ export const environment = {
     projectId: 'help-67ad0',
     storageBucket: '',
     messagingSenderId: '1067545049766'
-  }
+  },
+  api: 'https://clipboard.antonchristensen.net/clip'
 };
 
 /*

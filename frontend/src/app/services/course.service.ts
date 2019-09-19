@@ -1,79 +1,81 @@
 import {Injectable} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection, QueryFn} from '@angular/fire/firestore';
-import {Observable, BehaviorSubject} from 'rxjs';
+import {Observable, BehaviorSubject, Subject} from 'rxjs';
 import {Course, CoursePath} from '../models/course';
 import {CommonService} from './common.service';
-import {map, scan, tap, take} from 'rxjs/operators';
+import {map, scan, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {User} from '../models/user';
-import { filter } from 'minimatch';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
-  constructor(private afStore: AngularFirestore) {}
+
+  constructor(private afStore: AngularFirestore,
+              private http: HttpClient) {}
 
   public pageSize = 15;
 
   public getAll(): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.orderBy('instituteSlug', 'asc')
+      (ref) => ref.orderBy('departmentSlug', 'asc')
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getBySlug(instituteSlug: string, courseSlug: string): Observable<Course> {
-    return this.getSingle((ref) => {
-      return ref
-        .where('instituteSlug', '==', instituteSlug)
-        .where('slug', '==', courseSlug);
-    });
+  public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
+    console.log('called');
+    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+      shareReplay(1)
+    );
   }
 
   public getAllByLecturer(user: User): CoursePager {
     return new CoursePager(this.afStore, 'courses', (ref) => {
       return ref
         .where('associatedUserIDs', 'array-contains', user.id)
-        .orderBy('instituteSlug', 'asc')
+        .orderBy('departmentSlug', 'asc')
         .orderBy('title', 'asc');
       },
       {limit: this.pageSize}
     );
   }
 
-  public getAllByInstitute(instituteSlug: string): CoursePager {
+  public getAllByDepartment(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.where('instituteSlug', '==', instituteSlug)
+      (ref) => ref.where('departmentSlug', '==', departmentSlug)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getAllByLecturerAndInstitute(user: User, instituteSlug: string): CoursePager {
+  public getAllByLecturerAndDepartment(user: User, departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
-      (ref) => ref.where('instituteSlug', '==', instituteSlug)
+      (ref) => ref.where('departmentSlug', '==', departmentSlug)
                   .where('associatedUserIDs', 'array-contains', user.id)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public getAllActiveByInstitute(instituteSlug: string): CoursePager {
+  public getAllActiveByDepartment(departmentSlug: string): CoursePager {
     return new CoursePager(this.afStore,
       'courses',
       (ref) => ref.where('enabled', '==', true)
-                  .where('instituteSlug', '==', instituteSlug)
+                  .where('departmentSlug', '==', departmentSlug)
                   .orderBy('title', 'asc'),
       { limit: this.pageSize }
     );
   }
 
-  public isActualCourse(instituteSlug: string, courseSlug: string): Observable<boolean> {
-    return this.getBySlug(instituteSlug, courseSlug).pipe(
+  public isActualCourse(departmentSlug: string, courseSlug: string): Observable<boolean> {
+    return this.getBySlug(departmentSlug, courseSlug).pipe(
       map((course) => {
         return !!course;
       })
@@ -178,7 +180,7 @@ export class CoursePager {
               id: item.id,
               title: item.title,
               slug: item.slug,
-              instituteSlug: item.instituteSlug,
+              departmentSlug: item.departmentSlug,
               enabled: item.enabled,
               associatedUserIDs: item.associatedUserIDs
             } as Course;

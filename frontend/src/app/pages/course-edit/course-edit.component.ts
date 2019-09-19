@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CoursePager, CourseService } from 'src/app/services/course.service';
 import { Observable, timer, of, combineLatest, Subject } from 'rxjs';
 import { Course } from 'src/app/models/course';
-import { Institute } from 'src/app/models/institute';
+import { Department } from 'src/app/models/department';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalService } from 'src/app/services/modal.service';
 import { ToastService } from 'src/app/services/toasts.service';
-import { InstituteService } from 'src/app/services/institute.service';
+import { DepartmentService } from 'src/app/services/department.service';
 import { UserService } from 'src/app/services/user.service';
 import {switchMap, map, first, take} from 'rxjs/operators';
 import { User } from 'src/app/models/user';
@@ -20,10 +20,10 @@ import { User } from 'src/app/models/user';
 })
 export class CourseEditComponent implements OnInit {
   public coursesPager: CoursePager;
-  public institutes: Institute[];
+  public departments$: Observable<Department[]>;
 
   public coursesFilterForm = new FormGroup({
-    instituteSlug: new FormControl('', [
+    departmentSlug: new FormControl('', [
       Validators.required
     ]),
   });
@@ -33,7 +33,7 @@ export class CourseEditComponent implements OnInit {
     title: new FormControl('', [
       Validators.required,
     ]),
-    instituteSlug: new FormControl('', [
+    departmentSlug: new FormControl('', [
       Validators.required
     ]),
     courseSlug: new FormControl('', [
@@ -63,15 +63,15 @@ export class CourseEditComponent implements OnInit {
               private modalService: ModalService,
               private toastService: ToastService,
               private courseService: CourseService,
-              private instituteService: InstituteService,
+              private departmentService: DepartmentService,
               private userService: UserService) {}
 
   ngOnInit() {
     this.resetForm();
-    this.coursesFilterForm.controls.instituteSlug.valueChanges
-      .subscribe((instituteSlug) => {
+    this.coursesFilterForm.controls.departmentSlug.valueChanges
+      .subscribe((departmentSlug) => {
         if (this.auth.user && this.auth.user.role === 'admin') {
-          this.coursesPager = this.courseService.getAllByInstitute(instituteSlug);
+          this.coursesPager = this.courseService.getAllByDepartment(departmentSlug);
         }
       });
 
@@ -85,10 +85,10 @@ export class CourseEditComponent implements OnInit {
       }
     });
 
-    this.institutes = this.instituteService.getAll();
+    this.departments$ = this.departmentService.getAll();
 
     // Validate course slug when department changes
-    this.courseForm.controls.instituteSlug.valueChanges
+    this.courseForm.controls.departmentSlug.valueChanges
       .subscribe(() => {
         this.courseForm.controls.courseSlug.updateValueAndValidity();
       });
@@ -170,7 +170,7 @@ export class CourseEditComponent implements OnInit {
     this.courseForm.setValue({
       id: course.id,
       title: course.title,
-      instituteSlug: course.instituteSlug,
+      departmentSlug: course.departmentSlug,
       courseSlug: course.slug.toUpperCase(),
     });
     this.usersForm.reset({
@@ -195,7 +195,7 @@ export class CourseEditComponent implements OnInit {
     this.courseForm.reset({
       id: '',
       title: '',
-      instituteSlug: '',
+      departmentSlug: '',
       courseSlug: '',
     });
     this.usersForm.reset({
@@ -217,7 +217,7 @@ export class CourseEditComponent implements OnInit {
     const course: Course = {
       id: this.courseForm.value.id,
       title: this.courseForm.value.title,
-      instituteSlug: this.courseForm.value.instituteSlug,
+      departmentSlug: this.courseForm.value.departmentSlug,
       slug: this.courseForm.value.courseSlug.toLowerCase(),
       enabled: false,
       numTrashCansThisSession: 0,
@@ -229,7 +229,7 @@ export class CourseEditComponent implements OnInit {
 
   private updateCourse() {
     this.courseBeingEdited.title = this.courseForm.value.title;
-    this.courseBeingEdited.instituteSlug = this.courseForm.value.instituteSlug;
+    this.courseBeingEdited.departmentSlug = this.courseForm.value.departmentSlug;
     this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
     this.courseBeingEdited.associatedUserIDs = this.associatedUsers.map((u) => u.id);
 
@@ -260,10 +260,10 @@ export class CourseEditComponent implements OnInit {
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {
     return timer(300).pipe(
       switchMap(() => {
-        const instituteSlug = this.courseForm.value.instituteSlug;
+        const departmentSlug = this.courseForm.value.departmentSlug;
         const courseSlug = control.value.toLowerCase();
 
-        return this.courseService.getBySlug(instituteSlug, courseSlug).pipe(
+        return this.courseService.getBySlug(departmentSlug, courseSlug).pipe(
           map((result) => {
             if (result) {
               if (this.courseForm.value.id === result.id) {

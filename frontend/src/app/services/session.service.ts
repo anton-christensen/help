@@ -1,9 +1,9 @@
 import {Injectable } from '@angular/core';
 import {CourseService} from './course.service';
-import {InstituteService} from './institute.service';
+import {DepartmentService} from './department.service';
 import {Observable, ReplaySubject, Subscription, Subject} from 'rxjs';
 import {Course} from '../models/course';
-import {Institute} from '../models/institute';
+import {Department} from '../models/department';
 import {Router, NavigationEnd} from '@angular/router';
 import {filter} from 'rxjs/operators';
 
@@ -11,36 +11,35 @@ import {filter} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SessionService {
-  private institute;
-  private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
-  private courseSubscription: Subscription = new Subscription();
+  private currentDepartmentSlug: string;
+  private department$: Observable<Department> = new Observable<Department>();
+
+  private currentCourseSlug: string;
+  private course$: Observable<Course> = new Observable<Course>();
 
   constructor(private router: Router,
-              private instituteService: InstituteService,
+              private departmentService: DepartmentService,
               private courseService: CourseService) {
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd)
-    )
-      .subscribe((event) => {
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
-        const instituteSlug = paramMap.get('institute');
+
+        const departmentSlug = paramMap.get('department');
+        if (departmentSlug !== this.currentDepartmentSlug) {
+          this.currentDepartmentSlug = departmentSlug;
+          this.department$ = this.departmentService.getBySlug(departmentSlug);
+        }
+
         const courseSlug = paramMap.get('course');
-
-        this.courseSubscription.unsubscribe();
-
-        if (instituteSlug) {
-          this.institute = this.instituteService.getBySlug(instituteSlug);
-
-          if (courseSlug) {
-            this.courseSubscription = this.courseService.getBySlug(instituteSlug, courseSlug)
-              .subscribe((course) => this.course$.next(course));
-          }
+        if (courseSlug !== this.currentCourseSlug) {
+          this.currentCourseSlug = courseSlug;
+          this.course$ = this.courseService.getBySlug(departmentSlug, courseSlug);
         }
       });
   }
 
-  public getInstitute(): Institute {
-    return this.institute;
+  public getDepartment(): Observable<Department> {
+    return this.department$;
   }
 
   public getCourse$(): Observable<Course> {
