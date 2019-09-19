@@ -1,9 +1,9 @@
-version: '2'
+version: '3'
 services:
   rethinkdb:
     image: 'rethinkdb:latest'
     ports:
-     - "28015" # client driver connections
+     - "28015:28015" # client driver connections
      - "29015" # Intracluster connection
      - "2880:8080" # http administration interface
     volumes:
