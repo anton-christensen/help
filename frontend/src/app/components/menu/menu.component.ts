@@ -68,19 +68,11 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.open = false;
   }
 
-  public toggleCourseEnabled(course: Course): Promise<void> {
-    course.enabled = !course.enabled;
+  public toggleCourseEnabled(course: Course) {
+    const newStatus = !course.enabled;
 
-    if (!course.enabled) {
-      if (course.numTrashCansThisSession > 0) {
-        if (course.numTrashCansThisSession === 1) {
-          this.toastService.add(`There was a total of ${course.numTrashCansThisSession} trashcan this session`);
-        } else {
-          this.toastService.add(`There were a total of ${course.numTrashCansThisSession} trashcans this session`);
-        }
-      }
-    }
-    return this.courseService.setCourseEnabled(course);
+    this.courseService.setCourseEnabled(course, newStatus)
+      .subscribe(console.log);
   }
 
   public toggleNotificationsEnabled(course: Course) {
@@ -126,9 +118,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     } else if (current === 'courseList') {
       this.router.navigateByUrl('/departments');
     } else {
-      console.log(this.document.location.pathname, this.commonService.currentLocation);
       const departmentSlug = /\/departments\/([^\/]+)\/courses/.exec(this.document.location.pathname)[1];
-      console.log(departmentSlug);
       this.router.navigateByUrl(`/departments/${departmentSlug}`);
     }
   }

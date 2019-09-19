@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { CoursePager, CourseService } from 'src/app/services/course.service';
-import { Observable, timer, of, combineLatest, Subject } from 'rxjs';
+import { CourseService } from 'src/app/services/course.service';
+import { Observable, timer, Subject } from 'rxjs';
 import { Course } from 'src/app/models/course';
 import { Department } from 'src/app/models/department';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -19,7 +19,7 @@ import { User } from 'src/app/models/user';
   styleUrls: ['./course-edit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
-  public coursesPager: CoursePager;
+  public courses$: Observable<Course[]>;
   public departments$: Observable<Department[]>;
 
   public coursesFilterForm = new FormGroup({
@@ -70,19 +70,9 @@ export class CourseEditComponent implements OnInit {
     this.resetForm();
     this.coursesFilterForm.controls.departmentSlug.valueChanges
       .subscribe((departmentSlug) => {
-        if (this.auth.user && this.auth.user.role === 'admin') {
-          this.coursesPager = this.courseService.getAllByDepartment(departmentSlug);
-        }
-      });
+        this.courses$ = this.courseService.getRelevantByDepartment(departmentSlug);
 
-    this.auth.user$.subscribe(user => {
-      if (!user) {
-        this.coursesPager = null;
-      } else if (user.role === 'admin') {
-        // ...
-      } else {
-        this.coursesPager = this.courseService.getAllByLecturer(user);
-      }
+        //TODO If user is lecturer we need a get all associated
     });
 
     this.departments$ = this.departmentService.getAll();
@@ -110,10 +100,6 @@ export class CourseEditComponent implements OnInit {
       .subscribe((email) => {
         this.findUser(email.trim());
       });
-  }
-
-  public loadMoreCourses() {
-    this.coursesPager.more();
   }
 
   public onUserFormSubmit() {
@@ -247,7 +233,6 @@ export class CourseEditComponent implements OnInit {
           return;
         }
 
-        this.coursesPager.removeOneHack(course);
         this.courseService.deleteCourse(course).then(() => {
           if (this.editing && this.courseBeingEdited.id === course.id) {
             this.resetForm();

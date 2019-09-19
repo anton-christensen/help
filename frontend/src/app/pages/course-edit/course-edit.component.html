@@ -19,7 +19,7 @@
   </form>
 </ng-container>
 
-<ng-container *ngIf="coursesPager && coursesPager.data | async as courses">
+<ng-container *ngIf="courses$ | async as courses">
   <div class="tablefix-wrapper">
     <table class="course-list">
       <thead>
@@ -46,10 +46,6 @@
       </tbody>
     </table>
   </div>
-  <div class="text-centered" *ngIf="!(coursesPager.loading | async) && !(coursesPager.done | async)">
-    <button class="btn inline-block" (click)="loadMoreCourses()">Load more</button>
-  </div>
-  <app-loader  *ngIf="coursesPager.loading | async"></app-loader>
 </ng-container>
 
 <div class="course-edit">

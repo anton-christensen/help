@@ -1,7 +1,8 @@
 <ng-template #loading>
-  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <app-loader></app-loader>
 </ng-template>
-<ng-container *ngIf="coursePager && coursePager.data | async as courses; else loading">
+
+<ng-container *ngIf="courses$ | async as courses; else loading">
   <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
     <ng-container *ngIf="auth.isLecturer() || auth.isAssistant(); then assistant; else student"></ng-container>
@@ -28,11 +29,5 @@
       <app-course-link [course]="course"></app-course-link>
     </li>
   </ul>
-
-  <div class="text-centered" *ngIf="!(coursePager.loading | async) && !(coursePager.done | async)">
-    <button class="btn inline-block" (click)="getMoreCourses()">Load more courses</button>
-  </div>
-  <ng-container *ngIf="(coursePager.loading | async); then loading"></ng-container>
-
 </ng-container>
 

@@ -3,6 +3,8 @@ import {CourseService, CoursePager} from 'src/app/services/course.service';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import {CommonService} from '../../services/common.service';
+import {Observable} from 'rxjs';
+import {Course} from '../../models/course';
 
 @Component({
   selector: 'app-course-list',
@@ -10,7 +12,7 @@ import {CommonService} from '../../services/common.service';
   styleUrls: ['./course-list.component.scss']
 })
 export class CourseListComponent implements OnInit {
-  public coursePager: CoursePager;
+  public courses$: Observable<Course[]>;
 
   constructor(public auth: AuthService,
               private commonService: CommonService,
@@ -21,22 +23,11 @@ export class CourseListComponent implements OnInit {
   ngOnInit() {
     this.commonService.currentLocation = 'courseList';
 
-    this.session.getDepartment().subscribe(department => {
-      this.commonService.setTitle(`Courses at ${department.slug.toUpperCase()}`);
+    this.session.getDepartment()
+      .subscribe((department) => {
+        this.commonService.setTitle(`Courses at ${department.slug.toUpperCase()}`);
 
-      this.auth.user$.subscribe((user) => {
-        if (!user || user.role === 'student') {
-          this.coursePager = this.courseService.getAllActiveByDepartment(department.slug);
-        } else if (user.role === 'admin') {
-          this.coursePager = this.courseService.getAllByDepartment(department.slug);
-        } else if (user.role === 'TA' || user.role === 'lecturer') {
-          this.coursePager = this.courseService.getAllByLecturerAndDepartment(user, department.slug);
-        }
-      });
+        this.courses$ = this.courseService.getRelevantByDepartment(department.slug);
     });
-  }
-
-  public getMoreCourses() {
-    this.coursePager.more();
   }
 }

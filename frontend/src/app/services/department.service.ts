@@ -12,7 +12,7 @@ export class DepartmentService {
   private readonly allDepartments$: Observable<Department[]>;
 
   constructor(private http: HttpClient) {
-    this.allDepartments$ = this.http.get<Department[]>(environment.api).pipe(
+    this.allDepartments$ = this.http.get<Department[]>(`${environment.api}/departments`).pipe(
       shareReplay(1)
     );
   }

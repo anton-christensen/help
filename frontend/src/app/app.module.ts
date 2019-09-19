@@ -25,9 +25,10 @@ import {CourseEditComponent} from './pages/course-edit/course-edit.component';
 import {DepartmentListComponent} from './pages/department-list/department-list.component';
 import {MenuComponent} from './components/menu/menu.component';
 import {RoleEditComponent} from './components/role-edit/role-edit.component';
-import {HandleSuccessfullAuthComponent} from './components/handle-successfull-auth/handle-successfull-auth.component';
+import {HandleSuccessfulAuthComponent} from './components/handle-successful-auth/handle-successful-auth.component';
 import {ServiceWorkerModule} from '@angular/service-worker';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {TokenInterceptor} from './services/token.interceptor';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,7 @@ import {HttpClientModule} from '@angular/common/http';
     DepartmentListComponent,
     MenuComponent,
     RoleEditComponent,
-    HandleSuccessfullAuthComponent,
+    HandleSuccessfulAuthComponent,
   ],
   imports: [
     BrowserModule,
@@ -62,7 +63,13 @@ import {HttpClientModule} from '@angular/common/http';
     AngularFireAuthModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
