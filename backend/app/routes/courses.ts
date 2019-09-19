@@ -1,29 +1,75 @@
-import { r, Connection, RCursor } from 'rethinkdb-ts';
+import { r, Connection, RCursor, RDatum } from 'rethinkdb-ts';
 import { Router } from 'express';
 import { Database } from '../database';
+import { getUser, userRoleIn } from '../lib/auth';
+import { HelpResponse } from '../lib/responses';
+import { User } from '../models/user';
+
+async function userIsAssociatedWithCourse(user: User, departmentSlug: string, courseSlug: string) {
+    return await Database.courses.filter({
+        departmentSlug: departmentSlug,
+        slug: courseSlug
+    })('associatedUserIDs').nth(0).contains(user.id ? user.id : null).run(Database.connection);
+}
+
 
 export const courseRouter = Router();
 
 courseRouter
 .get('/courses', (request, response) => {
-    Database.courses
+    let user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        // disallow
+        return HelpResponse.dissalowed(response);
+    }
+    // r.table("users").filter(function(user) {
+    //     return user("placesVisited").contains("France")
+    // }).run( conn, callback)
+
+    r.row('age').contains('test')
+    Database.courses.filter((course:RDatum<any>) => course('associatedUserIDs').contains(user.id ? user.id : null))
     .run(Database.connection)
     .then( result => {
         response.send( result );
     })
-    .catch(error => response.send(error));
+    .catch(error => error(response, error));
 });
 
 courseRouter
-.get('/departments/:departmentSlug/courses', ( request, response ) => {
-    Database.courses.filter({
+.get('/departments/:departmentSlug/courses', async ( request, response ) => {
+    let user = getUser(response);
+
+    // default filter: department
+    let query = Database.courses.filter({
         departmentSlug: request.params.departmentSlug
-    })
-    .run(Database.connection)
+    });
+    // r.db('help').table('courses').filter({enabled: true}).union(r.db('help').table('courses').filter(c => c('associatedUserIDs').contains('2ab7fc83-f8fa-4da5-9085-155545e0d6c1'))).distinct()
+    if(userRoleIn(user, ['student', 'TA', 'lecturer'])) {
+        // get active courses on department
+        query = query.filter({enabled: true});
+    }
+    else if(userRoleIn(user, ['TA', 'lecturer'])) {
+        // get active & associated courses on department
+        query = query.filter((course:RDatum) => {
+            return r.or(
+                course('enabled').eq(true),
+                course('associatedUserIDs').contains(user.id ? user.id : null),
+            )
+        });
+    }
+    else if(userRoleIn(user, ['admin'])) {
+        // get all courses on department
+    }
+    else {
+        HelpResponse.error(response, "Unknown role type");
+    }
+
+
+    query.run(Database.connection)
     .then( result => {
         response.send( result );
     })
-    .catch(error => response.send(error));
+    .catch(error => HelpResponse.error(response, error));
 });
 
 
@@ -42,6 +88,13 @@ courseRouter
 
 courseRouter
 .post('/departments/:departmentSlug/courses/', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        // disallow
+        return HelpResponse.dissalowed(response);
+    }
+    
+    // TODO: validate schema
     let data = request.body;
     Database.courses.insert(data)
     .run(Database.connection)
@@ -51,8 +104,33 @@ courseRouter
 });
 
 courseRouter
-.put('/departments/:departmentSlug/courses/:courseSlug', (request, response) => {
+.put('/departments/:departmentSlug/courses/:courseSlug', async (request, response) => {
     let data = request.body;
+    
+    const user = getUser(response);
+    if(user.role == 'student') {
+        // disallow
+        return HelpResponse.dissalowed(response);
+    }
+    else if(user.role == 'TA' && 'enabled' in data) {
+        // TODO: disallow if other keys than enabled
+
+        // remove all but enabled property
+        data = {enabled: data.enabled};
+    }
+    
+    if(userRoleIn(user, ['TA', 'lecturer'])) {
+        try {
+            
+            if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
+                return HelpResponse.dissalowed(response);
+        }
+        catch(error) {
+            return HelpResponse.error(response, error);
+        }
+    }
+    
+    // TODO: validate schema
     Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug
@@ -65,6 +143,15 @@ courseRouter
 
 courseRouter
 .delete('/departments/:departmentSlug/courses/:courseSlug', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        return HelpResponse.dissalowed(response);
+    }
+    if(user.role == 'lecturer') {
+        if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
+            return HelpResponse.dissalowed(response);
+    }
+
     Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug

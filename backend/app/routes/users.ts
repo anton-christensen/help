@@ -1,22 +1,18 @@
-import { r, Connection, RCursor } from 'rethinkdb-ts';
+import { r, Connection, RCursor, RDatum } from 'rethinkdb-ts';
 import { Router, RequestHandler } from 'express';
 import { Database } from '../database';
 import { check } from 'express-validator';
 import got = require('got');
 import { User } from '../models/user';
 import { AuthTokenFootprint } from '../models/authToken';
-import { generateToken, hash, user } from '../lib/auth';
+import { generateToken, hash, getUser, userRoleIn } from '../lib/auth';
+import { HelpResponse } from '../lib/responses';
 
 export const userRouter = Router();
 
 userRouter
 .get('/user', (request, response) => {
-    response.send(user(response));
-});
-
-userRouter
-.get('/users', (request, response) => {
-    response.send(user(response));
+    response.send(getUser(response));
 });
 
 userRouter
@@ -70,7 +66,7 @@ userRouter
                     email,
                     anon: false,
                     name: `${firstName} ${lastName}`,
-                    role: 'student'
+                    role: 'student',
                 };
 
                 return Database.users.insert(user, {returnChanges: true})
@@ -131,4 +127,24 @@ userRouter
         console.log("New token error: ", error);
         response.send(error);
     });
+});
+
+userRouter
+.get('/users', async (request, response) => {
+    let user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        return HelpResponse.dissalowed(response);
+    }
+    else if(userRoleIn(user, ['lecturer', 'admin'])) {
+        let users = await Database.users.filter((user: RDatum) =>
+            r.or(
+                r.row('name').downcase().match(request.query.q.toLowerCase()).eq(null).not(),
+                r.row('email').downcase().match(request.query.q.toLowerCase()).eq(null).not()
+            )
+        ).run(Database.connection);
+        response.send(users);
+    }
+    else {
+        return HelpResponse.error(response, 'Unknown user role');
+    }
 });

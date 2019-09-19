@@ -16,16 +16,12 @@ GET: /departments/{:dpslug}/courses/{:cslug}
 	- all: get the course
 POST: /departments/{:dpslug}/courses/{:cslug}
 	- anon/TA: disallow
-	- Lect: allowed if associated with course
-	- admin: allowed
-PUT: /departments/{:dpslug}/courses/{:cslug} :: {enabled: _bool_, ...}
+	- Lect/admin: allowed
+PUT: /departments/{:dpslug}/courses/{:cslug}
 	- anon: disallow
-	- TA/Lect: allowed if associated with course
-	- admin : allowed
-PUT: /departments/{:dpslug}/courses/{:cslug} :: {_other_: _any_}
-	- anon/TA: disallow
+	- TA: allowed to update "enabled" if associated with course
 	- Lect: allowed if associated with course
-	- admin: allowed
+	- admin : allowed
 DELETE: /departments/{:dpslug}/courses/{:cslug}
 	- anon/TA: disallow
 	- Lect: allowed if associated with course
@@ -35,10 +31,10 @@ DELETE: /departments/{:dpslug}/courses/{:cslug}
 GET: /user
 	- anon: gets anon user
 	- TA/Lecturer/admin: gets their users
-GET: /users?q=achri15@
-	- anon/TA: disallow
-	- Lect/Admin: 
-
-GET: /users/_auth
+GET: /user/_auth
 	- the service that AAU CAS recieves which will check if the user 
 		is authorized and if- then redirects to the target given as query param
+
+GET: /users?q=achri15@
+	- anon/TA: disallow
+	- Lect/Admin: allow

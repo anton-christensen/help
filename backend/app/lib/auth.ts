@@ -5,22 +5,27 @@ import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
 import { r } from "rethinkdb-ts";
 
-export const user = (response: Response): User => {
+export const getUser = (response: Response): User => {
     let _user = (response.locals._user as User);
     return _user ? _user : {
         anon: true,
         role: 'student',
+        id: '',
         name: '',
         email: ''
     }
 }
 
+export const userRoleIn = (user: User, roles: Role[]): boolean => {
+    return roles.includes(user.role);
+}
+
 export const userRole = (response: Response): Role => {
-    return user(response).role;
+    return getUser(response).role;
 }
 
 export const generateToken = ():string => {
-    return crypto.randomBytes(256).toString('hex');
+    return crypto.randomBytes(64).toString('hex');
 }
 
 export const hash = (data: string):string => {
