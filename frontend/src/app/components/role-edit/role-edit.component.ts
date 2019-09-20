@@ -41,7 +41,7 @@ export class RoleEditComponent implements OnInit {
 
     this.userService.createUserWithEmail(this.form.controls.query.value).pipe(first())
       .subscribe((user) => {
-        console.log('created user:', user);
+        this.form.controls.query.setValue(user.email);
       });
   }
 }

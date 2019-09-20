@@ -11,7 +11,7 @@
       class="form-control"
       formControlName="departmentSlug"
       required>
-      <option value="" disabled selected>Select an department</option>
+      <option value="" disabled selected>Select a department</option>
       <option *ngFor="let department of departments$ | async" [value]="department.slug">
         {{ department.title }}
       </option>
@@ -75,7 +75,7 @@
         formControlName="departmentSlug"
         required>
 
-        <option value="" disabled selected>Select an department</option>
+        <option value="" disabled selected>Select a department</option>
         <option *ngFor="let department of departments$ | async" [value]="department.slug">
           {{ department.title }}
         </option>
