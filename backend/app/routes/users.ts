@@ -27,7 +27,11 @@ userRouter
 
     // TODO: check request schema
 
-    Database.users.insert(request.body);
+    Database.users.insert(request.body)
+    .run(Database.connection)
+    .then(result => {
+        response.send(result);
+    });
 });
 
 

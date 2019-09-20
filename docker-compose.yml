@@ -20,6 +20,8 @@ services:
     build: 
       context: ./backend 
       dockerfile: ./dev.Dockerfile
+    links:
+      - rethinkdb
     
     volumes: 
       - ./backend:/usr/src/help/backend
