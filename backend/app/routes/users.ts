@@ -16,6 +16,22 @@ userRouter
 });
 
 userRouter
+.post('/users', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        return HelpResponse.dissalowed(response);
+    }
+    else if(userRoleIn(user, ['lecturer'])) {
+        // TODO: check that new user role is not above lecturer or admin
+    }
+
+    // TODO: check request schema
+
+    Database.users.insert(request.body);
+});
+
+
+userRouter
 .get( '/user/_auth', ( request, response ) => {
     if (typeof(request.query.target) !== 'string') {
         response.send(`I don't know where to send you...`);

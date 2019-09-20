@@ -4,6 +4,7 @@ import { Response, RequestHandler } from "express";
 import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
 import { r } from "rethinkdb-ts";
+import { HelpResponse } from "./responses";
 
 export const getUser = (response: Response): User => {
     let _user = (response.locals._user as User);
@@ -42,6 +43,9 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         if(now < footprint.expiration) {
             response.locals._user = await Database.users.get(footprint.userID).run(Database.connection);
         }
+    }
+    if(!userRoleIn(getUser(response), ['student', 'TA', 'lecturer', 'admin'])) {
+        return HelpResponse.error(response, "Unknown user role");
     }
     next();
 };

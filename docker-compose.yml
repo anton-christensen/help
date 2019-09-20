@@ -8,3 +8,21 @@ services:
      - "2880:8080" # http administration interface
     volumes:
      - ./docker/rethinkdb/data:/data
+  pushpin:
+    image: fanout/pushpin
+    volumes: 
+      - ./docker/pushpin/routes:/etc/pushpin/routes
+    ports:
+        - "7999:7999"
+        - "5560-5563:5560-5563"
+  devapi:
+    image: backend/dev
+    build: 
+      context: ./backend 
+      dockerfile: ./dev.Dockerfile
+    
+    volumes: 
+      - ./backend:/usr/src/help/backend
+    ports:
+      - "28080:28080"
+
