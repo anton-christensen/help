@@ -36,6 +36,23 @@ courseRouter
 });
 
 courseRouter
+.post('/courses', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        // disallow
+        return HelpResponse.dissalowed(response);
+    }
+    
+    // TODO: validate schema
+    let data = request.body;
+    Database.courses.insert(data)
+    .run(Database.connection)
+    .then( result => {
+        response.send(result);
+    });
+});
+
+courseRouter
 .get('/departments/:departmentSlug/courses', async ( request, response ) => {
     let user = getUser(response);
 
@@ -44,7 +61,7 @@ courseRouter
         departmentSlug: request.params.departmentSlug
     });
     // r.db('help').table('courses').filter({enabled: true}).union(r.db('help').table('courses').filter(c => c('associatedUserIDs').contains('2ab7fc83-f8fa-4da5-9085-155545e0d6c1'))).distinct()
-    if(userRoleIn(user, ['student', 'TA', 'lecturer'])) {
+    if(userRoleIn(user, ['student'])) {
         // get active courses on department
         query = query.filter({enabled: true});
     }
@@ -60,10 +77,6 @@ courseRouter
     else if(userRoleIn(user, ['admin'])) {
         // get all courses on department
     }
-    else {
-        HelpResponse.error(response, "Unknown role type");
-    }
-
 
     query.run(Database.connection)
     .then( result => {
@@ -75,6 +88,8 @@ courseRouter
 
 courseRouter
 .get('/departments/:departmentSlug/courses/:courseSlug', ( request, response ) => {
+    // TODO: include posts
+    
     Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug
@@ -86,22 +101,6 @@ courseRouter
     .catch( error => response.send( error ) );
 });
 
-courseRouter
-.post('/departments/:departmentSlug/courses/', (request, response) => {
-    const user = getUser(response);
-    if(userRoleIn(user, ['student', 'TA'])) {
-        // disallow
-        return HelpResponse.dissalowed(response);
-    }
-    
-    // TODO: validate schema
-    let data = request.body;
-    Database.courses.insert(data)
-    .run(Database.connection)
-    .then( result => {
-        response.send(result);
-    });
-});
 
 courseRouter
 .put('/departments/:departmentSlug/courses/:courseSlug', async (request, response) => {
@@ -161,4 +160,47 @@ courseRouter
     .then( result => {
         response.send(result);
     })
+});
+
+courseRouter
+.post('/departments/:departmentSlug/courses/:courseSlug/posts', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student'])) {
+        return HelpResponse.dissalowed(response);
+    }
+    else if(userRoleIn(user, ['TA', 'lecturer'])) {
+        if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
+            return HelpResponse.dissalowed(response);
+    }
+
+    let post = request.body;
+    // TODO: validate post
+
+    Database.posts.insert(post)
+    .run(Database.connection)
+    .then(result => {
+        response.send(result);
+    });
+});
+
+courseRouter
+.put('/departments/:departmentSlug/courses/:courseSlug/posts/:postID', (request, response) => {
+    const user = getUser(response);
+    if(userRoleIn(user, ['student'])) {
+        return HelpResponse.dissalowed(response);
+    }
+    else if(userRoleIn(user, ['TA', 'lecturer'])) {
+        if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
+            return HelpResponse.dissalowed(response);
+    }
+
+    let post = request.body;
+    // TODO: validate post
+
+    // TODO: check if post ID is valid post ID
+    Database.posts.get(request.params.postID).update(post)
+    .run(Database.connection)
+    .then(result => {
+        response.send(result);
+    });
 });
