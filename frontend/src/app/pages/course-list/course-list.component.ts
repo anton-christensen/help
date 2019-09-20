@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {CourseService, CoursePager} from 'src/app/services/course.service';
+import {CourseService} from 'src/app/services/course.service';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import {CommonService} from '../../services/common.service';

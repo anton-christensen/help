@@ -7,7 +7,7 @@ import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
 import { Observable } from 'rxjs';
 import {CommonService} from '../../services/common.service';
-import {first, switchMap, tap} from 'rxjs/operators';
+import {first, map, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-student',
@@ -42,15 +42,15 @@ export class StudentComponent implements OnInit {
 
     this.trashCan$ = this.course$.pipe(
       switchMap((course) => {
-        return this.trashCanService.getOwnedByCourse(course);
+        return this.trashCanService.getActiveByCourse(course);
       }),
+      map((trashcans) => trashcans[0])
     );
   }
 
   public onSubmit(): void {
-    this.auth.user$.pipe(
-      first()
-    ).subscribe((user) => this.save(user.id))
+    this.auth.user$.pipe(first())
+      .subscribe((user) => this.save(user.id));
   }
 
   private save(userID: string) {
@@ -59,11 +59,11 @@ export class StudentComponent implements OnInit {
       return;
     }
 
-    this.trashCanService.addTrashCan(this.course, this.form.value.room, userID);
+    this.trashCanService.add(this.course, this.form.value.room, userID);
   }
 
-  public retractTrashCan(trashCan): Promise<any> {
-    return this.trashCanService.deleteTrashCan(trashCan);
+  public retractTrashCan(trashCan) {
+    this.trashCanService.delete(trashCan);
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

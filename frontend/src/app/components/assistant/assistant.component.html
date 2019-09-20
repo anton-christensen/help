@@ -28,8 +28,8 @@
             <td class="room">
               {{ trashCan.room }}
             </td>
-            <td *ngIf="hasCreatedDate(trashCan);" class="created">
-              {{ trashCan.created.seconds * 1000 | date : 'HH:mm on EE MMMM d' }}
+            <td *ngIf="trashCan.created" class="created">
+              {{ trashCan.created * 1000 | date : 'HH:mm on EE MMMM d' }}
             </td>
             <td class="delete">
               <i (click)="deleteTrashCan(trashCan)" class="material-icons clickable">

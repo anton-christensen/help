@@ -1,8 +1,7 @@
-export const PostPath = 'posts';
-
 export interface Post {
-  id: string;
-  courseID: string;
+  id?: string;
+  departmentSlug: string;
+  courseSlug: string;
   content: string;
-  created: string | object;
+  created?: number;
 }

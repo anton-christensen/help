@@ -1,5 +1,3 @@
-export const CoursePath = 'courses';
-
 export interface Course {
   id: string;
   title: string;

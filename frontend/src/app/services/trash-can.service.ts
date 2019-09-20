@@ -1,75 +1,39 @@
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {TrashCan, TrashCanPath} from '../models/trash-can';
-import {switchMap} from 'rxjs/operators';
-import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
-import {AuthService} from './auth.service';
-import {User} from '../models/user';
+import {RequestCache} from '../utils/request-cache';
+import {HttpClient} from '@angular/common/http';
+import {shareReplay} from 'rxjs/operators';
+import {TrashCan} from '../models/trash-can';
 import {Course} from '../models/course';
-import {CommonService} from './common.service';
+import {Observable} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrashCanService {
-
-  constructor(private afStore: AngularFirestore,
-              private auth: AuthService) {}
-
-  public getAll() {
-    return this.getMultiple(ref => ref);
-  }
-
-  public getOwnedByCourse(course: Course): Observable<TrashCan> {
-    return this.auth.user$.pipe(
-      switchMap((user) => {
-        if (!user) {
-          return of(null);
-        } else {
-          return this.getActiveByCourseAndUser(course, user);
-        }
-      })
+  private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, TrashCan[]>(({departmentSlug, courseSlug}) => {
+    return this.http.get<TrashCan[]>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans`).pipe(
+      shareReplay(1)
     );
-  }
+  });
 
-  public getActiveByCourseAndUser(course: Course, user: User): Observable<TrashCan> {
-    return this.getSingle((ref) => {
-      return ref
-        .where('active', '==', true)
-        .where('courseID', '==', course.id)
-        .where('userID', '==', user.id);
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   public getActiveByCourse(course: Course): Observable<TrashCan[]> {
-    return this.getMultiple((ref) => {
-      return ref
-        .where('active', '==', true)
-        .where('courseID', '==', course.id)
-        .orderBy('created', 'desc');
+    return this.byCourse.getObservable({departmentSlug: course.departmentSlug, courseSlug: course.slug});
+  }
+
+  public add(course: Course, room: string, userID: string): Observable<TrashCan> {
+    return this.http.post<TrashCan>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/trashcans`, {
+      userID,
+      departmentSlug: course.departmentSlug,
+      courseSlug: course.slug,
+      room,
+      active: true
     });
   }
 
-  public addTrashCan(course: Course, room: string, uid: string): Promise<TrashCan> {
-    const id = this.afStore.collection<TrashCan>(TrashCanPath).ref.doc().id;
-    const ref = this.afStore.collection<TrashCan>(TrashCanPath).doc(id);
-    const trashCan = new TrashCan(id, uid, course.id, room);
-
-    return ref.set(Object.assign({}, trashCan))
-      .then(() => {
-        return trashCan;
-      });
-  }
-
-  public deleteTrashCan(trashCan: TrashCan): Promise<any> {
-    return this.afStore.collection<TrashCan>(TrashCanPath).ref.doc(trashCan.id).update('active', false);
-  }
-
-  private getSingle(qFn: QueryFn): Observable<TrashCan> {
-    return CommonService.getSingle<TrashCan>(this.afStore, TrashCanPath, qFn);
-  }
-
-  private getMultiple(qFn: QueryFn): Observable<TrashCan[]> {
-    return CommonService.getMultiple<TrashCan>(this.afStore, TrashCanPath, qFn);
+  public delete(trashCan: TrashCan) {
+    return this.http.delete<TrashCan>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans`);
   }
 }

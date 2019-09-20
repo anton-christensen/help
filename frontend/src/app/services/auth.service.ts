@@ -1,31 +1,19 @@
 import {DOCUMENT } from '@angular/common';
 import {Injectable, Inject} from '@angular/core';
-import {AngularFireAuth} from '@angular/fire/auth';
-import {AngularFirestore} from '@angular/fire/firestore';
-import * as firebase from 'firebase/app';
-import {BehaviorSubject, Observable, of, ReplaySubject, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {first, switchMap, tap} from 'rxjs/operators';
-import {Role, User} from '../models/user';
+import {User} from '../models/user';
 import {Course} from '../models/course';
 import {UserService} from './user.service';
 import {ModalService } from './modal.service';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {ToastService} from './toasts.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  public user$: BehaviorSubject<User> = new BehaviorSubject<User>({
-    id: '',
-    email: '',
-    anon: true,
-    name: '',
-    role: 'student'
-  });
-
-  // public user: User;
+  public user$: BehaviorSubject<User> = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')) as User);
 
   private casUrl = 'https://login.aau.dk/cas';
   private apiLoginUrl = `${environment.api}/user/_auth`;
@@ -37,18 +25,16 @@ export class AuthService {
                 Do you accept this?`;
 
   constructor(@Inject(DOCUMENT) private document: Document,
-              private fireAuth: AngularFireAuth,
-              private afStore: AngularFirestore,
               private http: HttpClient,
               private userService: UserService,
               private modalService: ModalService) {
 
-    this.getUser().subscribe((user) => this.user$.next(user));
+    this.getUser().pipe(first()).subscribe();
 
     this.user$
       .subscribe((user) => {
-        console.log(user);
-      })
+        localStorage.setItem('user', JSON.stringify(user));
+      });
   }
 
   public previouslyAcceptedLogInConditions(): boolean {
@@ -87,7 +73,9 @@ export class AuthService {
   }
 
   public getUser(): Observable<User> {
-    return this.http.get<User>(`${environment.api}/user`);
+    return this.http.get<User>(`${environment.api}/user`).pipe(
+      tap((user) => this.user$.next(user))
+    );
   }
 
   public logout() {
@@ -127,11 +115,11 @@ export class AuthService {
 
   public canAssistInCourse(course: Course): Observable<boolean> {
     return this.user$.pipe(
-      switchMap((user) => of(user && (user.role === 'lecturer' || user.role === 'TA') && course.associatedUserIDs.includes(user.id)))
+      switchMap((user) => of(user && (user.role !== 'student') && course.associatedUserIDs.includes(user.id)))
     );
   }
 
-  public loggedIn(): Observable<boolean> {
+  public isLoggedIn(): Observable<boolean> {
     return this.user$.pipe(
       switchMap((user) => of(user && !user.anon))
     );

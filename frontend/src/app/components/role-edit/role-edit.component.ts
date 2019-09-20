@@ -3,8 +3,8 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {UserService} from 'src/app/services/user.service';
 import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
-import {Observable, Subject} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {Observable, of, Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-role-edit',
@@ -12,40 +12,26 @@ import {switchMap} from 'rxjs/operators';
   styleUrls: ['./role-edit.component.scss']
 })
 export class RoleEditComponent implements OnInit {
-  private email$ = new Subject<string>();
-  public user$: Observable<User>;
-  private user: User;
-  public gettingUser = false;
+  public foundUsers$: Observable<User[]>;
 
   public form = new FormGroup({
-    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
+    query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
 
   constructor(private userService: UserService,
               private auth: AuthService) {}
 
   ngOnInit() {
-    this.user$ = this.email$.pipe(
-      switchMap((email: string) => {
-        this.gettingUser = true;
-        return this.userService.getByEmail(email);
-      })
+    this.foundUsers$ = this.form.controls.query.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((val) => this.userService.searchByNameOrEmail(val.trim())),
+      shareReplay(1)
     );
-
-    this.user$
-      .subscribe((user) => {
-        this.gettingUser = false;
-        this.user = user;
-      });
-
-    this.form.controls.email.valueChanges
-      .subscribe((email) => {
-        this.findUser(email.trim());
-    });
   }
 
   public setRole(user: User, role: Role) {
-    this.userService.setRole(user, role);
+    this.userService.setRole(user, role).pipe(first()).subscribe();
   }
 
   onSubmit() {
@@ -53,15 +39,9 @@ export class RoleEditComponent implements OnInit {
       return;
     }
 
-    this.userService.createUserWithEmail(this.form.controls.email.value)
-      .then(() => {
-        this.findUser(this.form.controls.email.value);
+    this.userService.createUserWithEmail(this.form.controls.query.value).pipe(first())
+      .subscribe((user) => {
+        console.log('created user:', user);
       });
-  }
-
-  private findUser(email: string) {
-    if (this.user || /[.@]aau.dk$/.test(email.toLowerCase())) {
-      this.email$.next(email);
-    }
   }
 }

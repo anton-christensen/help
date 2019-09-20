@@ -1,19 +1,17 @@
-import {Component, OnInit, OnDestroy, Inject, ViewChild, ElementRef} from '@angular/core';
-import { Course } from 'src/app/models/course';
-
-import { AuthService } from 'src/app/services/auth.service';
-
-import { AngularFireMessaging } from '@angular/fire/messaging';
-import { NotificationService } from 'src/app/services/notification.service';
-import { NotificationToken } from 'src/app/models/notification-token';
-import { SessionService } from 'src/app/services/session.service';
-import { CourseService } from 'src/app/services/course.service';
-import { Subscription, Observable } from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {ToastService} from '../../services/toasts.service';
+import {first, switchMap} from 'rxjs/operators';
+import {CourseService} from '../../services/course.service';
 import {Router} from '@angular/router';
-import {DOCUMENT} from "@angular/common";
 import {CommonService} from '../../services/common.service';
+import {NotificationService} from '../../services/notification.service';
+import {Observable, Subscription} from 'rxjs';
+import {SessionService} from '../../services/session.service';
+import {AuthService} from '../../services/auth.service';
+import {DOCUMENT} from '@angular/common';
+import {NotificationToken} from '../../models/notification-token';
+import {Course} from '../../models/course';
+import {AngularFireMessaging} from '@angular/fire/messaging';
 
 @Component({
   selector: 'app-menu',
@@ -71,8 +69,10 @@ export class MenuComponent implements OnInit, OnDestroy {
   public toggleCourseEnabled(course: Course) {
     const newStatus = !course.enabled;
 
-    this.courseService.setCourseEnabled(course, newStatus)
-      .subscribe(console.log);
+    this.courseService.setEnabled(course, newStatus).pipe(first())
+      .subscribe((c) => {
+        console.log(c);
+      });
   }
 
   public toggleNotificationsEnabled(course: Course) {
@@ -83,8 +83,8 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.tokenToggleBusy = true;
 
     if (this.notificationToken) {
-      this.notificationService.deleteToken(this.notificationToken)
-        .then(() => {
+      this.notificationService.deleteToken(this.notificationToken).pipe(first())
+        .subscribe(() => {
           this.tokenToggleBusy = false;
         });
     } else {

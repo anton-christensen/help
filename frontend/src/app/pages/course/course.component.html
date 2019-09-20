@@ -1,11 +1,11 @@
 <ng-template #loading>
-  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <app-loader></app-loader>
 </ng-template>
 
 <ng-container *ngIf="course$ | async as course; else loading">
   <h1 class="course-title">{{ course.title }}</h1>
 
-  <ng-container *ngIf="auth.canAssistInCourse(course); then assistant; else student"></ng-container>
+  <ng-container *ngIf="auth.canAssistInCourse(course) | async; then assistant; else student"></ng-container>
 
   <ng-template #assistant>
     <app-assistant></app-assistant>

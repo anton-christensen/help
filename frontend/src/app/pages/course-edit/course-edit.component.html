@@ -128,35 +128,35 @@
     <form class="no-detail inline-button"
           [formGroup]="usersForm"
           (ngSubmit)="onUserFormSubmit()">
-      <label for="email">
-        AAU email
+      <label for="query">
+        AAU email or name
       </label>
       <input type="text"
-             id="email"
-             name="aau-email"
+             id="query"
+             name="help-aau-user-search"
              autocomplete="off"
              required
-             formControlName="email"
-             placeholder="Enter a valid AAU email">
-      <button *ngIf="!gettingUser && !(user$ | async) && usersForm.valid"
+             formControlName="query"
+             placeholder="Enter a name or valid AAU email">
+      <button *ngIf="(foundUsers$ | async)?.length === 0 && usersForm.valid"
               type="submit"
               class="btn">
         Create and add
       </button>
-      <button *ngIf="!gettingUser && (user$ | async) && usersForm.valid"
+      <button *ngIf="(foundUsers$ | async)?.length === 0 && usersForm.valid"
               type="submit"
               class="btn">
         Add
       </button>
 
-      <div *ngIf="(!gettingUser && !(user$ | async) && usersForm.valid) || (usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email)" class="info">
-          <span *ngIf="!gettingUser && !(user$ | async) && usersForm.valid">
-            This user does not exist in the system yet, but can be created and then added to the course
-          </span>
+      <div *ngIf="(foundUsers$ | async)?.length === 0" class="info">
+    <span *ngIf="usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.query">
+      No users found. Enter a valid AAU email (ending in '.aau.dk') to add a new user
+    </span>
 
-        <span *ngIf="usersForm.invalid && (usersForm.touched || usersForm.dirty) && usersForm.value.email">
-            Please enter a valid AAU email (ending in '.aau.dk')
-          </span>
+        <span *ngIf="(foundUsers$ | async)?.length === 0 && usersForm.valid">
+      This user does not exist in the system yet, but can be added
+    </span>
       </div>
     </form>
 
