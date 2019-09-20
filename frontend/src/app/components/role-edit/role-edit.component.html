@@ -3,35 +3,35 @@
 <form class="no-detail inline-button"
       [formGroup]="form"
       (ngSubmit)="onSubmit()">
-  <label for="email">
+  <label for="query">
     AAU email
   </label>
   <input type="text"
-         id="email"
-         name="aau-email"
+         id="query"
+         name="help-aau-user-search"
          autocomplete="off"
          required
-         formControlName="email"
-         placeholder="Enter a valid AAU email">
-  <button *ngIf="!gettingUser && !(user$ | async) && form.valid"
+         formControlName="query"
+         placeholder="Enter a name or valid AAU email">
+  <button *ngIf="(foundUsers$ | async)?.length === 0 && form.valid"
           type="submit"
           class="btn">
     Add
   </button>
 
-  <div *ngIf="(!gettingUser && !(user$ | async) && form.valid) || (form.invalid && (form.touched || form.dirty) && form.value.email)" class="info">
-    <span *ngIf="!gettingUser && !(user$ | async) && form.valid">
-      This user does not exist in the system yet, but can be added
+  <div *ngIf="(foundUsers$ | async)?.length === 0" class="info">
+    <span *ngIf="form.invalid && (form.touched || form.dirty) && form.value.query">
+      No users found. Enter a valid AAU email (ending in '.aau.dk') to add a new user
     </span>
 
-    <span *ngIf="form.invalid && (form.touched || form.dirty) && form.value.email">
-      Please enter a valid AAU email (ending in '.aau.dk')
+    <span *ngIf="(foundUsers$ | async)?.length === 0 && form.valid">
+      This user does not exist in the system yet, but can be added
     </span>
   </div>
 </form>
 
-<div class="tablefix-wrapper">
-  <table class="user-list" *ngIf="user$ | async as user">
+<div class="tablefix-wrapper" *ngIf="foundUsers$ | async as users">
+  <table class="user-list" *ngIf="users.length">
     <thead>
     <tr>
       <th>User</th>
@@ -39,7 +39,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="user">
+    <tr class="user" *ngFor="let user of users">
       <td class="user">
         <span class="block name">{{ user.name }}</span>
         <span class="explanation email">{{ user.email }}</span></td>

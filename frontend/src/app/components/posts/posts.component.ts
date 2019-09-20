@@ -7,7 +7,7 @@ import {FormGroup, FormControl} from '@angular/forms';
 import {Course} from 'src/app/models/course';
 import {ModalService} from 'src/app/services/modal.service';
 import {SessionService} from 'src/app/services/session.service';
-import {switchMap} from 'rxjs/operators';
+import {first, switchMap} from 'rxjs/operators';
 import {CommonService} from '../../services/common.service';
 import * as SimpleMDE from 'simplemde';
 import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
@@ -36,7 +36,7 @@ export class PostsComponent implements OnInit, AfterViewInit {
               public auth: AuthService,
               private postService: PostService,
               private session: SessionService,
-              private _scrollToService: ScrollToService) {
+              private scrollToService: ScrollToService) {
   }
 
   ngOnInit() {
@@ -47,10 +47,6 @@ export class PostsComponent implements OnInit, AfterViewInit {
         return this.postService.getAllByCourse(course);
       })
     );
-  }
-
-  private reInitEditor() {
-
   }
 
   ngAfterViewInit() {
@@ -84,13 +80,14 @@ export class PostsComponent implements OnInit, AfterViewInit {
     const post: Post = {
       id: this.form.value.id,
       content: this.form.value.content,
-      courseID: course.id,
-      created: firebase.firestore.FieldValue.serverTimestamp()
+      departmentSlug: course.departmentSlug,
+      courseSlug: course.slug,
     };
 
-    this.postService.createOrUpdatePost(post).then(() => {
-      this.cancelEdit();
-    });
+    this.postService.createOrUpdate(post).pipe(first())
+      .subscribe(() => {
+        this.cancelEdit();
+      });
   }
 
   public editPost(post: Post) {
@@ -102,7 +99,7 @@ export class PostsComponent implements OnInit, AfterViewInit {
 
     this.editing = true;
 
-    this._scrollToService.scrollTo({target: 'editor-header', duration: 250});
+    this.scrollToService.scrollTo({target: 'editor-header', duration: 250});
   }
 
   public deletePost(post: Post) {
@@ -114,7 +111,7 @@ export class PostsComponent implements OnInit, AfterViewInit {
         if (btn.type !== 'negative') {
           return;
         }
-        this.postService.deletePost(post);
+        this.postService.delete(post);
       })
       .catch();
   }
@@ -127,9 +124,5 @@ export class PostsComponent implements OnInit, AfterViewInit {
     if (this.wysiwyg.isFullscreenActive()) {
       SimpleMDE.toggleFullScreen(this.wysiwyg);
     }
-  }
-
-  public hasCreatedDate(post: any): boolean {
-    return CommonService.documentIsCreatedDatePresent(post);
   }
 }

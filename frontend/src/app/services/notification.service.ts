@@ -1,15 +1,15 @@
-import {Injectable} from '@angular/core';
-import {AngularFireMessaging} from '@angular/fire/messaging';
-import {AngularFirestore, QueryFn} from '@angular/fire/firestore';
-import {Course} from '../models/course';
-import {AuthService} from './auth.service';
-import {NotificationToken, NotificationTokenPath} from '../models/notification-token';
+import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
+import {User} from "../models/user";
+import {RequestCache} from "../utils/request-cache";
+import {NotificationToken} from "../models/notification-token";
+import {environment} from "../../environments/environment";
+import {first, shareReplay, switchMap} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
+import {AngularFireMessaging} from "@angular/fire/messaging";
+import {AuthService} from "./auth.service";
+import {Course} from "../models/course";
 import * as Fingerprint from 'fingerprintjs2';
-
-import {Observable} from 'rxjs';
-import {map, mergeMap, switchMap, first} from 'rxjs/operators';
-import {CommonService} from './common.service';
-
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +17,22 @@ import {CommonService} from './common.service';
 export class NotificationService {
   public fingerprint$: Observable<string>;
   private fingerprint: string;
+  private user: User;
 
-  constructor(private afStore: AngularFirestore,
+  private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, NotificationToken>(({departmentSlug, courseSlug}) => {
+    return this.http.get<NotificationToken>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/notifications`).pipe(
+      shareReplay(1)
+    );
+  });
+
+  constructor(private http: HttpClient,
               private afMessaging: AngularFireMessaging,
               private auth: AuthService) {
+    this.auth.user$
+      .subscribe((u) => {
+        this.user = u;
+      });
+
     this.fingerprint$ = new Observable<string>((observer) => {
       if (this.fingerprint === undefined) {
         setTimeout(() => {
@@ -45,36 +57,13 @@ export class NotificationService {
           // Request a new token
           this.afMessaging.requestToken
             .subscribe((token) => {
-              // resolve() when done
-              const ref = this.afStore.collection<NotificationToken>(NotificationTokenPath, (ref2) => {
-                return ref2
-                .where('userID', '==', this.auth.user.id)
-                .where('deviceID', '==', fingerprint)
-                .where('courseID', '==', course.id)
-                .limit(1);
-              });
-
-              ref.get().toPromise()
-                .then((snapshot) => {
-                  if (snapshot.docs.length === 0) {
-                    // Create a new token
-                    const id = this.afStore.collection<NotificationToken>(NotificationTokenPath).ref.doc().id;
-                    const doc = {
-                      token,
-                      deviceID: fingerprint,
-                      userID: this.auth.user.id,
-                      courseID: course.id
-                    };
-
-                    return this.afStore.collection<NotificationToken>(NotificationTokenPath).doc(id).set(doc);
-                  } else {
-                    // Update the token
-                    return snapshot.docs[0].ref.update({token});
-                  }
-                })
-                .then(() => {
-                  resolve(token);
-                }) ;
+              this.http.post<NotificationToken>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/notifications`, {
+                token,
+                deviceID: fingerprint,
+                userID: this.user.id,
+                courseID: course.id
+              }).pipe(first())
+                .subscribe(() => resolve(token));
             });
         });
     });
@@ -85,29 +74,15 @@ export class NotificationService {
       switchMap((fingerprint) => {
         return this.auth.user$.pipe(
           switchMap((user) => {
-            return this.getSingle((ref) => {
-              return ref
-              .where('userID', '==', user ? user.id : '')
-              .where('deviceID', '==', fingerprint)
-              .where('courseID', '==', course.id);
-            });
+            return this.byCourse.getObservable({departmentSlug: course.departmentSlug, courseSlug: course.slug});
           })
         );
       })
     );
   }
 
-  public deleteToken(token: NotificationToken): Promise<any> {
+  public deleteToken(token: NotificationToken): Observable<any> {
     this.afMessaging.deleteToken(token.token);
-
-    return this.afStore.collection<NotificationToken>(NotificationTokenPath).doc(token.id).delete();
-  }
-
-  private getSingle(qFn: QueryFn): Observable<NotificationToken> {
-    return CommonService.getSingle<NotificationToken>(this.afStore, NotificationTokenPath, qFn);
-  }
-
-  private getMultiple(qFn: QueryFn): Observable<NotificationToken[]> {
-    return CommonService.getMultiple<NotificationToken>(this.afStore, NotificationTokenPath, qFn);
+    return this.http.delete<NotificationToken>(`${environment.api}/departments/${token.departmentSlug}/courses/${token.courseSlug}/notifications`);
   }
 }

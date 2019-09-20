@@ -10,17 +10,12 @@ import {AngularFirestore} from '@angular/fire/firestore';
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
-  d: Observable<any>;
-
   constructor(public auth: AuthService,
-              private afStore: AngularFirestore,
               private commonService: CommonService) {}
 
   ngOnInit() {
     this.commonService.currentLocation = 'admin';
     this.commonService.setTitle(`Admin panel`);
-
-    // this.d = this.afStore.collection('courses').valueChanges();
   }
 
 }

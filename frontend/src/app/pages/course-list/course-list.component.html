@@ -3,9 +3,9 @@
 </ng-template>
 
 <ng-container *ngIf="courses$ | async as courses; else loading">
-  <ng-container *ngIf="auth.isAdmin(); then admin; else notAdmin"></ng-container>
+  <ng-container *ngIf="auth.isAdmin() | async; then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
-    <ng-container *ngIf="auth.isLecturer() || auth.isAssistant(); then assistant; else student"></ng-container>
+    <ng-container *ngIf="(auth.isLecturer() | async) || (auth.isAssistant() | async); then assistant; else student"></ng-container>
   </ng-template>
 
   <ng-template #admin>

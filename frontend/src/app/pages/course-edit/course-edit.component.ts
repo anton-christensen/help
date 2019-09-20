@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CourseService } from 'src/app/services/course.service';
-import { Observable, timer, Subject } from 'rxjs';
+import { Observable, timer} from 'rxjs';
 import { Course } from 'src/app/models/course';
 import { Department } from 'src/app/models/department';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -9,7 +9,7 @@ import { ModalService } from 'src/app/services/modal.service';
 import { ToastService } from 'src/app/services/toasts.service';
 import { DepartmentService } from 'src/app/services/department.service';
 import { UserService } from 'src/app/services/user.service';
-import {switchMap, map, first, take} from 'rxjs/operators';
+import {switchMap, map, first, take, debounceTime, distinctUntilChanged, shareReplay} from 'rxjs/operators';
 import { User } from 'src/app/models/user';
 
 
@@ -21,6 +21,7 @@ import { User } from 'src/app/models/user';
 export class CourseEditComponent implements OnInit {
   public courses$: Observable<Course[]>;
   public departments$: Observable<Department[]>;
+  private loggedInUser: User;
 
   public coursesFilterForm = new FormGroup({
     departmentSlug: new FormControl('', [
@@ -51,12 +52,12 @@ export class CourseEditComponent implements OnInit {
   public courseBeingEdited: Course;
 
   public usersForm = new FormGroup({
-    email: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
+    query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
-  private email$ = new Subject<string>();
-  public user$: Observable<User>;
+
+  public foundUsers$: Observable<User[]>;
+
   private user: User;
-  public gettingUser = false;
   public associatedUsers: User[];
 
   constructor(public auth: AuthService,
@@ -64,18 +65,26 @@ export class CourseEditComponent implements OnInit {
               private toastService: ToastService,
               private courseService: CourseService,
               private departmentService: DepartmentService,
-              private userService: UserService) {}
+              private userService: UserService) {
+    this.auth.user$
+      .subscribe((user) => {
+        this.loggedInUser = user;
+      });
+  }
 
   ngOnInit() {
     this.resetForm();
+    this.departments$ = this.departmentService.getAll();
+
+    // Admins can see all courses, but only by department
     this.coursesFilterForm.controls.departmentSlug.valueChanges
       .subscribe((departmentSlug) => {
         this.courses$ = this.courseService.getRelevantByDepartment(departmentSlug);
-
-        //TODO If user is lecturer we need a get all associated
     });
 
-    this.departments$ = this.departmentService.getAll();
+    // Lecturers can see all associated courses
+    this.courses$ = this.courseService.getAllAssociated();
+
 
     // Validate course slug when department changes
     this.courseForm.controls.departmentSlug.valueChanges
@@ -83,23 +92,12 @@ export class CourseEditComponent implements OnInit {
         this.courseForm.controls.courseSlug.updateValueAndValidity();
       });
 
-    this.user$ = this.email$.pipe(
-      switchMap((email: string) => {
-        this.gettingUser = true;
-        return this.userService.getByEmail(email);
-      })
+    this.foundUsers$ = this.usersForm.controls.query.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((val) => this.userService.searchByNameOrEmail(val.trim())),
+      shareReplay(1)
     );
-
-    this.user$
-      .subscribe((user) => {
-        this.gettingUser = false;
-        this.user = user;
-      });
-
-    this.usersForm.controls.email.valueChanges
-      .subscribe((email) => {
-        this.findUser(email.trim());
-      });
   }
 
   public onUserFormSubmit() {
@@ -110,17 +108,10 @@ export class CourseEditComponent implements OnInit {
     if (this.user) {
       this.addUserToCourse(this.user);
     } else {
-      this.userService.createUserWithEmail(this.usersForm.controls.email.value)
-        .then((user) => {
+      this.userService.createUserWithEmail(this.usersForm.controls.email.value).pipe(first())
+        .subscribe((user) => {
           this.addUserToCourse(user);
-          this.findUser(user.email);
         });
-    }
-  }
-
-  private findUser(email: string) {
-    if (this.user || /[.@]aau.dk$/.test(email.toLowerCase())) {
-      this.email$.next(email);
     }
   }
 
@@ -175,7 +166,7 @@ export class CourseEditComponent implements OnInit {
 
   public resetForm() {
     this.courseBeingEdited = null;
-    this.associatedUsers = [this.auth.user];
+    this.associatedUsers = [this.loggedInUser];
     this.editing = false;
 
     this.courseForm.reset({
@@ -210,7 +201,7 @@ export class CourseEditComponent implements OnInit {
       associatedUserIDs: this.associatedUsers.map((u) => u.id)
     };
 
-    this.courseService.createOrUpdateCourse(course);
+    this.courseService.createOrUpdate(course);
   }
 
   private updateCourse() {
@@ -219,7 +210,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
     this.courseBeingEdited.associatedUserIDs = this.associatedUsers.map((u) => u.id);
 
-    this.courseService.createOrUpdateCourse(this.courseBeingEdited);
+    this.courseService.createOrUpdate(this.courseBeingEdited);
   }
 
   public deleteCourse(course: Course) {
@@ -233,7 +224,8 @@ export class CourseEditComponent implements OnInit {
           return;
         }
 
-        this.courseService.deleteCourse(course).then(() => {
+        this.courseService.delete(course).pipe(first())
+          .subscribe(() => {
           if (this.editing && this.courseBeingEdited.id === course.id) {
             this.resetForm();
           }

@@ -1,7 +1,3 @@
-<app-role-edit *ngIf="auth.isAdmin()"></app-role-edit>
+<app-role-edit *ngIf="auth.isAdmin() | async"></app-role-edit>
 
 <app-course-edit></app-course-edit>
-
-<!--<pre>-->
-<!--  {{ d | async | json }}-->
-<!--</pre>-->

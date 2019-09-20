@@ -12,10 +12,9 @@
 </div>
 
 <div class="menu-bg" *ngIf="open" (click)="menuClicked($event)"></div>
-<div class="menu" [ngClass]="{open: open}">
+<div class="menu" [ngClass]="{open: open}" *ngIf="auth.user$ | async as user">
   <div class="top">
-    <div class="name"
-         *ngIf="auth.user && !auth.user.anon && auth.user$ | async as user">
+    <div class="name" *ngIf="auth.isLoggedIn() | async">
       <div class="fl">
         <label>
           {{ user.name }}
@@ -88,7 +87,7 @@
     </a>
 
     <a class="menu-item"
-       href="/assets/help/{{(auth.user$ | async)?.role !== 'student' ? 'non-' : ''}}students.pdf"
+       href="/assets/help/{{ user.role !== 'student' ? 'non-' : ''}}students.pdf"
        target="_blank">
       <div class="fl">
         <label>
@@ -114,7 +113,7 @@
       </div>
     </a>
 
-    <ng-container *ngIf="auth.loggedIn(); then loggedIn; else loggedOut;"></ng-container>
+    <ng-container *ngIf="auth.isLoggedIn() | async; then loggedIn; else loggedOut;"></ng-container>
 
     <ng-template #loggedIn>
       <div class="menu-item"

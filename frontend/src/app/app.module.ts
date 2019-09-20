@@ -2,8 +2,6 @@ import {NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AngularFireModule} from '@angular/fire';
-import {AngularFireAuthModule} from '@angular/fire/auth';
-import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireMessagingModule} from '@angular/fire/messaging';
 import {MarkdownModule} from 'ngx-markdown';
 import {ScrollToModule} from '@nicky-lenaers/ngx-scroll-to';
@@ -59,8 +57,6 @@ import {TokenInterceptor} from './services/token.interceptor';
     ScrollToModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
-    AngularFirestoreModule,
-    AngularFireAuthModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
