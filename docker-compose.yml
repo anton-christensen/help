@@ -9,7 +9,8 @@ services:
     volumes:
      - ./docker/rethinkdb/data:/data
   pushpin:
-    image: fanout/pushpin
+    build: ./docker/pushpin
+    image: my/pushpin
     volumes: 
       - ./docker/pushpin/routes:/etc/pushpin/routes
     ports:

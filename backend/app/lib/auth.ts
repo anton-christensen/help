@@ -25,6 +25,13 @@ export const userRole = (response: Response): Role => {
     return getUser(response).role;
 }
 
+export const userIsAssociatedWithCourse = async (user: User, departmentSlug: string, courseSlug: string) => {
+    return await Database.courses.filter({
+        departmentSlug: departmentSlug,
+        slug: courseSlug
+    })('associatedUserIDs').nth(0).contains(user.id ? user.id : null).run(Database.connection);
+}
+
 export const generateToken = ():string => {
     return crypto.randomBytes(64).toString('hex');
 }

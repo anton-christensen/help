@@ -4,9 +4,9 @@ import * as dotenv from "dotenv";
 import { Database } from "./database";
 import { departmentRouter, courseRouter, userRouter } from './routes';
 import { AuthMiddleware } from "./lib/auth";
-import { StreamMiddleware, StreamLib } from "./lib/stream";
+import { StreamMiddleware, StreamWorker } from "./lib/stream";
+import { trashCanRouter } from "./routes/trashCans";
 
-import * as crypto from "crypto";
 dotenv.config();
 
 Database.init().then(() => {
@@ -24,6 +24,7 @@ Database.init().then(() => {
 
     app.use( '/', departmentRouter );
     app.use( '/', courseRouter );
+    app.use( '/', trashCanRouter );
     app.use( '/', userRouter)
     
     app.use((req, res, next) => {
@@ -39,6 +40,6 @@ Database.init().then(() => {
         } catch {}
     } );
 
-    StreamLib.streamWorker();
+    StreamWorker.start();
 
 });

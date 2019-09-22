@@ -5,5 +5,5 @@ export interface TrashCan {
   room: string;
   userID: string;
   created: Date;
-  id: string;
+  id?: string;
 }

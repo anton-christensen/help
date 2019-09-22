@@ -5,14 +5,6 @@ import { getUser, userRoleIn } from '../lib/auth';
 import { HelpResponse } from '../lib/responses';
 import { User } from '../models/user';
 
-async function userIsAssociatedWithCourse(user: User, departmentSlug: string, courseSlug: string) {
-    return await Database.courses.filter({
-        departmentSlug: departmentSlug,
-        slug: courseSlug
-    })('associatedUserIDs').nth(0).contains(user.id ? user.id : null).run(Database.connection);
-}
-
-
 export const courseRouter = Router();
 
 courseRouter
@@ -22,9 +14,6 @@ courseRouter
         // disallow
         return HelpResponse.dissalowed(response);
     }
-    // r.table("users").filter(function(user) {
-    //     return user("placesVisited").contains("France")
-    // }).run( conn, callback)
 
     r.row('age').contains('test')
     Database.courses.filter((course:RDatum<any>) => course('associatedUserIDs').contains(user.id ? user.id : null))
