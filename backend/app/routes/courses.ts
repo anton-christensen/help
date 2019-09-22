@@ -1,7 +1,7 @@
 import { r, Connection, RCursor, RDatum } from 'rethinkdb-ts';
 import { Router } from 'express';
 import { Database } from '../database';
-import { getUser, userRoleIn } from '../lib/auth';
+import { getUser, userRoleIn, userIsAssociatedWithCourse } from '../lib/auth';
 import { HelpResponse } from '../lib/responses';
 import { User } from '../models/user';
 
