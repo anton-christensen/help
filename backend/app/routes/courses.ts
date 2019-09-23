@@ -193,3 +193,16 @@ courseRouter
         response.send(result);
     });
 });
+
+
+courseRouter
+.get('/departments/:departmentSlug/courses/:courseSlug/posts', (request, response) => {
+    Database.posts.filter({
+        departmentSlug: request.params.departmentSlug,
+        courseSlug: request.params.courseSlug
+    })
+    .run(Database.connection)
+    .then(result => {
+        response.send(result);
+    });
+});
