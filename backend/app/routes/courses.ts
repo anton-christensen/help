@@ -4,6 +4,7 @@ import { Database } from '../database';
 import { getUser, userRoleIn, userIsAssociatedWithCourse } from '../lib/auth';
 import { HelpResponse } from '../lib/responses';
 import { User } from '../models/user';
+import { shouldStream, createStream } from '../lib/stream';
 
 export const courseRouter = Router();
 
@@ -15,11 +16,24 @@ courseRouter
         return HelpResponse.dissalowed(response);
     }
 
-    r.row('age').contains('test')
-    Database.courses.filter((course:RDatum<any>) => course('associatedUserIDs').contains(user.id ? user.id : null))
-    .run(Database.connection)
+    let query = Database.courses
+                .filter(
+                    (course:RDatum<any>) => 
+                        course('associatedUserIDs').contains(user.id ? user.id : null)
+                );
+
+    if(shouldStream(response)) {
+        createStream(
+            response,
+            `GET(${user.id}):/courses`,
+            query.changes(),
+            (err, row) => row
+        );
+    }
+
+    query.run(Database.connection)
     .then( result => {
-        response.send( result );
+        response.send( JSON.stringify(result)+'\n' );
     })
     .catch(error => error(response, error));
 });
@@ -66,10 +80,18 @@ courseRouter
     else if(userRoleIn(user, ['admin'])) {
         // get all courses on department
     }
+    if(shouldStream(response)) {
+        createStream(
+            response,
+            `GET(${user.id}):/${request.params.departmentSlug}/courses`,
+            query.changes(),
+            (err, row) => row
+        );
+    }
 
     query.run(Database.connection)
     .then( result => {
-        response.send( result );
+        response.send( JSON.stringify(result) + '\n' );
     })
     .catch(error => HelpResponse.error(response, error));
 });
@@ -77,15 +99,22 @@ courseRouter
 
 courseRouter
 .get('/departments/:departmentSlug/courses/:courseSlug', ( request, response ) => {
-    // TODO: include posts
-    
-    Database.courses.filter({
+    let query = Database.courses.filter({
         departmentSlug: request.params.departmentSlug,
         slug: request.params.courseSlug
-    })
-    .run(Database.connection)
+    });
+
+    if(shouldStream(response)) {
+        createStream(
+            response,
+            `GET:/${request.params.departmentSlug}/${request.params.courseSlug}`,
+            query.changes(),
+            (err, row) => row.new_val
+        )
+    }
+    query.run(Database.connection)
     .then( result => {
-        response.send( result );
+        response.send( JSON.stringify(result[0])+'\n');
     })
     .catch( error => response.send( error ) );
 });
@@ -149,6 +178,28 @@ courseRouter
     .then( result => {
         response.send(result);
     })
+});
+
+courseRouter
+.get('/departments/:departmentSlug/courses/:courseSlug/posts', (request, response) => {
+    let query = Database.posts.filter({
+        departmentSlug: request.params.departmentSlug,
+        courseSlug: request.params.courseSlug
+    });
+
+    if(shouldStream(response)) {
+        createStream(
+            response,
+            `GET-ALL:/${request.params.departmentSlug}/${request.params.courseSlug}/posts`,
+            query.changes(),
+            (err, row) => row
+        );
+    }
+
+    query.run(Database.connection)
+    .then(result => {
+        response.send(JSON.stringify(result)+'\n');
+    });
 });
 
 courseRouter
