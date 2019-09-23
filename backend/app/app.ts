@@ -6,6 +6,8 @@ import { departmentRouter, courseRouter, userRouter } from './routes';
 import { AuthMiddleware } from "./lib/auth";
 import { StreamMiddleware, StreamWorker } from "./lib/stream";
 import { trashCanRouter } from "./routes/trashCans";
+import {get} from 'http'
+import { RequestOptions } from "https";
 
 dotenv.config();
 

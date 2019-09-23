@@ -19,6 +19,7 @@ if [ -w /etc/pushpin/pushpin.conf ]; then
 		-e 's/push_in_http_addr=.*/push_in_http_addr=0.0.0.0/' \
 		-e 's/push_in_sub_specs=.*/push_in_sub_spec=tcp:\/\/\*:5562/' \
 		-e 's/command_spec=.*/command_spec=tcp:\/\/\*:5563/' \
+		-e 's/auto_cross_origin=.*/auto_cross_origin=true/' \
 		-e 's/^http_port=.*/http_port=7999/' \
 		/etc/pushpin/pushpin.conf
 else

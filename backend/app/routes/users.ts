@@ -7,12 +7,25 @@ import { User } from '../models/user';
 import { AuthTokenFootprint } from '../models/authToken';
 import { generateToken, hash, getUser, userRoleIn } from '../lib/auth';
 import { HelpResponse } from '../lib/responses';
+import { shouldStream, createStream } from '../lib/stream';
 
 export const userRouter = Router();
 
 userRouter
 .get('/user', (request, response) => {
-    response.send(getUser(response));
+    const user = getUser(response);
+    let query = Database.users.get(user.id);
+    
+    if(shouldStream(response)) {
+        createStream(
+            response,
+            `GET(${user.id}):/user`,
+            query.changes(),
+            (err, row) => row
+        );
+    }
+
+    response.send(JSON.stringify(getUser(response)) + '\n');
 });
 
 userRouter
@@ -156,13 +169,24 @@ userRouter
         return HelpResponse.dissalowed(response);
     }
     else if(userRoleIn(user, ['lecturer', 'admin'])) {
-        let users = await Database.users.filter((user: RDatum) =>
+        let query = Database.users.filter((user: RDatum) =>
             r.or(
                 r.row('name').downcase().match(request.query.q.toLowerCase()).eq(null).not(),
                 r.row('email').downcase().match(request.query.q.toLowerCase()).eq(null).not()
             )
-        ).run(Database.connection);
-        response.send(users);
+        );
+        
+        if(shouldStream(response)) {
+            createStream(
+                response,
+                `GET:/users?q=${request.query.q.toLowerCase()}`,
+                query.changes(),
+                (err, row) => row
+            );
+        }
+
+        let users = await query.run(Database.connection);
+        response.send(JSON.stringify(users)+'\n');
     }
     else {
         return HelpResponse.error(response, 'Unknown user role');
