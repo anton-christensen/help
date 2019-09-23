@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map, shareReplay} from 'rxjs/operators';
+import {map, shareReplay, tap} from 'rxjs/operators';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {RequestCache} from '../utils/request-cache';
+import {getStreamObservable} from "../utils/stream-http";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class CourseService {
   private readonly allAssociated: Observable<Course[]>;
 
   private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
-    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+    return getStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
       shareReplay(1)
     );
   });
@@ -35,9 +36,7 @@ export class CourseService {
   }
 
   public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
-    return this.bySlug.getObservable({departmentSlug, courseSlug}).pipe(
-      map((courses) => courses[0])
-    );
+    return this.bySlug.getObservable({departmentSlug, courseSlug})
   }
 
   public getRelevantByDepartment(departmentSlug: string): Observable<Course[]> {

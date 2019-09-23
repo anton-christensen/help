@@ -8,11 +8,9 @@ import {Course} from 'src/app/models/course';
 import {ModalService} from 'src/app/services/modal.service';
 import {SessionService} from 'src/app/services/session.service';
 import {first, switchMap} from 'rxjs/operators';
-import {CommonService} from '../../services/common.service';
 import * as SimpleMDE from 'simplemde';
 import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
 import { User } from 'src/app/models/user';
-import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-posts',
@@ -50,25 +48,27 @@ export class PostsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    combineLatest(this.auth.user$, this.course$).subscribe((val) => {
-      const user = val[0];
-      const course = val[1];
-      if (!user || !course || this.wysiwyg) {
-        return;
-      }
-      if (!course.associatedUserIDs.includes(user.id) && user.role !== 'admin') {
-        return;
-      }
+    combineLatest([this.auth.user$, this.course$])
+      .subscribe((val) => {
+        const user = val[0];
+        const course = val[1];
+        if (!user || !course || this.wysiwyg) {
+          return;
+        }
+        if (!course.associatedUserIDs.includes(user.id) && user.role !== 'admin') {
+          return;
+        }
 
-      this.wysiwyg = new SimpleMDE({
-        forceSync: true,
-        spellChecker: false,
-        status: false,
-        placeholder: 'Write a post on the bulletin board.\nPosts can be styled by using markdown.\nClick the \'?\' to get an overview of what is possible.'
-      });
-      this.wysiwyg.codemirror.on('change', () => {
-        this.form.controls.content.setValue( this.wysiwyg.value() );
-      });
+        this.wysiwyg = new SimpleMDE({
+          forceSync: true,
+          spellChecker: false,
+          status: false,
+          placeholder: 'Write a post on the bulletin board.\nPosts can be styled by using markdown.\nClick the \'?\' to get an overview of what is possible.'
+        });
+
+        this.wysiwyg.codemirror.on('change', () => {
+          this.form.controls.content.setValue( this.wysiwyg.value() );
+        });
     });
   }
 

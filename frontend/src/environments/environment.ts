@@ -12,7 +12,8 @@ export const environment = {
     storageBucket: '',
     messagingSenderId: '1067545049766'
   },
-  api: 'https://api.help.antonchristensen.net'
+  //api: 'https://api.help.antonchristensen.net'
+  api: 'http://192.168.0.51:7999'
 };
 
 /*

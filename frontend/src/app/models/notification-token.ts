@@ -1,5 +1,5 @@
 export interface NotificationToken {
-  id: string;
+  id?: string;
   token: string;
   deviceID: string;
   userID: string;

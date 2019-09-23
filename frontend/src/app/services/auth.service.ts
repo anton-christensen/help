@@ -115,7 +115,7 @@ export class AuthService {
 
   public canAssistInCourse(course: Course): Observable<boolean> {
     return this.user$.pipe(
-      switchMap((user) => of(user && (user.role !== 'student') && course.associatedUserIDs.includes(user.id)))
+      switchMap((user) => of(user && (user.role !== 'student') && (course.associatedUserIDs.includes(user.id) || user.role === 'admin')))
     );
   }
 

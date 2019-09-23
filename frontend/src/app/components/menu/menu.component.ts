@@ -69,10 +69,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   public toggleCourseEnabled(course: Course) {
     const newStatus = !course.enabled;
 
-    this.courseService.setEnabled(course, newStatus).pipe(first())
-      .subscribe((c) => {
-        console.log(c);
-      });
+    this.courseService.setEnabled(course, newStatus).pipe(first()).subscribe();
   }
 
   public toggleNotificationsEnabled(course: Course) {
