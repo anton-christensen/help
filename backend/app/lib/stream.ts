@@ -117,6 +117,9 @@ export class StreamWorker {
                 if(--stream.refCount < 1 && stream.ready) {
                     console.log("Stopping DB changefeed on channel: ", stream.channel);
                     stream.stop();
+                    StreamWorker.runningStreams.splice(i,1);
+                    i--;
+                    continue;
                 }
                 else {
                     console.log(`Now ${stream.refCount} listeners on channel: ${stream.channel}`);
