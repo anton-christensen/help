@@ -1,31 +1,31 @@
 import {Observable} from 'rxjs';
 
 export class RequestCache<T, T2> {
-  private readonly timeLimit = 750;
+  private readonly timeLimit;
   private readonly requestFunction: (T) => Observable<T2>;
-  private cache: {
-    key: T,
-    time: number,
-    observable: Observable<T2>
-  }[];
+  private readonly cache: {
+    [key: string]: Observable<T2>
+  };
 
-  constructor(request: (T) => Observable<T2>) {
+  constructor(request: (T) => Observable<T2>, timeLimit = 750) {
     this.requestFunction = request;
-    this.cache = [];
+    this.timeLimit = timeLimit;
+    this.cache = {};
   }
 
   public getObservable(query: T): Observable<T2> {
-    let found = this.cache.find((el) => JSON.stringify(el.key) === JSON.stringify(query));
-    if (!found || found.time < Date.now() - this.timeLimit) {
-      found = {
-        key: query,
-        time: Date.now(),
-        observable: this.requestFunction(query)
-      };
+    const key = JSON.stringify(query);
+    let observable = this.cache[key];
 
-      this.cache.push(found);
+    if (!observable) {
+      observable = this.requestFunction(query);
+
+      this.cache[key] = observable;
+      setTimeout(() => {
+        delete this.cache[key];
+      }, this.timeLimit)
     }
 
-    return found.observable;
+    return observable;
   }
 }

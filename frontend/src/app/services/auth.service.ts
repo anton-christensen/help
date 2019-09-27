@@ -121,7 +121,7 @@ export class AuthService {
 
   public isLoggedIn(): Observable<boolean> {
     return this.user$.pipe(
-      switchMap((user) => of(user && !user.anon))
+      switchMap((user) => of(user && !user.anon)),
     );
   }
 }

@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 import {TrashCanService} from 'src/app/services/trash-can.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {TrashCan} from 'src/app/models/trash-can';
 import {CommonService} from 'src/app/services/common.service';
 import {Course} from 'src/app/models/course';
 import {SessionService} from '../../services/session.service';
-import {switchMap, tap} from 'rxjs/operators';
+import {first, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-assistant',
@@ -27,20 +27,24 @@ export class AssistantComponent implements OnInit {
 
     this.trashCans$ = this.course$.pipe(
       switchMap((course) => {
-        return this.trashCanService.getActiveByCourse(course).pipe(
-          tap((trashCans) => {
-            if (trashCans.length) {
-              this.commonService.setTitle(`(${trashCans.length}) ${course.slug.toUpperCase()}`);
-            } else {
-              this.commonService.setTitle(`${course.slug.toUpperCase()}`);
-            }
-          })
-        );
+        if (course.enabled) {
+          return this.trashCanService.getActiveByCourse(course).pipe(
+            tap((trashCans) => {
+              if (trashCans.length) {
+                this.commonService.setTitle(`(${trashCans.length}) ${course.slug.toUpperCase()}`);
+              } else {
+                this.commonService.setTitle(`${course.slug.toUpperCase()}`);
+              }
+            })
+          );
+        } else {
+          return of([])
+        }
       })
     );
   }
 
   public deleteTrashCan(can: TrashCan) {
-    this.trashCanService.delete(can);
+    this.trashCanService.delete(can).pipe(first()).subscribe();
   }
 }

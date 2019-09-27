@@ -36,7 +36,7 @@
   </div>
 
   <ng-container *ngIf="sessionService.getCourse$() | async as course">
-    <ng-container *ngIf="auth.canAssistInCourse(course)">
+    <ng-container *ngIf="auth.canAssistInCourse(course) | async">
       <div class="menu-item"
            (click)="toggleCourseEnabled(course)">
         <div class="fl">
@@ -73,7 +73,7 @@
 
   <div class="bottom">
     <a class="menu-item"
-       *ngIf="auth.isAdmin() || auth.isLecturer()"
+       *ngIf="(auth.isAdmin() | async) || (auth.isLecturer() | async)"
        (click)="adminClicked()"
        [routerLink]="['/admin']">
       <div class="fl">

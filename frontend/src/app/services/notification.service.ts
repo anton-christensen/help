@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
-import {User} from "../models/user";
 import {RequestCache} from "../utils/request-cache";
 import {NotificationToken} from "../models/notification-token";
 import {environment} from "../../environments/environment";
@@ -17,10 +16,9 @@ import * as Fingerprint from 'fingerprintjs2';
 export class NotificationService {
   public fingerprint$: Observable<string>;
   private fingerprint: string;
-  private user: User;
 
   private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, NotificationToken>(({departmentSlug, courseSlug}) => {
-    return this.http.get<NotificationToken>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/notifications`).pipe(
+    return this.http.get<NotificationToken>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans/notificationtokens`).pipe(
       shareReplay(1)
     );
   });
@@ -28,11 +26,6 @@ export class NotificationService {
   constructor(private http: HttpClient,
               private afMessaging: AngularFireMessaging,
               private auth: AuthService) {
-    this.auth.user$
-      .subscribe((u) => {
-        this.user = u;
-      });
-
     this.fingerprint$ = new Observable<string>((observer) => {
       if (this.fingerprint === undefined) {
         setTimeout(() => {
@@ -57,13 +50,10 @@ export class NotificationService {
           // Request a new token
           this.afMessaging.requestToken
             .subscribe((token) => {
-              this.http.post<NotificationToken>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/notifications`, {
+              this.http.post<NotificationToken>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/trashcans/notificationtokens`, {
                 token,
-                deviceID: fingerprint,
-                userID: this.user.id,
-                courseID: course.id
-              }).pipe(first())
-                .subscribe(() => resolve(token));
+                deviceID: fingerprint
+              }).pipe(first()).subscribe(() => resolve(token));
             });
         });
     });
@@ -71,9 +61,9 @@ export class NotificationService {
 
   public getToken(course: Course): Observable<NotificationToken> {
     return this.fingerprint$.pipe(
-      switchMap((fingerprint) => {
+      switchMap(() => {
         return this.auth.user$.pipe(
-          switchMap((user) => {
+          switchMap(() => {
             return this.byCourse.getObservable({departmentSlug: course.departmentSlug, courseSlug: course.slug});
           })
         );
@@ -83,6 +73,6 @@ export class NotificationService {
 
   public deleteToken(token: NotificationToken): Observable<any> {
     this.afMessaging.deleteToken(token.token);
-    return this.http.delete<NotificationToken>(`${environment.api}/departments/${token.departmentSlug}/courses/${token.courseSlug}/notifications`);
+    return this.http.delete<NotificationToken>(`${environment.api}/departments/${token.departmentSlug}/courses/${token.courseSlug}/trashcans/notificationtokens`);
   }
 }

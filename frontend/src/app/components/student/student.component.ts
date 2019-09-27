@@ -5,7 +5,7 @@ import {Course} from 'src/app/models/course';
 import {TrashCan} from '../../models/trash-can';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
-import { Observable } from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {CommonService} from '../../services/common.service';
 import {first, map, switchMap, tap} from 'rxjs/operators';
 
@@ -42,28 +42,27 @@ export class StudentComponent implements OnInit {
 
     this.trashCan$ = this.course$.pipe(
       switchMap((course) => {
-        return this.trashCanService.getActiveByCourse(course);
+        if (course.enabled) {
+          return this.trashCanService.getActiveByCourse(course);
+        } else {
+          return of([]);
+        }
       }),
       map((trashcans) => trashcans[0])
     );
   }
 
   public onSubmit(): void {
-    this.auth.user$.pipe(first())
-      .subscribe((user) => this.save(user.id));
-  }
-
-  private save(userID: string) {
     if (this.form.invalid) {
       console.error('You tried to save something invalid... How did you accomplish that?');
       return;
     }
 
-    this.trashCanService.add(this.course, this.form.value.room, userID);
+    this.trashCanService.add(this.course, this.form.value.room).pipe(first()).subscribe();
   }
 
   public retractTrashCan(trashCan) {
-    this.trashCanService.delete(trashCan);
+    this.trashCanService.delete(trashCan).pipe(first()).subscribe();
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

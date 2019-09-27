@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AngularFireModule} from '@angular/fire';
@@ -26,7 +26,12 @@ import {RoleEditComponent} from './components/role-edit/role-edit.component';
 import {HandleSuccessfulAuthComponent} from './components/handle-successful-auth/handle-successful-auth.component';
 import {ServiceWorkerModule} from '@angular/service-worker';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {TokenInterceptor} from './services/token.interceptor';
+import {TokenInterceptor} from './providers/token.interceptor';
+import {UserProvider} from "./providers/user.provider";
+
+export function userProviderFactory(provider: UserProvider) {
+  return () => provider.authenticate();
+}
 
 @NgModule({
   declarations: [
@@ -60,6 +65,13 @@ import {TokenInterceptor} from './services/token.interceptor';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
+    UserProvider,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: userProviderFactory,
+      deps: [UserProvider],
+      multi: true
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
@@ -68,4 +80,5 @@ import {TokenInterceptor} from './services/token.interceptor';
   ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {}

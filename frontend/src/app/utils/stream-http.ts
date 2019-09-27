@@ -1,5 +1,33 @@
 import {from, Observable} from "rxjs";
-import {filter, map, scan, flatMap} from "rxjs/operators";
+import {filter, map, scan, flatMap, tap} from "rxjs/operators";
+
+export function getListStreamObservable<T>(url): Observable<T[]> {
+  return new Observable<T[]>((subscriber) => {
+    let results = [];
+
+    getStreamObservable<T>(url)
+      .subscribe((result) => {
+        if (Array.isArray(result)) {
+          results = result;
+        } else {
+          const oldVal = result['old_val'];
+          const newVal = result['new_val'];
+          if (newVal === null) {
+            // Deletion
+            results.splice(results.findIndex((val) => val.id === oldVal.id), 1);
+          } else if (oldVal === null) {
+            // Insertion
+            results.push(newVal);
+          } else {
+            // Update
+            results[results.findIndex((val) => val.id === oldVal.id)] = newVal;
+          }
+        }
+        subscriber.next(results);
+      }
+    );
+  })
+}
 
 export function getStreamObservable<T>(url): Observable<T> {
   const xhr = new XMLHttpRequest();
@@ -11,6 +39,12 @@ export function getStreamObservable<T>(url): Observable<T> {
   );
 
   xhr.open("GET", url);
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    xhr.setRequestHeader('auth-token', token);
+  }
+
   xhr.setRequestHeader('stream', 'true');
   xhr.send();
 

@@ -16,6 +16,12 @@ export class UserService {
     );
   });
 
+  private byNameOrEmail = new RequestCache<string, User[]>((query) => {
+    return this.http.get<User[]>(`${environment.api}/users`, {params: {q: query}}).pipe(
+      shareReplay(1)
+    );
+  }, 5000);
+
   constructor(private http: HttpClient) {}
 
   public getByID(userID: string): Observable<User> {
@@ -32,7 +38,7 @@ export class UserService {
   }
 
   public searchByNameOrEmail(query: string): Observable<User[]> {
-    return this.http.get<User[]>(`${environment.api}/users`, {params: {q: query}});
+    return this.byNameOrEmail.getObservable(query);
   }
 
   public createUserWithEmail(email: string): Observable<User> {

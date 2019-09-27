@@ -16,7 +16,7 @@ export class PostService {
     return this.http.get<Post[]>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/posts`).pipe(
       shareReplay(1)
     );
-  });
+  }, 2500);
 
   constructor(private http: HttpClient) {}
 
