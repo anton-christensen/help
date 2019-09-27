@@ -65,3 +65,18 @@ GET: /user/_auth
 GET: /users?q=achri15@
 	- anon/TA: disallow
 	- Lect/Admin: allow
+
+
+# notifications
+GET: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
+	- admin: allow
+	- TA/lecturer: allow if associated with course
+	- other: disallow
+
+POST: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
+	- admin: allow
+	- TA/lecturer: allow if associated with course
+	- other: disallow
+
+DELETE: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
+	- all: allow

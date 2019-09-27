@@ -1,31 +1,36 @@
 version: '3'
 services:
+  # DATABASE
   rethinkdb:
     image: 'rethinkdb:latest'
-    ports:
-     - "28015:28015" # client driver connections
-     - "29015" # Intracluster connection
-     - "2880:8080" # http administration interface
-    volumes:
+    volumes: # persist data
      - ./docker/rethinkdb/data:/data
+  
+  # fancy REST -> Realtime API middleware
   pushpin:
     build: ./docker/pushpin
     image: my/pushpin
     volumes: 
       - ./docker/pushpin/routes:/etc/pushpin/routes
-    ports:
-        - "7999:7999"
-        - "5560-5563:5560-5563"
-  devapi:
+  
+  # REST API with pushpin integration
+  api:
     image: backend/dev
     build: 
       context: ./backend 
-      dockerfile: ./dev.Dockerfile
-    links:
+      dockerfile: ./prod.Dockerfile
+    depends_on:
       - rethinkdb
     
     volumes: 
       - ./backend:/usr/src/help/backend
+  
+  caddy:
+    image: "wemakeservices/caddy-docker:latest"
+    volumes:
+      - ./docker/caddy/certs:/root/.caddy  # to save certificates on disk
+      - ./docker/caddy/Caddyfile.prod:/etc/Caddyfile  # to mount custom Caddyfile
     ports:
-      - "28080:28080"
+      - "80:80"
+      - "443:443"
 

@@ -13,7 +13,7 @@ courseRouter
     let user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
         // disallow
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
 
     let query = Database.courses
@@ -43,7 +43,7 @@ courseRouter
     const user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
         // disallow
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     
     // TODO: validate schema
@@ -127,7 +127,7 @@ courseRouter
     const user = getUser(response);
     if(user.role == 'student') {
         // disallow
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     else if(user.role == 'TA' && 'enabled' in data) {
         // TODO: disallow if other keys than enabled
@@ -140,7 +140,7 @@ courseRouter
         try {
             
             if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
-                return HelpResponse.dissalowed(response);
+                return HelpResponse.disallowed(response);
         }
         catch(error) {
             return HelpResponse.error(response, error);
@@ -162,11 +162,11 @@ courseRouter
 .delete('/departments/:departmentSlug/courses/:courseSlug', (request, response) => {
     const user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     if(user.role == 'lecturer') {
         if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
-            return HelpResponse.dissalowed(response);
+            return HelpResponse.disallowed(response);
     }
 
     Database.courses.filter({
@@ -206,11 +206,11 @@ courseRouter
 .post('/departments/:departmentSlug/courses/:courseSlug/posts', (request, response) => {
     const user = getUser(response);
     if(userRoleIn(user, ['student'])) {
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     else if(userRoleIn(user, ['TA', 'lecturer'])) {
         if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
-            return HelpResponse.dissalowed(response);
+            return HelpResponse.disallowed(response);
     }
 
     let post = request.body;
@@ -227,11 +227,11 @@ courseRouter
 .put('/departments/:departmentSlug/courses/:courseSlug/posts/:postID', (request, response) => {
     const user = getUser(response);
     if(userRoleIn(user, ['student'])) {
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     else if(userRoleIn(user, ['TA', 'lecturer'])) {
         if(!userIsAssociatedWithCourse(user, request.params.departmentSlug, request.params.courseSlug))
-            return HelpResponse.dissalowed(response);
+            return HelpResponse.disallowed(response);
     }
 
     let post = request.body;

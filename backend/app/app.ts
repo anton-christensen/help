@@ -3,11 +3,12 @@ import { AddressInfo } from "net";
 import * as dotenv from "dotenv";
 import { Database } from "./database";
 import { departmentRouter, courseRouter, userRouter } from './routes';
-import { AuthMiddleware } from "./lib/auth";
+import { AuthMiddleware, generateToken } from "./lib/auth";
 import { StreamMiddleware, StreamWorker } from "./lib/stream";
 import { trashCanRouter } from "./routes/trashCans";
 import {get} from 'http'
 import { RequestOptions } from "https";
+import { notificationTokensRouter } from "./routes/notificationTokens";
 
 dotenv.config();
 
@@ -20,6 +21,10 @@ Database.init().then(() => {
         next();
     });
 
+    app.get('/anon/auth', async (request, response) => {
+        response.send({token: generateToken()});
+    });
+
     // get user from auth-token
     app.use(AuthMiddleware);
     app.use(StreamMiddleware);
@@ -27,7 +32,8 @@ Database.init().then(() => {
     app.use( '/', departmentRouter );
     app.use( '/', courseRouter );
     app.use( '/', trashCanRouter );
-    app.use( '/', userRouter)
+    app.use( '/', userRouter);
+    app.use( '/', notificationTokensRouter);
     
     app.use((req, res, next) => {
         console.log("finished: ", req.path);

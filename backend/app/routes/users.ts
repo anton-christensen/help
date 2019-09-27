@@ -1,5 +1,5 @@
 import { r, Connection, RCursor, RDatum } from 'rethinkdb-ts';
-import { Router, RequestHandler } from 'express';
+import { Router, RequestHandler, response } from 'express';
 import { Database } from '../database';
 import { check } from 'express-validator';
 import got = require('got');
@@ -12,34 +12,38 @@ import { shouldStream, createStream } from '../lib/stream';
 export const userRouter = Router();
 
 userRouter
-.get('/user', (request, response) => {
+.get('/user', async (request, response) => {
     const user = getUser(response);
-    let query = Database.users.get(user.id);
-    
-    if(shouldStream(response)) {
-        createStream(
-            response,
-            `GET(${user.id}):/user`,
-            query.changes(),
-            (err, row) => row
-        );
+    let query;
+    if(user.anon === false) {
+        query = Database.users.get(user.id);
+        if(shouldStream(response)) {
+            createStream(
+                response,
+                `GET(${user.id}):/user`,
+                query.changes(),
+                (err, row) => row
+            );
+        }
+        response.send(JSON.stringify(getUser(response)) + '\n');
+    }
+    else {
+        response.send(JSON.stringify(user) + '\n');
     }
 
-    response.send(JSON.stringify(getUser(response)) + '\n');
 });
 
 userRouter
 .post('/users', (request, response) => {
     const user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     else if(userRoleIn(user, ['lecturer'])) {
         // TODO: check that new user role is not above lecturer or admin
     }
 
     // TODO: check request schema
-
     Database.users.insert(request.body)
     .run(Database.connection)
     .then(result => {
@@ -166,7 +170,7 @@ userRouter
 .get('/users', async (request, response) => {
     let user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
-        return HelpResponse.dissalowed(response);
+        return HelpResponse.disallowed(response);
     }
     else if(userRoleIn(user, ['lecturer', 'admin'])) {
         let query = Database.users.filter((user: RDatum) =>

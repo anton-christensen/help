@@ -68,7 +68,9 @@ export class StreamWorker {
             StreamWorker.runningStreams.push(stream);
 
             cursor.each((err, row) => {
-                expressGrip.publish(stream.channel, new grip.HttpStreamFormat(JSON.stringify(stream.map(err,row)) + '\n'));
+                try {
+                    expressGrip.publish(stream.channel, new grip.HttpStreamFormat(JSON.stringify(stream.map(err,row)) + '\n'));
+                } catch { console.log("EXCEPTION: ", row); }
             });
         });
     }

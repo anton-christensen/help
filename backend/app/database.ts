@@ -11,8 +11,9 @@ export class Database {
   public static get r(): typeof r { return this._r; }
 
   public static get db(): RDatabase { return r.db(this.dbName); }
-
+  
   public static get trashCans(): RTable { return this.db.table('trashCans'); }
+  public static get notificationTokens(): RTable { return this.db.table('notificationTokens'); }
   public static get departments(): RTable { return this.db.table('departments'); }
   public static get courses(): RTable { return this.db.table('courses'); }
   public static get posts(): RTable { return this.db.table('posts'); }

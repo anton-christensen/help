@@ -12,7 +12,8 @@ export const trashCanRouter = Router();
 trashCanRouter
 .get( '/departments/:departmentSlug/courses/:courseSlug/trashcans', async ( request, response ) => {
     const user = getUser(response);
-    
+    console.log(user, request.header('auth-token'));
+
     let query = Database.trashCans
     .filter({
         active: true,
@@ -38,7 +39,7 @@ trashCanRouter
             );
         }
         let cans = await query.run(Database.connection);
-        return response.send(cans);
+        return response.send(JSON.stringify(cans)+'\n');
     }
     if(shouldStream(response)) {
         createStream(
@@ -57,6 +58,10 @@ trashCanRouter
 trashCanRouter
 .post( '/departments/:departmentSlug/courses/:courseSlug/trashcans', async ( request, response ) => {
     const user = getUser(response);
+    if(!user) {
+        return HelpResponse.disallowed(response);
+    }
+
 
     let can: TrashCan = {
         active: true,
@@ -77,12 +82,12 @@ trashCanRouter
 });
 
 trashCanRouter
-.delete( '/departments/:departmentSlug/courses/:courseSlug/trashcans/:userID', ( request, response ) => {
+.delete( '/departments/:departmentSlug/courses/:courseSlug/trashcans/:trashcanID', ( request, response ) => {
     Database.trashCans.filter({
         active: true,
         departmentSlug: request.params.departmentSlug,
         courseSlug: request.params.courseSlug,
-        userID: request.params.userID
+        id: request.params.trashcanID
     })
     .update({active: false})
     .run(Database.connection)

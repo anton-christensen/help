@@ -1,0 +1,8 @@
+http://help.local {
+    proxy / frontend:8000
+}
+
+http://api.help.local {
+    proxy / api:7999
+}
+

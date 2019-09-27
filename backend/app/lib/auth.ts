@@ -8,13 +8,7 @@ import { HelpResponse } from "./responses";
 
 export const getUser = (response: Response): User => {
     let _user = (response.locals._user as User);
-    return _user ? _user : {
-        anon: true,
-        role: 'student',
-        id: '',
-        name: '',
-        email: ''
-    }
+    return _user;
 }
 
 export const userRoleIn = (user: User, roles: Role[]): boolean => {
@@ -46,13 +40,32 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         token = hash(token);
         const footprint = (await Database.db.table('authTokens').get(token)
         .run(Database.connection) as AuthTokenFootprint);
+
+        if(!footprint) {
+            response.locals._user = {
+                anon: true,
+                id: '',
+                email: '',
+                name: '',
+                role: 'student'
+            }
+            response.locals._user.id = await r.uuid(token).run(Database.connection);
+            return next();
+        }
+
         let now = await r.now().run(Database.connection);
         if(now < footprint.expiration) {
             response.locals._user = await Database.users.get(footprint.userID).run(Database.connection);
         }
+        
+        if(!userRoleIn(getUser(response), ['student', 'TA', 'lecturer', 'admin'])) {
+            return HelpResponse.error(response, "Unknown user role");
+        }
+
+        return next();
     }
-    if(!userRoleIn(getUser(response), ['student', 'TA', 'lecturer', 'admin'])) {
-        return HelpResponse.error(response, "Unknown user role");
+    else {
+        return next();
+        // return HelpResponse.dissalowed(response);
     }
-    next();
 };
