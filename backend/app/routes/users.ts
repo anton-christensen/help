@@ -34,6 +34,57 @@ userRouter
 });
 
 userRouter
+.get('/users/:userID', async (request, response) => {
+    let user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        return HelpResponse.disallowed(response);
+    }
+    else if(userRoleIn(user, ['lecturer', 'admin'])) {
+        let query = Database.users.get(request.params.userID);
+        
+        if(shouldStream(response)) {
+            createStream(
+                response,
+                `GET:/users/${request.params.userID}`,
+                query.changes(),
+                (err, row) => row
+            );
+        }
+
+        let user = await query.run(Database.connection);
+        response.send(JSON.stringify(user)+'\n');
+    }
+});
+
+userRouter
+.get('/users', async (request, response) => {
+    let user = getUser(response);
+    if(userRoleIn(user, ['student', 'TA'])) {
+        return HelpResponse.disallowed(response);
+    }
+    else if(userRoleIn(user, ['lecturer', 'admin'])) {
+        let query = Database.users.filter((user: RDatum) =>
+            r.or(
+                r.row('name').downcase().match(request.query.q.toLowerCase()).eq(null).not(),
+                r.row('email').downcase().match(request.query.q.toLowerCase()).eq(null).not()
+            )
+        );
+        
+        if(shouldStream(response)) {
+            createStream(
+                response,
+                `GET:/users?q=${request.query.q.toLowerCase()}`,
+                query.changes(),
+                (err, row) => row
+            );
+        }
+
+        let users = await query.run(Database.connection);
+        response.send(JSON.stringify(users)+'\n');
+    }
+});
+
+userRouter
 .post('/users', (request, response) => {
     const user = getUser(response);
     if(userRoleIn(user, ['student', 'TA'])) {
@@ -164,35 +215,4 @@ userRouter
         console.log("New token error: ", error);
         response.send(error);
     });
-});
-
-userRouter
-.get('/users', async (request, response) => {
-    let user = getUser(response);
-    if(userRoleIn(user, ['student', 'TA'])) {
-        return HelpResponse.disallowed(response);
-    }
-    else if(userRoleIn(user, ['lecturer', 'admin'])) {
-        let query = Database.users.filter((user: RDatum) =>
-            r.or(
-                r.row('name').downcase().match(request.query.q.toLowerCase()).eq(null).not(),
-                r.row('email').downcase().match(request.query.q.toLowerCase()).eq(null).not()
-            )
-        );
-        
-        if(shouldStream(response)) {
-            createStream(
-                response,
-                `GET:/users?q=${request.query.q.toLowerCase()}`,
-                query.changes(),
-                (err, row) => row
-            );
-        }
-
-        let users = await query.run(Database.connection);
-        response.send(JSON.stringify(users)+'\n');
-    }
-    else {
-        return HelpResponse.error(response, 'Unknown user role');
-    }
 });

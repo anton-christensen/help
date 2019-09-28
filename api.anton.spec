@@ -53,6 +53,8 @@ DELETE /departments/{:dpslug}/courses/{:cslug}/trashcans/{:userID}
 GET: /user
 	- anon: gets anon user and new auth token
 	- TA/Lecturer/admin: gets their users and their provided auth token
+
+
 POST: /users
 	- anon/TA: disallow
 	- Lecturer: allow, but role can only be set to student or TA
@@ -66,6 +68,9 @@ GET: /users?q=achri15@
 	- anon/TA: disallow
 	- Lect/Admin: allow
 
+GET: /users/{:userID}
+	- anon/TA: disallow
+	- Lect/Admin: allow
 
 # notifications
 GET: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
