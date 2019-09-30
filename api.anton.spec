@@ -30,11 +30,19 @@ DELETE: /departments/{:dpslug}/courses/{:cslug}
 	- admin: allowed
 
 # posts
+GET: /departments/{:dpslug}/courses/{:cslug}/posts
+	- any: allowed
+
 POST: /departments/{:dpslug}/courses/{:cslug}/posts
 	- anon: disallow
 	- TA/Lect: allowed if associated
 	- admin: allowed
 PUT: /departments/{:dpslug}/courses/{:cslug}/posts/{:postID}
+	- anon: disallow
+	- TA/Lect: allowed if associated
+	- admin: allowed
+
+DELETE: /departments/{:dpslug}/courses/{:cslug}/posts/{:postID}
 	- anon: disallow
 	- TA/Lect: allowed if associated
 	- admin: allowed
@@ -64,7 +72,7 @@ GET: /user/_auth
 	- the service that AAU CAS recieves which will check if the user 
 		is authorized and if- then redirects to the target given as query param
 
-GET: /users?q=achri15@
+GET: /users?q=achri15&l=10&p=0
 	- anon/TA: disallow
 	- Lect/Admin: allow
 

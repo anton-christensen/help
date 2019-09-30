@@ -7,3 +7,10 @@ export interface User {
   name: string;
   role: Role;
 }
+
+export interface POSTUser {
+  email: string;
+  name: string;
+  role: Role;
+}
+

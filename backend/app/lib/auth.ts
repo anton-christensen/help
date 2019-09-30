@@ -1,13 +1,13 @@
 import * as crypto from "crypto";
 import { Role, User } from "../models/user";
-import { Response, RequestHandler } from "express";
+import { Response, Request, RequestHandler } from "express";
 import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
 import { r } from "rethinkdb-ts";
 import { HelpResponse } from "./responses";
 
-export const getUser = (response: Response): User => {
-    let _user = (response.locals._user as User);
+export const getUser = (request: Request): User => {
+    let _user = ((request as any)._user as User);
     return _user;
 }
 
@@ -15,8 +15,8 @@ export const userRoleIn = (user: User, roles: Role[]): boolean => {
     return roles.includes(user.role);
 }
 
-export const userRole = (response: Response): Role => {
-    return getUser(response).role;
+export const userRole = (request: Request): Role => {
+    return getUser(request).role;
 }
 
 export const userIsAssociatedWithCourse = async (user: User, departmentSlug: string, courseSlug: string) => {
@@ -42,23 +42,24 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         .run(Database.connection) as AuthTokenFootprint);
 
         if(!footprint) {
-            response.locals._user = {
+            let user = {
                 anon: true,
                 id: '',
                 email: '',
                 name: '',
                 role: 'student'
             }
-            response.locals._user.id = await r.uuid(token).run(Database.connection);
+            user.id = await r.uuid(token).run(Database.connection);
+            (request as any)._user = (user as any);
             return next();
         }
 
         let now = await r.now().run(Database.connection);
         if(now < footprint.expiration) {
-            response.locals._user = await Database.users.get(footprint.userID).run(Database.connection);
+            (request as any)._user = await Database.users.get(footprint.userID).run(Database.connection);
         }
         
-        if(!userRoleIn(getUser(response), ['student', 'TA', 'lecturer', 'admin'])) {
+        if(!userRoleIn(getUser(request), ['student', 'TA', 'lecturer', 'admin'])) {
             return HelpResponse.error(response, "Unknown user role");
         }
 

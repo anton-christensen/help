@@ -26,6 +26,8 @@ export const shouldStream = (response: Response): User => {
 }
 
 export const createStream = (response: Response, channel: string, dbStream :RFeed, modifier: (err: any, row: any) => string) => {
+    if(!shouldStream(response)) { return; }
+    
     response.header('Grip-Hold', 'stream');
     response.header('Grip-Channel', channel);
     console.log("New stream listener: ", channel);

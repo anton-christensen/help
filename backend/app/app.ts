@@ -1,15 +1,13 @@
-import express from "express";
+import express, { response } from "express";
 import { AddressInfo } from "net";
 import * as dotenv from "dotenv";
 import { Database } from "./database";
-import { departmentRouter, courseRouter, userRouter } from './routes';
+import { departmentRouter, courseRouter, userRouter, postRouter, trashCanRouter } from './routes';
 import { AuthMiddleware, generateToken } from "./lib/auth";
 import { StreamMiddleware, StreamWorker } from "./lib/stream";
-import { trashCanRouter } from "./routes/trashCans";
-import { get } from 'http'
-import { RequestOptions } from "https";
 import { notificationTokensRouter } from "./routes/notificationTokens";
 import { OnUpdateWorker } from "./lib/dataChanges";
+
 
 dotenv.config();
 
@@ -18,6 +16,7 @@ Database.init().then(() => {
     app.use(express.json())
     app.use((req, res, next) => {
         console.log(`${req.method}: ${req.path}`);
+        res.contentType('json');
         next();
     });
 
@@ -31,6 +30,7 @@ Database.init().then(() => {
 
     app.use( '/', departmentRouter );
     app.use( '/', courseRouter );
+    app.use( '/', postRouter );
     app.use( '/', trashCanRouter );
     app.use( '/', userRouter);
     app.use( '/', notificationTokensRouter);
