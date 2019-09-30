@@ -114,6 +114,7 @@ courseRouter
     }
     query.run(Database.connection)
     .then( result => {
+        // TODO: check om der er et resultat
         response.send( JSON.stringify(result[0])+'\n');
     })
     .catch( error => response.send( error ) );
