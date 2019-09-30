@@ -72,3 +72,23 @@ notificationTokensRouter
     })
     .catch( error => response.send( error ) );
 });
+
+notificationTokensRouter
+.delete('/departments/:departmentSlug/courses/:courseSlug/trashcans/notificationtokens/:deviceID', async (request, response) => {
+    const user = getUser(response);
+    const dpSlug = request.params.departmentSlug;
+    const cSlug = request.params.courseSlug;
+    const dID = request.params.deviceID;
+    
+    let query;
+    query = Database.notificationTokens
+    .filter({
+        userID: user.id,
+        deviceID: dID,
+        departmentSlug: dpSlug,
+        courseSlug: cSlug
+    }).delete();
+
+    let notificationTokens = await query.run(Database.connection);
+    response.send(JSON.stringify(notificationTokens) + '\n');
+});
