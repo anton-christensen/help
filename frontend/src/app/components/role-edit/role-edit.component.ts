@@ -3,8 +3,8 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {UserService} from 'src/app/services/user.service';
 import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
-import {Observable, of, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-role-edit',
@@ -13,6 +13,7 @@ import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap} from 
 })
 export class RoleEditComponent implements OnInit {
   public foundUsers$: Observable<User[]>;
+  public loading: boolean;
 
   public form = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
@@ -23,10 +24,12 @@ export class RoleEditComponent implements OnInit {
 
   ngOnInit() {
     this.foundUsers$ = this.form.controls.query.valueChanges.pipe(
+      tap(() => this.loading = true),
       debounceTime(300),
       distinctUntilChanged(),
       switchMap((val) => this.userService.searchByNameOrEmail(val.trim())),
-      shareReplay(1)
+      shareReplay(1),
+      tap(() => this.loading = false)
     );
   }
 

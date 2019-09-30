@@ -1,14 +1,11 @@
 export const environment = {
   production: true,
   firebase: {
-    apiKey: 'AIzaSyD7vHzEcdck47ADUlOkuUxnrmkMqR8XJrk',
-    authDomain: 'help-67ad0.firebaseapp.com',
-    databaseURL: 'https://help-67ad0.firebaseio.com',
-    projectId: 'help-67ad0',
-    storageBucket: '',
-    messagingSenderId: '1067545049766',
-    appId: "1:1067545049766:web:a552810612976999"
+    apiKey: 'AIzaSyBo-tvO7ivUmnP-1X6T0_AG_eCYiXntq7w',
+    projectId: 'aau-help',
+    messagingSenderId: '9179952640',
+    appId: '1:9179952640:web:d61aa7a7e86e1db1a54ae5'
   },
-  // api: 'https://api.help.antonchristensen.net'
-  api: 'http://192.168.0.51:7999'
+  api: 'https://api.help.antonchristensen.net'
+  // api: 'http://192.168.0.51:7999'
 };

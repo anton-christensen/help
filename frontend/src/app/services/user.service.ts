@@ -2,7 +2,7 @@ import {shareReplay} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {RequestCache} from '../utils/request-cache';
 import {HttpClient} from '@angular/common/http';
-import {combineLatest, Observable} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {Role, User} from '../models/user';
 import {environment} from '../../environments/environment';
 
@@ -17,9 +17,14 @@ export class UserService {
   });
 
   private byNameOrEmail = new RequestCache<string, User[]>((query) => {
-    return this.http.get<User[]>(`${environment.api}/users`, {params: {q: query}}).pipe(
-      shareReplay(1)
-    );
+    if (query) {
+      return this.http.get<User[]>(`${environment.api}/users`, {params: {q: query}}).pipe(
+        shareReplay(1)
+      );
+    } else {
+      return of([]);
+    }
+
   }, 5000);
 
   constructor(private http: HttpClient) {}
