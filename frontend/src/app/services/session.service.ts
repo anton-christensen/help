@@ -33,7 +33,7 @@ export class SessionService {
         const courseSlug = paramMap.get('course');
         if (courseSlug && courseSlug !== this.currentCourseSlug) {
           this.currentCourseSlug = courseSlug;
-          this.course$ = this.courseService.getBySlug(departmentSlug, courseSlug);
+          this.course$ = this.courseService.getStreamBySlug(departmentSlug, courseSlug);
         }
       });
   }

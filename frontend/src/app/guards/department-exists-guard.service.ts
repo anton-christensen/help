@@ -24,11 +24,15 @@ export class DepartmentExistsGuard implements CanActivate {
   Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const departmentSlug = childRoute.paramMap.get('department');
 
-    if (this.departmentService.isActualDepartment(departmentSlug)) {
-      return true;
-    } else {
-      this.toastService.add('Department not found', 5000);
-      return this.router.parseUrl('/departments');
-    }
+    return this.departmentService.isActualDepartment(departmentSlug).pipe(
+      map((exists) => {
+        console.log(exists);
+        if (!exists) {
+          this.toastService.add('Department not found', 5000);
+          return this.router.parseUrl('/departments');
+        }
+
+        return true;
+      }));
   }
 }

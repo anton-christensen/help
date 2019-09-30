@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map, shareReplay, tap} from 'rxjs/operators';
+import {map, shareReplay} from 'rxjs/operators';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {RequestCache} from '../utils/request-cache';
-import {getStreamObservable} from "../utils/stream-http";
+import {getStreamObservable} from '../utils/stream-http';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +13,17 @@ import {getStreamObservable} from "../utils/stream-http";
 export class CourseService {
   private readonly allAssociated: Observable<Course[]>;
 
-  private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
+  private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return getStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
       shareReplay(1)
     );
   });
+
+  private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
+    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+      shareReplay(1)
+    );
+  }, 5000);
 
   private readonly byDepartment = new RequestCache<string, Course[]>((departmentSlug: string) => {
     return this.http.get<Course[]>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
@@ -35,8 +41,12 @@ export class CourseService {
     return this.allAssociated;
   }
 
+  public getStreamBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
+    return this.bySlugStream.getObservable({departmentSlug, courseSlug});
+  }
+
   public getBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
-    return this.bySlug.getObservable({departmentSlug, courseSlug})
+    return this.bySlug.getObservable({departmentSlug, courseSlug});
   }
 
   public getRelevantByDepartment(departmentSlug: string): Observable<Course[]> {
@@ -44,7 +54,7 @@ export class CourseService {
   }
 
   public isActualCourse(departmentSlug: string, courseSlug: string): Observable<boolean> {
-    return this.getBySlug(departmentSlug, courseSlug).pipe(
+    return this.bySlug.getObservable({departmentSlug, courseSlug}).pipe(
       map((course) => {
         return !!course;
       })

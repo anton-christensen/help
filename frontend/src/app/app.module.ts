@@ -28,6 +28,9 @@ import {ServiceWorkerModule} from '@angular/service-worker';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {TokenInterceptor} from './providers/token.interceptor';
 import {UserProvider} from "./providers/user.provider";
+import {LoadingBarRouterModule} from '@ngx-loading-bar/router';
+import {LoadingBarModule} from '@ngx-loading-bar/core';
+import {LoadingBarHttpClientModule} from '@ngx-loading-bar/http-client';
 
 export function userProviderFactory(provider: UserProvider) {
   return () => provider.authenticate();
@@ -62,7 +65,10 @@ export function userProviderFactory(provider: UserProvider) {
     ScrollToModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    LoadingBarHttpClientModule,
+    LoadingBarRouterModule,
+    LoadingBarModule
   ],
   providers: [
     UserProvider,

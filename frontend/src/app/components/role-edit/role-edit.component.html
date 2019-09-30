@@ -16,16 +16,16 @@
   <button *ngIf="(foundUsers$ | async)?.length === 0 && form.valid"
           type="submit"
           class="btn">
-    Add
+    Create
   </button>
 
   <div *ngIf="(foundUsers$ | async)?.length === 0" class="info">
     <span *ngIf="form.invalid && (form.touched || form.dirty) && form.value.query">
-      No users found. Enter a valid AAU email (ending in '.aau.dk') to add a new user
+      No users found. Enter a valid AAU email (ending in '.aau.dk') to create a new user
     </span>
 
     <span *ngIf="(foundUsers$ | async)?.length === 0 && form.valid">
-      This user does not exist in the system yet, but can be added
+      This user does not exist in the system yet, but can be created
     </span>
   </div>
 </form>
@@ -39,6 +39,7 @@
     </tr>
     </thead>
     <tbody>
+    <app-loader *ngIf="loading"></app-loader>
     <tr class="user" *ngFor="let user of users">
       <td class="user">
         <span class="block name">{{ user.name }}</span>

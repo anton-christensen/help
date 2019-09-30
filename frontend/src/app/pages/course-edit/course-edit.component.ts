@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { CourseService } from 'src/app/services/course.service';
-import { Observable, timer} from 'rxjs';
-import { Course } from 'src/app/models/course';
-import { Department } from 'src/app/models/department';
-import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
-import { ModalService } from 'src/app/services/modal.service';
-import { ToastService } from 'src/app/services/toasts.service';
-import { DepartmentService } from 'src/app/services/department.service';
-import { UserService } from 'src/app/services/user.service';
-import {switchMap, map, first, take, debounceTime, distinctUntilChanged, shareReplay} from 'rxjs/operators';
-import { User } from 'src/app/models/user';
+import {Component, OnInit} from '@angular/core';
+import {CourseService} from 'src/app/services/course.service';
+import {Observable, timer} from 'rxjs';
+import {Course} from 'src/app/models/course';
+import {Department} from 'src/app/models/department';
+import {FormGroup, FormControl, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
+import {AuthService} from 'src/app/services/auth.service';
+import {ModalService} from 'src/app/services/modal.service';
+import {ToastService} from 'src/app/services/toasts.service';
+import {DepartmentService} from 'src/app/services/department.service';
+import {UserService} from 'src/app/services/user.service';
+import {switchMap, map, first, take, debounceTime, distinctUntilChanged, shareReplay, tap} from 'rxjs/operators';
+import {User} from 'src/app/models/user';
 
 
 @Component({
@@ -19,8 +19,8 @@ import { User } from 'src/app/models/user';
   styleUrls: ['./course-edit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
-  public courses$: Observable<Course[]>;
   public departments$: Observable<Department[]>;
+  public courses$: Observable<Course[]>;
   private loggedInUser: User;
 
   public coursesFilterForm = new FormGroup({
@@ -48,17 +48,16 @@ export class CourseEditComponent implements OnInit {
   public get f() {
     return this.courseForm.controls;
   }
-  public editing = false;
   public courseBeingEdited: Course;
+  public associatedUsers: User[];
+  public newCourse = true;
 
   public usersForm = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
 
   public foundUsers$: Observable<User[]>;
-
-  private user: User;
-  public associatedUsers: User[];
+  public loading: boolean;
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -85,7 +84,6 @@ export class CourseEditComponent implements OnInit {
     // Lecturers can see all associated courses
     this.courses$ = this.courseService.getAllAssociated();
 
-
     // Validate course slug when department changes
     this.courseForm.controls.departmentSlug.valueChanges
       .subscribe(() => {
@@ -93,54 +91,13 @@ export class CourseEditComponent implements OnInit {
       });
 
     this.foundUsers$ = this.usersForm.controls.query.valueChanges.pipe(
+      tap(() => this.loading = true),
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap((val) => this.userService.searchByNameOrEmail(val.trim())),
-      shareReplay(1)
+      switchMap((val) => this.userService.searchByNameOrEmail(val ? val.trim() : '')),
+      shareReplay(1),
+      tap(() => this.loading = false)
     );
-  }
-
-  public onUserFormSubmit() {
-    if (this.usersForm.invalid) {
-      return;
-    }
-
-    if (this.user) {
-      this.addUserToCourse(this.user);
-    } else {
-      this.userService.createUserWithEmail(this.usersForm.controls.email.value).pipe(first())
-        .subscribe((user) => {
-          this.addUserToCourse(user);
-        });
-    }
-  }
-
-  private addUserToCourse(user: User) {
-    // Check if user is already in course
-    if (this.associatedUsers.find((u) => u.id === user.id)) {
-      this.toastService.add('User is already in this course');
-    } else {
-      if (user.role === 'student') {
-        this.userService.setRole(user, 'TA');
-        user.role = 'TA';
-      }
-      this.associatedUsers.push(user);
-
-      this.usersForm.reset({
-        email: ''
-      });
-    }
-  }
-
-  public removeUserFromCourse(user: User) {
-    const newAssociatedUsers = this.associatedUsers.filter((u) => u.id !== user.id);
-
-    // Check if this removal means there are no admins og lecturers left
-    if (!newAssociatedUsers.find((u) => u.role === 'admin' || u.role === 'lecturer')) {
-      this.toastService.add('There must be at least one admin or lecturer associated with every course');
-    } else {
-      this.associatedUsers = newAssociatedUsers;
-    }
   }
 
   public editCourse(course: Course) {
@@ -154,21 +111,16 @@ export class CourseEditComponent implements OnInit {
       email: ''
     });
 
-    this.userService.getAllByID(course.associatedUserIDs).pipe(
-      take(1)
-    ).subscribe((users) => {
-      this.associatedUsers = users;
-    });
+    this.userService.getAllByID(course.associatedUserIDs).pipe(take(1))
+      .subscribe((users) => {
+        this.associatedUsers = users;
+      });
 
     this.courseBeingEdited = course;
-    this.editing = true;
+    this.newCourse = false;
   }
 
   public resetForm() {
-    this.courseBeingEdited = null;
-    this.associatedUsers = [this.loggedInUser];
-    this.editing = false;
-
     this.courseForm.reset({
       id: '',
       title: '',
@@ -178,13 +130,17 @@ export class CourseEditComponent implements OnInit {
     this.usersForm.reset({
       email: ''
     });
+
+    this.courseBeingEdited = null;
+    this.newCourse = true;
+    this.associatedUsers = [this.loggedInUser];
   }
 
   public submitCourse() {
-    if (this.editing) {
-      this.updateCourse();
-    } else {
+    if (this.newCourse) {
       this.createCourse();
+    } else {
+      this.updateCourse();
     }
 
     this.resetForm();
@@ -226,10 +182,10 @@ export class CourseEditComponent implements OnInit {
 
         this.courseService.delete(course).pipe(first())
           .subscribe(() => {
-          if (this.editing && this.courseBeingEdited.id === course.id) {
-            this.resetForm();
-          }
-        });
+            if (this.courseBeingEdited && this.courseBeingEdited.id === course.id) {
+              this.resetForm();
+            }
+          });
       })
       .catch();
   }
@@ -256,5 +212,45 @@ export class CourseEditComponent implements OnInit {
         );
       })
     );
+  }
+
+  public onUserFormSubmit() {
+    if (this.usersForm.invalid) {
+      return;
+    }
+
+    this.userService.createUserWithEmail(this.usersForm.controls.query.value.trim()).pipe(first())
+      .subscribe((user) => {
+        this.addUserToCourse(user);
+      });
+  }
+
+  public addUserToCourse(user: User) {
+    // Check if user is already in course
+    if (this.associatedUsers.find((u) => u.id === user.id)) {
+      this.toastService.add('User is already in this course');
+    } else {
+      // Set role to TA if previously a student
+      if (user.role === 'student') {
+        this.userService.setRole(user, 'TA');
+        user.role = 'TA';
+      }
+      this.associatedUsers.push(user);
+    }
+  }
+
+  public removeUserFromCourse(user: User) {
+    const newAssociatedUsers = this.associatedUsers.filter((u) => u.id !== user.id);
+
+    // Check if this removal means there are no admins og lecturers left
+    if (!newAssociatedUsers.find((u) => u.role === 'admin' || u.role === 'lecturer')) {
+      this.toastService.add('There must be at least one admin or lecturer associated with every course');
+    } else {
+      this.associatedUsers = newAssociatedUsers;
+    }
+  }
+
+  public isUserInCourse(user: User): boolean {
+    return !!this.associatedUsers.find((u) => u.id === user.id);
   }
 }
