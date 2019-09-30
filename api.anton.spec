@@ -73,15 +73,13 @@ GET: /users/{:userID}
 	- Lect/Admin: allow
 
 # notifications
-GET: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
-	- admin: allow
-	- TA/lecturer: allow if associated with course
-	- other: disallow
+GET: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens/{:deviceID}
+	- all: allow
 
 POST: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
 	- admin: allow
 	- TA/lecturer: allow if associated with course
 	- other: disallow
 
-DELETE: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens
+DELETE: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens/{:deviceID}
 	- all: allow

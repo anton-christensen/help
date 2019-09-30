@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { Database } from '../database';
 import { ChangesOptions } from 'rethinkdb';
 import { TrashCan } from '../models/trashCan';
+import { NotificationToken } from '../models/notificationToken';
 
 
 export class NotificationWorker {
@@ -10,6 +11,20 @@ export class NotificationWorker {
             cursor.each((err, row) => {
                 if(row.type == "add") {
                     NotificationWorker.onNewTrashCan(row['new_val'])
+                }
+            });
+        });
+
+        Database.notificationTokens.changes({includeTypes: true}).run().then(cursor => {
+            cursor.each((err, row) => {
+                if(row.type == "add") {
+                    NotificationWorker.onNewNotificationToken(row['new_val'])
+                }
+                if(row.type == "remove") {
+                    NotificationWorker.onDeleteNotificationToken(row['old_val'])
+                }
+                if(row.type == "change") {
+                    NotificationWorker.onUpdatedNotificationToken(row['old_val'], row['new_val'])
                 }
             });
         });
@@ -24,30 +39,23 @@ export class NotificationWorker {
               icon: `https://help.aau.dk/assets/icons/icon-128x128.png`
             }
           })
-        
     }
 
 
     // Subscribe notification tokens to trash cans from their course
-    static onNewNotificationToken(token) {
-        const data = token.data();
-        return admin.messaging().subscribeToTopic(data.token, `TrashCan-${data.courseID}`);
+    static onNewNotificationToken(notificationToken: NotificationToken) {
+        return admin.messaging().subscribeToTopic(notificationToken.token, `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`);
     }
 
     // Handle notification token subscriptions on updates
-    static onUpdatedNotificationToken(token) {
-        const oldData = token.before.data();
-        const newData = token.after.data();
-
-        return admin.messaging().unsubscribeFromTopic(oldData.token, `TrashCan-${oldData.courseID}`).then(() => {
-            return admin.messaging().subscribeToTopic(newData.token, `TrashCan-${newData.courseID}`);
+    static onUpdatedNotificationToken(oldNotificationToken: NotificationToken, newNotificationToken: NotificationToken) {
+        return admin.messaging().unsubscribeFromTopic(oldNotificationToken.token, `TrashCan-${oldNotificationToken.departmentSlug}-${oldNotificationToken.courseSlug}`).then(() => {
+            return admin.messaging().subscribeToTopic(newNotificationToken.token, `TrashCan-${newNotificationToken.departmentSlug}-${notificationToken.courseSlug}`);
         });
     }
 
     // Unsubscribe when tokens are removed
-    static onDeleteNotificationToken(token) {
-        const data = token.data();
-
-        return admin.messaging().unsubscribeFromTopic(data.token, `TrashCan-${data.courseID}`);
+    static onDeleteNotificationToken(notificationToken: NotificationToken) {
+        return admin.messaging().unsubscribeFromTopic(notificationToken.token, `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`);
     }
 }
