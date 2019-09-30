@@ -5,7 +5,7 @@ import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {RequestCache} from '../utils/request-cache';
-import {getStreamObservable} from '../utils/stream-http';
+import {getSingleStreamObservable} from '../utils/stream-http';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class CourseService {
   private readonly allAssociated: Observable<Course[]>;
 
   private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
-    return getStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+    return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
       shareReplay(1)
     );
   });

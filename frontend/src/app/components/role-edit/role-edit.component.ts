@@ -13,7 +13,6 @@ import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap, tap} 
 })
 export class RoleEditComponent implements OnInit {
   public foundUsers$: Observable<User[]>;
-  public loading: boolean;
 
   public form = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
@@ -24,12 +23,10 @@ export class RoleEditComponent implements OnInit {
 
   ngOnInit() {
     this.foundUsers$ = this.form.controls.query.valueChanges.pipe(
-      tap(() => this.loading = true),
       debounceTime(300),
       distinctUntilChanged(),
       switchMap((val) => this.userService.searchByNameOrEmail(val.trim())),
       shareReplay(1),
-      tap(() => this.loading = false)
     );
   }
 

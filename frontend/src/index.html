@@ -17,11 +17,150 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="prefetch" as="style">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet">
 
-  <style>html,body{margin:0}.lds-grid{display:block;position:absolute;width:64px;top:30vh;left:calc(50% - 32px);}.lds-grid div{position:absolute;width:13px;height:13px;border-radius:50%;background:#424242;animation:lds-grid 1.2s linear infinite}.lds-grid div:nth-child(1){top:6px;left:6px;animation-delay:0s}.lds-grid div:nth-child(2){top:6px;left:26px;animation-delay:-0.4s}.lds-grid div:nth-child(3){top:6px;left:45px;animation-delay:-0.8s}.lds-grid div:nth-child(4){top:26px;left:6px;animation-delay:-0.4s}.lds-grid div:nth-child(5){top:26px;left:26px;animation-delay:-0.8s}.lds-grid div:nth-child(6){top:26px;left:45px;animation-delay:-1.2s}.lds-grid div:nth-child(7){top:45px;left:6px;animation-delay:-0.8s}.lds-grid div:nth-child(8){top:45px;left:26px;animation-delay:-1.2s}.lds-grid div:nth-child(9){top:45px;left:45px;animation-delay:-1.6s}@keyframes lds-grid{0%,100%{opacity:1}50%{opacity:.5}}</style>
+  <style>
+    ngx-loading-bar, .ldr {
+      top:3rem;
+    }
+    .ldr {
+      position: relative;
+      height: 2px;
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      overflow: hidden;
+      z-index: 3;
+    }
+    .ldr div {
+      background-color: #2373c8;
+    }
+    .ldr div:before {
+      content: "";
+      position: absolute;
+      background-color: inherit;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      will-change: left, right;
+      -webkit-animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+      animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+    .ldr div:after {
+      content: "";
+      position: absolute;
+      background-color: inherit;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      will-change: left, right;
+      -webkit-animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      -webkit-animation-delay: 1.15s;
+      animation-delay: 1.15s;
+    }
+
+    @-webkit-keyframes indeterminate {
+      0% {
+        left: -35%;
+        right: 100%;
+      }
+      60% {
+        left: 100%;
+        right: -90%;
+      }
+      100% {
+        left: 100%;
+        right: -90%;
+      }
+    }
+    @keyframes indeterminate {
+      0% {
+        left: -35%;
+        right: 100%;
+      }
+      60% {
+        left: 100%;
+        right: -90%;
+      }
+      100% {
+        left: 100%;
+        right: -90%;
+      }
+    }
+    @-webkit-keyframes indeterminate-short {
+      0% {
+        left: -200%;
+        right: 100%;
+      }
+      60% {
+        left: 107%;
+        right: -8%;
+      }
+      100% {
+        left: 107%;
+        right: -8%;
+      }
+    }
+    @keyframes indeterminate-short {
+      0% {
+        left: -200%;
+        right: 100%;
+      }
+      60% {
+        left: 107%;
+        right: -8%;
+      }
+      100% {
+        left: 107%;
+        right: -8%;
+      }
+    }
+
+    .menu-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3rem;
+      display: block;
+      background: white;
+      z-index: 3;
+      box-shadow: 0px -42px 40px 19px;
+    }
+
+    .menu-bar .button {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      font-size: 1.5rem;
+      line-height: 3rem;
+      cursor: pointer;
+      padding: 0 1rem;
+      float: left;
+    }
+
+    .menu-bar .left {
+      float: left;
+    }
+
+    .menu-bar .right {
+      float: right;
+    }
+  </style>
+
 </head>
 <body>
   <app-root>
-    <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <app-menu>
+      <div class="menu-bar">
+        <div class="button left material-icons">arrow_back</div>
+      <div class="button material-icons right">menu</div>
+      </div>
+
+      <div class="ldr">
+        <div></div>
+      </div>
+    </app-menu>
   </app-root>
   <noscript>
     You need to enable JavaScript in your browser if you want to use help.aau.dk

@@ -12,8 +12,8 @@ export class AppComponent implements OnInit {
   private offline$: Observable<Event>;
   public online = navigator.onLine;
 
-  constructor(public auth: AuthService) {
-  }
+
+  constructor(public auth: AuthService) {}
 
   ngOnInit(): void {
     this.online$ = fromEvent(window, 'online');

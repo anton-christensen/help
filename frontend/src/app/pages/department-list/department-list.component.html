@@ -1,8 +1,4 @@
-<ng-template #loading>
-  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-</ng-template>
-
-<div *ngIf="departments$ | async as departments; else loading">
+<div *ngIf="departments$ | async as departments">
   <h1 class="course-title">Departments with Courses</h1>
 
   <ul>

@@ -12,10 +12,12 @@ import {filter} from 'rxjs/operators';
 })
 export class SessionService {
   private currentDepartmentSlug: string;
-  private department$: Observable<Department> = new Observable<Department>();
+  private departmentSub: Subscription;
+  private department$: ReplaySubject<Department> = new ReplaySubject<Department>(1);
 
   private currentCourseSlug: string;
-  private course$: Observable<Course> = new Observable<Course>();
+  private courseSub: Subscription;
+  private course$: ReplaySubject<Course> = new ReplaySubject<Course>(1);
 
   constructor(private router: Router,
               private departmentService: DepartmentService,
@@ -25,15 +27,35 @@ export class SessionService {
         const paramMap = this.router.routerState.root.firstChild.snapshot.paramMap;
 
         const departmentSlug = paramMap.get('department');
-        if (departmentSlug && departmentSlug !== this.currentDepartmentSlug) {
-          this.currentDepartmentSlug = departmentSlug;
-          this.department$ = this.departmentService.getBySlug(departmentSlug);
+        if (departmentSlug) {
+          if (departmentSlug !== this.currentDepartmentSlug) {
+            if (this.departmentSub) {
+              this.departmentSub.unsubscribe();
+            }
+
+            this.currentDepartmentSlug = departmentSlug;
+            this.departmentSub = this.departmentService.getBySlug(departmentSlug)
+              .subscribe((d) => this.department$.next(d));
+          }
+        } else {
+          this.currentDepartmentSlug = '';
+          this.department$.next(null);
         }
 
         const courseSlug = paramMap.get('course');
-        if (courseSlug && courseSlug !== this.currentCourseSlug) {
-          this.currentCourseSlug = courseSlug;
-          this.course$ = this.courseService.getStreamBySlug(departmentSlug, courseSlug);
+        if (courseSlug) {
+          if (courseSlug !== this.currentCourseSlug) {
+            if (this.courseSub) {
+              this.courseSub.unsubscribe();
+            }
+
+            this.currentCourseSlug = courseSlug;
+            this.courseSub = this.courseService.getStreamBySlug(departmentSlug, courseSlug)
+              .subscribe((c) => this.course$.next(c));
+          }
+        } else {
+          this.currentCourseSlug = '';
+          this.course$.next(null);
         }
       });
   }

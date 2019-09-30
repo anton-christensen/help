@@ -25,9 +25,10 @@ export class CourseListComponent implements OnInit {
 
     this.session.getDepartment()
       .subscribe((department) => {
-        this.commonService.setTitle(`Courses at ${department.slug.toUpperCase()}`);
-
-        this.courses$ = this.courseService.getRelevantByDepartment(department.slug);
+        if (department) {
+          this.commonService.setTitle(`Courses at ${department.slug.toUpperCase()}`);
+          this.courses$ = this.courseService.getRelevantByDepartment(department.slug);
+        }
     });
   }
 }

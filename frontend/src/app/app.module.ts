@@ -16,7 +16,6 @@ import {StudentComponent} from './components/student/student.component';
 import {AssistantComponent} from './components/assistant/assistant.component';
 import {PostsComponent} from './components/posts/posts.component';
 import {CourseLinkComponent} from './components/course-link/course-link.component';
-import {LoaderComponent} from './components/loader/loader.component';
 import {AdminComponent} from './pages/admin/admin.component';
 import {ModalComponent} from './components/modal/modal.component';
 import {CourseEditComponent} from './pages/course-edit/course-edit.component';
@@ -27,10 +26,10 @@ import {HandleSuccessfulAuthComponent} from './components/handle-successful-auth
 import {ServiceWorkerModule} from '@angular/service-worker';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {TokenInterceptor} from './providers/token.interceptor';
-import {UserProvider} from "./providers/user.provider";
-import {LoadingBarRouterModule} from '@ngx-loading-bar/router';
+import {UserProvider} from './providers/user.provider';
 import {LoadingBarModule} from '@ngx-loading-bar/core';
 import {LoadingBarHttpClientModule} from '@ngx-loading-bar/http-client';
+import {NgLetDirective} from './utils/ng-let.directive';
 
 export function userProviderFactory(provider: UserProvider) {
   return () => provider.authenticate();
@@ -47,7 +46,6 @@ export function userProviderFactory(provider: UserProvider) {
     AssistantComponent,
     PostsComponent,
     CourseLinkComponent,
-    LoaderComponent,
     AdminComponent,
     ModalComponent,
     CourseEditComponent,
@@ -55,6 +53,7 @@ export function userProviderFactory(provider: UserProvider) {
     MenuComponent,
     RoleEditComponent,
     HandleSuccessfulAuthComponent,
+    NgLetDirective,
   ],
   imports: [
     BrowserModule,
@@ -65,10 +64,9 @@ export function userProviderFactory(provider: UserProvider) {
     ScrollToModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
-    LoadingBarHttpClientModule,
-    LoadingBarRouterModule,
-    LoadingBarModule
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
+    LoadingBarModule,
+    LoadingBarHttpClientModule
   ],
   providers: [
     UserProvider,

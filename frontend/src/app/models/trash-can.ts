@@ -1,5 +1,5 @@
 export interface TrashCan {
-  id?: string;
+  id: string;
   userID: string;
   departmentSlug: string;
   courseSlug: string;

@@ -26,7 +26,6 @@ export class DepartmentExistsGuard implements CanActivate {
 
     return this.departmentService.isActualDepartment(departmentSlug).pipe(
       map((exists) => {
-        console.log(exists);
         if (!exists) {
           this.toastService.add('Department not found', 5000);
           return this.router.parseUrl('/departments');

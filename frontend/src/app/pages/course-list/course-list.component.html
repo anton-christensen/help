@@ -1,8 +1,4 @@
-<ng-template #loading>
-  <app-loader></app-loader>
-</ng-template>
-
-<ng-container *ngIf="courses$ | async as courses; else loading">
+<ng-container *ngIf="courses$ | async as courses">
   <ng-container *ngIf="auth.isAdmin() | async; then admin; else notAdmin"></ng-container>
   <ng-template #notAdmin>
     <ng-container *ngIf="(auth.isLecturer() | async) || (auth.isAssistant() | async); then assistant; else student"></ng-container>

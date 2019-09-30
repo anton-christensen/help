@@ -57,7 +57,6 @@ export class CourseEditComponent implements OnInit {
   });
 
   public foundUsers$: Observable<User[]>;
-  public loading: boolean;
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -91,12 +90,10 @@ export class CourseEditComponent implements OnInit {
       });
 
     this.foundUsers$ = this.usersForm.controls.query.valueChanges.pipe(
-      tap(() => this.loading = true),
       debounceTime(300),
       distinctUntilChanged(),
       switchMap((val) => this.userService.searchByNameOrEmail(val ? val.trim() : '')),
       shareReplay(1),
-      tap(() => this.loading = false)
     );
   }
 

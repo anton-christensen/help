@@ -9,6 +9,8 @@
        (click)="openMenu()">
     menu
   </div>
+
+  <ngx-loading-bar color="#2373C8" [includeSpinner]="false" [fixed]="false"></ngx-loading-bar>
 </div>
 
 <div class="menu-bg" *ngIf="open" (click)="menuClicked($event)"></div>
@@ -40,7 +42,7 @@
       <div class="menu-item"
            (click)="toggleCourseEnabled(course)">
         <div class="fl">
-          <label>
+          <label for="course-enable-switch">
             Course active
           </label>
           <label class="sublabel">
@@ -53,10 +55,10 @@
         </div>
       </div>
 
-      <div class="menu-item"
-           (click)="toggleNotificationsEnabled(course)">
+      <div class="menu-item" *ngLet="notificationToken$ | async as token"
+           (click)="toggleNotificationsEnabled(course, token)">
         <div class="fl">
-          <label>
+          <label for="notifications-enable-switch">
             Notifications
           </label>
           <label class="sublabel">
@@ -64,7 +66,7 @@
           </label>
         </div>
         <div class="switch">
-          <input id="notifications-enable-switch" type="checkbox" [checked]="notificationToken" [disabled]="tokenToggleBusy"/>
+          <input id="notifications-enable-switch" type="checkbox" [checked]="token" [disabled]="tokenToggleBusy"/>
           <span class="slider"></span>
         </div>
       </div>
