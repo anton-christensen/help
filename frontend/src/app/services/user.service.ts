@@ -16,9 +16,9 @@ export class UserService {
     );
   });
 
-  private byNameOrEmail = new RequestCache<string, User[]>((query) => {
-    if (query) {
-      return this.http.get<User[]>(`${environment.api}/users`, {params: {q: query}}).pipe(
+  private byNameOrEmail = new RequestCache<{q: string, l: number, p: number}, User[]>(({q, l, p}) => {
+    if (q) {
+      return this.http.get<User[]>(`${environment.api}/users`, {params: {q, l, p}}).pipe(
         shareReplay(1)
       );
     } else {
@@ -42,8 +42,8 @@ export class UserService {
     return combineLatest(observables);
   }
 
-  public searchByNameOrEmail(query: string): Observable<User[]> {
-    return this.byNameOrEmail.getObservable(query);
+  public searchByNameOrEmail(query: string, limit: number, page: number): Observable<User[]> {
+    return this.byNameOrEmail.getObservable({q: query, l: limit, p: page});
   }
 
   public createUserWithEmail(email: string): Observable<User> {

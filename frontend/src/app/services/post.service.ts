@@ -6,6 +6,7 @@ import {shareReplay} from 'rxjs/operators';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
+import {getListStreamObservable} from '../utils/stream-http';
 
 
 @Injectable({
@@ -13,7 +14,7 @@ import {environment} from '../../environments/environment';
 })
 export class PostService {
   private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, Post[]>(({departmentSlug, courseSlug}) => {
-    return this.http.get<Post[]>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/posts`).pipe(
+    return getListStreamObservable<Post>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/posts`).pipe(
       shareReplay(1)
     );
   }, 2500);
@@ -27,6 +28,7 @@ export class PostService {
   public createOrUpdate(post: Post): Observable<Post> {
     if (!post.id) {
       // New post
+      delete post.id;
       return this.http.post<Post>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts`, post);
     } else {
       // Post already exists, update content

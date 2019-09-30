@@ -10,7 +10,6 @@ import {SessionService} from 'src/app/services/session.service';
 import {first, switchMap} from 'rxjs/operators';
 import * as SimpleMDE from 'simplemde';
 import { ScrollToService } from '@nicky-lenaers/ngx-scroll-to';
-import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-posts',
@@ -19,8 +18,6 @@ import { User } from 'src/app/models/user';
 })
 export class PostsComponent implements OnInit, AfterViewInit {
   public course$: Observable<Course>;
-  public course: Course;
-  public user: User;
   public posts$: Observable<Post[]>;
   public editing = false;
   private wysiwyg: SimpleMDE;
@@ -111,7 +108,8 @@ export class PostsComponent implements OnInit, AfterViewInit {
         if (btn.type !== 'negative') {
           return;
         }
-        this.postService.delete(post);
+        this.postService.delete(post).pipe(first())
+          .subscribe();
       })
       .catch();
   }
