@@ -23,7 +23,7 @@ export const userIsAssociatedWithCourse = async (user: User, departmentSlug: str
     return await Database.courses.filter({
         departmentSlug: departmentSlug,
         slug: courseSlug
-    })('associatedUserIDs').nth(0).contains(user.id ? user.id : null).run(Database.connection);
+    })('associatedUserIDs').contains(function(idList) { return idList.contains(user.id ? user.id : null) }).run(Database.connection);
 }
 
 export const generateToken = ():string => {
@@ -62,11 +62,9 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         if(!userRoleIn(getUser(request), ['student', 'TA', 'lecturer', 'admin'])) {
             return HelpResponse.error(response, "Unknown user role");
         }
-
         return next();
     }
     else {
         return next();
-        // return HelpResponse.dissalowed(response);
     }
 };

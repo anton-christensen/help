@@ -99,16 +99,14 @@ export namespace CourseController {
         let query = Database.courses.filter({
             departmentSlug: input.departmentSlug,
             slug: input.courseSlug
-        }).limit(1);
+        });
     
-        if(shouldStream(response)) {
-            createStream(
-                response,
-                `GET:/${input.departmentSlug}/${input.courseSlug}`,
-                query.changes(),
-                (err, row) => row
-            )
-        }
+        createStream(
+            response,
+            `GET:/${input.departmentSlug}/${input.courseSlug}`,
+            query.changes(),
+            (err, row) => row
+        )
         query.run(Database.connection)
         .then( result => {
             if(result.length)

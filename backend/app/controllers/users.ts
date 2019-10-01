@@ -8,12 +8,12 @@ import { User } from "../models/user";
 import { AuthTokenFootprint } from "../models/authToken";
 import got = require("got");
 import { checkSchema, matchedData } from "express-validator";
-import { isString } from "util";
 
 export namespace UserController {
     export const getAuthedUserValidator = checkSchema({});
     export const getAuthedUser: RequestHandler = async (request, response) => {
         const user = getUser(request);
+        console.log(user);
         let query;
         if(user.anon === false) {
             query = Database.users.get(user.id);

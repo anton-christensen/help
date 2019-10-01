@@ -7,6 +7,7 @@ import { AuthMiddleware, generateToken } from "./lib/auth";
 import { StreamMiddleware, StreamWorker } from "./lib/stream";
 import { notificationTokensRouter } from "./routes/notificationTokens";
 import { OnUpdateWorker } from "./lib/dataChanges";
+import { HelpResponse } from "./lib/responses";
 
 
 dotenv.config();
@@ -21,7 +22,7 @@ Database.init().then(() => {
     });
 
     app.get('/anon/auth', async (request, response) => {
-        response.send({token: generateToken()});
+        HelpResponse.success(response, {token: generateToken()});
     });
 
     // get user from auth-token

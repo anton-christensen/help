@@ -5,6 +5,7 @@ import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
 import { r, RFeed } from "rethinkdb-ts";
 import { socket } from "zeromq";
+import { HelpResponse } from "./responses";
 
 var Tnet = require('tnet');
 const grip = require('grip');
@@ -71,7 +72,7 @@ export class StreamWorker {
 
             cursor.each((err, row) => {
                 try {
-                    expressGrip.publish(stream.channel, new grip.HttpStreamFormat(JSON.stringify(stream.map(err,row)) + '\n'));
+                    expressGrip.publish(stream.channel, new grip.HttpStreamFormat(HelpResponse.jsonWrap(stream.map(err,row))));
                 } catch { console.log("EXCEPTION: ", row); }
             });
         });
