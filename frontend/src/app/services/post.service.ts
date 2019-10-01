@@ -2,11 +2,13 @@ import {Injectable} from '@angular/core';
 import {RequestCache} from '../utils/request-cache';
 import {Post} from '../models/post';
 import {HttpClient} from '@angular/common/http';
-import {shareReplay} from 'rxjs/operators';
+import {map, shareReplay} from 'rxjs/operators';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {getListStreamObservable} from '../utils/stream-http';
+import {APIResponse, responseAdapter} from '../models/api-response';
+import {NotificationToken} from '../models/notification-token';
 
 
 @Injectable({
@@ -29,16 +31,22 @@ export class PostService {
     if (!post.id) {
       // New post
       delete post.id;
-      return this.http.post<Post>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts`, post);
+      return this.http.post<APIResponse<Post>>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts`, post).pipe(
+        map((response) => responseAdapter<Post>(response)),
+      );
     } else {
       // Post already exists, update content
-      return this.http.put<Post>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts/${post.id}`, {
+      return this.http.put<APIResponse<Post>>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts/${post.id}`, {
         content: post.content
-      });
+      }).pipe(
+        map((response) => responseAdapter<Post>(response)),
+      );
     }
   }
 
   public delete(post: Post): Observable<any> {
-    return this.http.delete<Post>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts/${post.id}`);
+    return this.http.delete<APIResponse<Post>>(`${environment.api}/departments/${post.departmentSlug}/courses/${post.courseSlug}/posts/${post.id}`).pipe(
+      map((response) => responseAdapter<Post>(response)),
+    );
   }
 }

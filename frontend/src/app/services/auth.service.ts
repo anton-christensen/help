@@ -1,13 +1,14 @@
 import {DOCUMENT } from '@angular/common';
 import {Injectable, Inject} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {first, switchMap, tap} from 'rxjs/operators';
+import {first, map, switchMap, tap} from 'rxjs/operators';
 import {User} from '../models/user';
 import {Course} from '../models/course';
 import {UserService} from './user.service';
 import {ModalService } from './modal.service';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ import {environment} from '../../environments/environment';
 export class AuthService {
   public user$: BehaviorSubject<User> = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')) as User);
 
-  private casUrl = 'https://login.aau.dk/cas';
+  private casUrl = 'https://signon.aau.dk/cas';
   private apiLoginUrl = `${environment.api}/user/_auth`;
   private GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
                 The information can only be accessed by lecturers and administrators.
@@ -73,7 +74,8 @@ export class AuthService {
   }
 
   public getUser(): Observable<User> {
-    return this.http.get<User>(`${environment.api}/user`).pipe(
+    return this.http.get<APIResponse<User>>(`${environment.api}/user`).pipe(
+      map((response) => responseAdapter<User>(response)),
       tap((user) => this.user$.next(user))
     );
   }

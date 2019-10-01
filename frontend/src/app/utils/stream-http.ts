@@ -1,21 +1,25 @@
 import {from, Observable} from 'rxjs';
 import {filter, map, scan, flatMap} from 'rxjs/operators';
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 export function getListStreamObservable<T extends {id: string}>(url): Observable<T[]> {
   return new Observable<T[]>((subscriber) => {
+    let firstTime = true;
     let results = [];
 
-    getStreamObservable<T[] | {new_val: T | null, old_val: T | null}>(url)
-      .subscribe((result) => {
-        if (!result) {
+    getStreamObservable<APIResponse<T[]> | {new_val: T | null, old_val: T | null}>(url)
+      .subscribe((response) => {
+        if (!response) {
           return;
         }
 
-        if (Array.isArray(result)) {
-          results = result;
+        if (firstTime) {
+          firstTime = false;
+          const responseData = responseAdapter<T[]>(response as APIResponse<T[]>);
+          results = responseData === null ? [] : responseData;
         } else {
-          const oldVal = result.old_val;
-          const newVal = result.new_val;
+          const oldVal = (response as {old_val: T | null}).old_val;
+          const newVal = (response as {new_val: T | null}).new_val;
           if (newVal === null) {
             // Deletion
             results.splice(results.findIndex((val) => val.id === oldVal.id), 1);
@@ -33,19 +37,22 @@ export function getListStreamObservable<T extends {id: string}>(url): Observable
   });
 }
 
-export function getSingleStreamObservable<T extends {id: string}>(url): Observable<T> {
+export function getSingleStreamObservable<T>(url): Observable<T> {
   return new Observable<T>((subscriber) => {
-    getStreamObservable<{new_val: T | null, old_val: T | null} | T>(url)
-      .subscribe((result) => {
-        if (!result) {
+    let firstTime = true;
+
+    getStreamObservable<APIResponse<T> | {new_val: T | null, old_val: T | null}>(url)
+      .subscribe((response) => {
+        if (!response) {
           return;
         }
 
-        if ((result as T).id) {
-          subscriber.next(result as T);
+        if (firstTime) {
+          firstTime = false;
+          subscriber.next(responseAdapter<T>(response as APIResponse<T>));
         } else {
-          const oldVal = (result as {new_val: T | null, old_val: T | null}).old_val;
-          const newVal = (result as {new_val: T | null, old_val: T | null}).new_val;
+          const oldVal = (response as {old_val: T | null}).old_val;
+          const newVal = (response as {new_val: T | null}).new_val;
           if (newVal === null) {
             // Deletion
             subscriber.next(null);

@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,9 @@ export class DepartmentService {
   private readonly allDepartments$: Observable<Department[]>;
 
   constructor(private http: HttpClient) {
-    this.allDepartments$ = this.http.get<Department[]>(`${environment.api}/departments`).pipe(
+    this.allDepartments$ = this.http.get<APIResponse<Department[]>>(`${environment.api}/departments`).pipe(
+      map((response) => responseAdapter<Department[]>(response)),
+      map((departments) => departments === null ? [] : departments),
       shareReplay(1)
     );
   }

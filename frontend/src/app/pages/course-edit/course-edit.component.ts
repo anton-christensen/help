@@ -19,6 +19,7 @@ import {User} from 'src/app/models/user';
   styleUrls: ['./course-edit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
+  /* COURSES */
   public departments$: Observable<Department[]>;
   public courses$: Observable<Course[]>;
   private loggedInUser: User;
@@ -48,15 +49,20 @@ export class CourseEditComponent implements OnInit {
   public get f() {
     return this.courseForm.controls;
   }
+
   public courseBeingEdited: Course;
   public associatedUsers: User[];
   public newCourse = true;
 
+
+  /* USERS */
   public usersForm = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
   });
 
   public foundUsers$: Observable<User[]>;
+  public pageSize = 5;
+  public currentPage = 0;
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -92,7 +98,8 @@ export class CourseEditComponent implements OnInit {
     this.foundUsers$ = this.usersForm.controls.query.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap((val) => this.userService.searchByNameOrEmail(val ? val.trim() : '')),
+      switchMap((val) => this.userService.searchByNameOrEmail(val ? val.trim() : '', this.pageSize, this.currentPage)),
+      tap(() => this.currentPage = 0),
       shareReplay(1),
     );
   }

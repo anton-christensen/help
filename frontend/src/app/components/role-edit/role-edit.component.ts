@@ -3,7 +3,7 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {UserService} from 'src/app/services/user.service';
 import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, first, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 @Component({
@@ -15,6 +15,9 @@ export class RoleEditComponent implements OnInit {
   public foundUsers$: Observable<User[]>;
   public pageSize = 5;
   public currentPage = 0;
+  public morePages = false;
+
+  private pageSubject = new BehaviorSubject<number>(0);
 
   public form = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
@@ -24,12 +27,13 @@ export class RoleEditComponent implements OnInit {
               private auth: AuthService) {}
 
   ngOnInit() {
-    this.foundUsers$ = this.form.controls.query.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((val) => this.userService.searchByNameOrEmail(val.trim(), this.pageSize, this.currentPage)),
-      tap(() => this.currentPage = 0),
-      shareReplay(1)
+    this.foundUsers$ = combineLatest([
+      this.form.controls.query.valueChanges.pipe(debounceTime(300),distinctUntilChanged()),
+      this.pageSubject]).pipe(
+        tap((values) => this.currentPage = values[1] === this.currentPage ? 0 : values[1]),
+        switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage)),
+        tap((results) => this.morePages = results.length === this.pageSize),
+        shareReplay(1)
     );
   }
 
@@ -46,5 +50,9 @@ export class RoleEditComponent implements OnInit {
       .subscribe((user) => {
         this.form.controls.query.setValue(user.email);
       });
+  }
+
+  nextPage() {
+    this.pageSubject.next(this.currentPage + 1)
   }
 }

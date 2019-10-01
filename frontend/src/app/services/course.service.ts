@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {RequestCache} from '../utils/request-cache';
 import {getSingleStreamObservable} from '../utils/stream-http';
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -20,19 +21,24 @@ export class CourseService {
   });
 
   private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
-    return this.http.get<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+    return this.http.get<APIResponse<Course>>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
+      map((response) => responseAdapter<Course>(response)),
       shareReplay(1)
     );
   }, 5000);
 
   private readonly byDepartment = new RequestCache<string, Course[]>((departmentSlug: string) => {
-    return this.http.get<Course[]>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
+    return this.http.get<APIResponse<Course[]>>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
+      map((response) => responseAdapter<Course[]>(response)),
+      map((courses) => courses === null ? [] : courses),
       shareReplay(1)
     );
   });
 
   constructor(private http: HttpClient) {
-    this.allAssociated = this.http.get<Course[]>(`${environment.api}/courses`).pipe(
+    this.allAssociated = this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
+      map((response) => responseAdapter<Course[]>(response)),
+      map((courses) => courses === null ? [] : courses),
       shareReplay(1)
     );
   }
@@ -63,28 +69,38 @@ export class CourseService {
 
   public setEnabled(course: Course, enabled: boolean): Observable<Course> {
     if (enabled) {
-      return this.http.put<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
+      return this.http.put<APIResponse<Course>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
         enabled,
         numTrashCansThisSession: 0
-      });
+      }).pipe(
+        map((response) => responseAdapter<Course>(response))
+      );
     } else {
-      return this.http.put<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
+      return this.http.put<APIResponse<Course>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, {
         enabled,
-      });
+      }).pipe(
+        map((response) => responseAdapter<Course>(response))
+      );
     }
   }
 
   public delete(course: Course): Observable<any> {
-    return this.http.delete<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`);
+    return this.http.delete<APIResponse<Course>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`).pipe(
+      map((response) => responseAdapter<Course>(response))
+    );
   }
 
   public createOrUpdate(course: Course): Observable<Course> {
     if (!course.id) {
       // New course
-      return this.http.post<Course>(`${environment.api}/courses`, course);
+      return this.http.post<APIResponse<Course>>(`${environment.api}/courses`, course).pipe(
+        map((response) => responseAdapter<Course>(response))
+      );
     } else {
       // Course already exists, update
-      return this.http.put<Course>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, course);
+      return this.http.put<APIResponse<Course>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, course).pipe(
+        map((response) => responseAdapter<Course>(response))
+      );
     }
   }
 }

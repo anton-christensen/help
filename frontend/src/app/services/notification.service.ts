@@ -3,12 +3,13 @@ import {Observable, of} from 'rxjs';
 import {RequestCache} from '../utils/request-cache';
 import {NotificationToken} from '../models/notification-token';
 import {environment} from '../../environments/environment';
-import {first, shareReplay, switchMap} from 'rxjs/operators';
+import {first, map, shareReplay, switchMap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {AngularFireMessaging} from '@angular/fire/messaging';
 import {Course} from '../models/course';
 import * as Fingerprint from 'fingerprintjs2';
 import {getSingleStreamObservable} from '../utils/stream-http';
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +52,7 @@ export class NotificationService {
           // Request a new token
           this.afMessaging.requestToken
             .subscribe((token) => {
-              this.http.post<NotificationToken>(
+              this.http.post<APIResponse<NotificationToken>>(
                 `${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/trashcans/notificationtokens`, {
                 token,
                 deviceID: fingerprint
@@ -76,8 +77,10 @@ export class NotificationService {
 
   public deleteToken(token: NotificationToken): Observable<any> {
     this.afMessaging.deleteToken(token.token);
-    return this.http.delete<NotificationToken>(
+    return this.http.delete<APIResponse<NotificationToken>>(
       `${environment.api}/departments/${token.departmentSlug}/courses/${token.courseSlug}/trashcans/notificationtokens/${token.deviceID}`
+    ).pipe(
+      map((response) => responseAdapter<NotificationToken>(response)),
     );
   }
 }

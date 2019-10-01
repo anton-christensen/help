@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {RequestCache} from '../utils/request-cache';
 import {HttpClient} from '@angular/common/http';
-import {shareReplay, tap} from 'rxjs/operators';
+import {map, shareReplay, tap} from 'rxjs/operators';
 import {TrashCan} from '../models/trash-can';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {getListStreamObservable} from "../utils/stream-http";
+import {APIResponse, responseAdapter} from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -25,12 +26,16 @@ export class TrashCanService {
   }
 
   public add(course: Course, room: string): Observable<TrashCan> {
-    return this.http.post<TrashCan>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/trashcans`, {
+    return this.http.post<APIResponse<TrashCan>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}/trashcans`, {
       room,
-    });
+    }).pipe(
+      map((response) => responseAdapter<TrashCan>(response)),
+    );
   }
 
   public delete(trashCan: TrashCan) {
-    return this.http.delete<TrashCan>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`);
+    return this.http.delete<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`).pipe(
+      map((response) => responseAdapter<TrashCan>(response)),
+    );
   }
 }
