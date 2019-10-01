@@ -99,7 +99,7 @@ export namespace UserController {
 
     export const createUserValidator = checkSchema({
         email: { in: ['body'], isEmail:  true },
-        role:  { in: ['body'], isIn: { options: ['TA', 'student'] } },
+        role:  { in: ['body'], isIn: { options: [['TA', 'student', 'lecturer', 'admin']] } },
         name:  { in: ['body'], optional: true, isString: true },
     });
     export const createUser: RequestHandler = (request, response) => {
@@ -110,13 +110,37 @@ export namespace UserController {
         if(userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        else if(userRoleIn(user, ['lecturer'])) {
-            // TODO: check that new user role is not above lecturer or admin
+        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+            return HelpResponse.disallowed(response);
         }
 
         // TODO: Check that user email is unique
     
         HelpResponse.fromPromise(response, Database.users.insert(input).run(Database.connection));
+    }
+
+    export const updateUserValidator = checkSchema({
+        userID:{ in: ['params'] },
+        email: { in: ['body'], optional: true, isEmail:  true },
+        role:  { in: ['body'], optional: true, isIn: { options: [['TA', 'student', 'lecturer', 'admin']] } },
+        name:  { in: ['body'], optional: true, isString: true },
+    });
+    export const updateUser: RequestHandler = (request, response) => {
+        const user = getUser(request);
+        const input = matchedData(request, {locations: ['body']});
+        const params = matchedData(request, {locations: ['params']});
+        input.anon = false;
+    
+        if(userRoleIn(user, ['student', 'TA'])) {
+            return HelpResponse.disallowed(response);
+        }
+        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+            return HelpResponse.disallowed(response);
+        }
+
+        // TODO: Check that user email is unique
+    
+        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
     }
 
     export const validateCASLoginValidator = checkSchema({
