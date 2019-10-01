@@ -18,12 +18,10 @@ export class AuthService {
 
   private casUrl = 'https://signon.aau.dk/cas';
   private apiLoginUrl = `${environment.api}/user/_auth`;
-  private GDPRMessage = `If you log in with your AAU credentials we will save your email and name in our database.\n
-                The information can only be accessed by lecturers and administrators.
-                They use it to identify the correct user to promote to a certain role.\n\n
-                If you only wish to use the system as a student there is no reason to log in, but if you do so
-                your information will also be stored and requests for help are associated with it.\n\n
-                Do you accept this?`;
+  private GDPRMessage = `If you log in with your AAU credentials your email and name is saved in our database.\n
+                The information can only be accessed by lecturers and administrators to identify which users to promote to certain roles.\n\n
+                If you only wish to use the system as a student there is no reason to log in.\n\n
+                Can you accept this?`;
 
   constructor(@Inject(DOCUMENT) private document: Document,
               private http: HttpClient,
