@@ -6,30 +6,30 @@ import {combineLatest, Observable, of} from 'rxjs';
 import {Role, User} from '../models/user';
 import {environment} from '../../environments/environment';
 import {APIResponse, responseAdapter} from '../models/api-response';
+import {createEmptyPaginatedResult, PaginatedResult} from '../utils/paginated-result';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private byID = new RequestCache<string, User>((userID) => {
+  private readonly byID = new RequestCache<string, User>((userID) => {
     return this.http.get<APIResponse<User>>(`${environment.api}/users/${userID}`).pipe(
       map((response) => responseAdapter<User>(response)),
       shareReplay(1)
     );
   });
 
-  private byNameOrEmail = new RequestCache<{q: string, l: number, p: number}, User[]>(({q, l, p}) => {
+    private readonly byNameOrEmail = new RequestCache<{q: string, l: number, p: number}, PaginatedResult<User>>(({q, l, p}) => {
     if (q) {
-      return this.http.get<APIResponse<User[]>>(`${environment.api}/users`, {params: {q, l, p}}).pipe(
-        map((response) => responseAdapter<User[]>(response)),
-        map((users) => users === null ? [] : users),
+      return this.http.get<APIResponse<PaginatedResult<User>>>(`${environment.api}/users`, {params: {q, l, p}}).pipe(
+        map((response) => responseAdapter<PaginatedResult<User>>(response)),
+        map((users) => users === null ? createEmptyPaginatedResult<User>() : users),
         shareReplay(1)
       );
     } else {
-      return of([]);
+      return of(createEmptyPaginatedResult<User>());
     }
-
-  }, 5000);
+  }, 10000);
 
   constructor(private http: HttpClient) {}
 
@@ -46,7 +46,7 @@ export class UserService {
     return combineLatest(observables);
   }
 
-  public searchByNameOrEmail(query: string, limit: number, page: number): Observable<User[]> {
+  public searchByNameOrEmail(query: string, limit: number, page: number): Observable<PaginatedResult<User>> {
     return this.byNameOrEmail.getObservable({q: query, l: limit, p: page});
   }
 

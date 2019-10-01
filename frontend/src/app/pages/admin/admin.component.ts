@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import {CommonService} from '../../services/common.service';
-import {Observable} from 'rxjs';
-import {AngularFirestore} from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-admin',

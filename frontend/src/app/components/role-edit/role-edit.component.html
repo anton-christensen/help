@@ -56,9 +56,20 @@
     </tr>
     </tbody>
   </table>
-  <button class="btn"
-          *ngIf="morePages"
-          (click)="nextPage()">
-    Next page
-  </button>
+</div>
+
+<div class="pagination-buttons" *ngIf="numPages > 1">
+  <span class="prev material-icons"
+     *ngIf="currentPage > 0"
+     (click)="prevPage()">
+    keyboard_arrow_left
+  </span>
+  <span class="numbers">
+    {{ currentPage + 1 }}/{{ numPages }}
+  </span>
+  <span class="next material-icons"
+     *ngIf="currentPage < numPages - 1"
+     (click)="nextPage()">
+    keyboard_arrow_right
+  </span>
 </div>
