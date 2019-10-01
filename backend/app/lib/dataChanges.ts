@@ -4,6 +4,7 @@ import { TrashCan } from '../models/trashCan';
 import { NotificationToken } from '../models/notificationToken';
 import { Course } from '../models/course';
 import { User } from '../models/user';
+import { r } from 'rethinkdb-ts';
 
 export class OnUpdateWorker {
     public static start() {
@@ -19,6 +20,9 @@ export class OnUpdateWorker {
             cursor.each((err, row) => {
                 if(row.type == "add") {
                     OnUpdateWorker.onNewTrashCan(row['new_val'])
+                }
+                if(row.type == "change") {
+                    OnUpdateWorker.onUpdateTrashCan(row['old_val'], row['new_val']);
                 }
             });
         });
@@ -71,6 +75,15 @@ export class OnUpdateWorker {
             }
           });
     }
+
+    // Send notification to proper topic when a trashcan appears
+    static onUpdateTrashCan(oldCan: TrashCan, newCan: TrashCan) {
+        if(newCan.active == false)
+            Database.trashCans.get(newCan.id).replace(r.row.without('userID')).run(Database.connection);
+    }
+
+
+
 
 
     // Subscribe notification tokens to trash cans from their course

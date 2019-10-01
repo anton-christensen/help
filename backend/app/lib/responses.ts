@@ -10,6 +10,7 @@ export const schemaErrorHandler: RequestHandler = (request, response, next) => {
 }
 
 export class HelpResponse {
+    
     static jsonWrap(payload: any) {
         return JSON.stringify(payload) + '\n';
     }
@@ -30,6 +31,24 @@ export class HelpResponse {
             HelpResponse.error(response, error) 
         );
     }
+
+    static pagedFromPromise(response: Response, nPages: number, promise: Promise<any>) {
+        promise
+        .then( result => 
+            HelpResponse.success(response, HelpResponse.paginationWrap(nPages, result))
+        )
+        .catch( error => 
+            HelpResponse.error(response, error) 
+        );
+    }
+    
+    static paginationWrap(nPages: number, payload: any): any {
+        return {
+            numPages: nPages,
+            data: payload
+        }
+    }
+
     public static disallowed(response: Response) {
         this.error(response, "Disallowed", 403);
     };

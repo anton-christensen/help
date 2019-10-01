@@ -69,7 +69,7 @@ export class Database {
 
   private static makeTablesAndIndexes(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      Promise.all([
+      return Promise.all([
         this.ensureTableExists('authTokens'),
         this.ensureTableExists('courses'),
         this.ensureTableExists('departments'),
@@ -81,10 +81,17 @@ export class Database {
         return Promise.all([
           this.ensureIndexExists('users', 'email'),
           this.ensureIndexExists('trashCans', 'created'),
-        ]).then(() => {
-          resolve();
-        });
-      }).catch(err => reject(err));
+        ]);
+      }).then(() => {
+        return Promise.all([
+          // remove user ID from inactive trashCans
+          Database.trashCans.filter({active: false}).replace(r.row.without('userID')).run(Database.connection)
+        ]);
+      })
+      .then(() => {
+        resolve();
+      })
+      .catch(err => reject(err));
     });
   }
 }

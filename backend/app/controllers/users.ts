@@ -82,6 +82,7 @@ export namespace UserController {
                 )
             );
             
+            const count = Math.ceil(await query.count().run(Database.connection) / limit);
             query = query.skip(page*limit).limit(limit);
     
             createStream(
@@ -91,13 +92,14 @@ export namespace UserController {
                 (err, row) => row
             );
             
-            HelpResponse.fromPromise(response, query.run(Database.connection));
+            HelpResponse.pagedFromPromise(response, count, query.run(Database.connection));
+            // HelpResponse.fromPromise(response, query.run(Database.connection));
         }
     }
 
     export const createUserValidator = checkSchema({
         email: { in: ['body'], isEmail:  true },
-        role:  { in: ['body'], isIn: { options: ['TA', 'student'] } },
+        role:  { in: ['body'], isIn: { options: [['TA', 'student', 'lecturer', 'admin']] } },
         name:  { in: ['body'], optional: true, isString: true },
     });
     export const createUser: RequestHandler = (request, response) => {
@@ -108,8 +110,8 @@ export namespace UserController {
         if(userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        else if(userRoleIn(user, ['lecturer'])) {
-            // TODO: check that new user role is not above lecturer or admin
+        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+            return HelpResponse.disallowed(response);
         }
 
         // TODO: Check that user email is unique
@@ -117,15 +119,39 @@ export namespace UserController {
         HelpResponse.fromPromise(response, Database.users.insert(input).run(Database.connection));
     }
 
+    export const updateUserValidator = checkSchema({
+        userID:{ in: ['params'] },
+        email: { in: ['body'], optional: true, isEmail:  true },
+        role:  { in: ['body'], optional: true, isIn: { options: [['TA', 'student', 'lecturer', 'admin']] } },
+        name:  { in: ['body'], optional: true, isString: true },
+    });
+    export const updateUser: RequestHandler = (request, response) => {
+        const user = getUser(request);
+        const input = matchedData(request, {locations: ['body']});
+        const params = matchedData(request, {locations: ['params']});
+        input.anon = false;
+    
+        if(userRoleIn(user, ['student', 'TA'])) {
+            return HelpResponse.disallowed(response);
+        }
+        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+            return HelpResponse.disallowed(response);
+        }
+
+        // TODO: Check that user email is unique
+    
+        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
+    }
+
     export const validateCASLoginValidator = checkSchema({
-        target: { in: ['query'], isURL: true },
+        target: { in: ['query'], isString: true },
         ticket: { in: ['query'], isString: true },
     });
     export const validateCASLogin: RequestHandler = ( request, response ) => {
         const input = matchedData(request);
-
+        
         got(
-            `https://login.aau.dk/cas/samlValidate?TARGET=${encodeURI(input.target)}`, 
+            `https://signon.aau.dk/cas/samlValidate?TARGET=${request.protocol}://${request.headers.host}${request.path}?target=${encodeURI(input.target)}`, 
             { 
                 method: 'post',
                 body: `<?xml version=\"1.0\" encoding=\"utf-8\"?>
@@ -142,19 +168,19 @@ export namespace UserController {
         .then((casResponse) => {
             let body = casResponse ? casResponse.body : "";
     
-            if (!body.includes('samlp:Success')) {
+            if (!body.includes('saml1p:Success')) {
                 throw "authentication error";
             }
                  
             let extractMatch = (match: RegExpExecArray | null) => {
                 if(match == null || match.length < 2) {
-                    throw "decode error";
+                    throw "decode error: " + body;
                 }
                 return match[1];
             };
-            const email = extractMatch(new RegExp('<Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body));
-            const firstName = extractMatch(new RegExp('<Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body));
-            const lastName = extractMatch(new RegExp('<Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><AttributeValue>([^<]+)</AttributeValue>').exec(body));
+            const email = extractMatch(new RegExp('<saml1:Attribute AttributeName="mail" AttributeNamespace="http://www.ja-sig.org/products/cas/"><saml1:AttributeValue xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">([^<]+)</saml1:AttributeValue></saml1:Attribute>').exec(body));
+            const firstName = extractMatch(new RegExp('<saml1:Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><saml1:AttributeValue xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">([^<]+)</saml1:AttributeValue></saml1:Attribute>').exec(body));
+            const lastName = extractMatch(new RegExp('<saml1:Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><saml1:AttributeValue xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">([^<]+)</saml1:AttributeValue></saml1:Attribute>').exec(body));
             
             return Database.users.filter({email: email})
             .run(Database.connection)
