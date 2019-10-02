@@ -7,3 +7,14 @@ export interface User {
   name: string;
   role: Role;
 }
+
+export const userStorageKey = 'user';
+
+
+export type Token = string;
+
+export interface TokenWrapper {
+  token: Token;
+}
+
+export const tokenStorageKey = 'token';

@@ -2,7 +2,7 @@ import {from, Observable} from 'rxjs';
 import {filter, map, scan, flatMap} from 'rxjs/operators';
 import {APIResponse, responseAdapter} from '../models/api-response';
 
-export function getListStreamObservable<T extends {id: string}>(url): Observable<T[]> {
+export function getListStreamObservable<T extends {id: string}>(url, cmp: (a: T, b: T) => number = (a, b) => a.id.localeCompare(b.id)): Observable<T[]> {
   return new Observable<T[]>((subscriber) => {
     let firstTime = true;
     let results = [];
@@ -16,7 +16,7 @@ export function getListStreamObservable<T extends {id: string}>(url): Observable
         if (firstTime) {
           firstTime = false;
           const responseData = responseAdapter<T[]>(response as APIResponse<T[]>);
-          results = responseData === null ? [] : responseData;
+          results = responseData === null ? [] : responseData.sort(cmp);
         } else {
           const oldVal = (response as {old_val: T | null}).old_val;
           const newVal = (response as {new_val: T | null}).new_val;
@@ -26,6 +26,7 @@ export function getListStreamObservable<T extends {id: string}>(url): Observable
           } else if (oldVal === null) {
             // Insertion
             results.push(newVal);
+            results = results.sort(cmp);
           } else {
             // Update
             results[results.findIndex((val) => val.id === oldVal.id)] = newVal;

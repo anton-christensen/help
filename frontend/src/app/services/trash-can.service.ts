@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {RequestCache} from '../utils/request-cache';
 import {HttpClient} from '@angular/common/http';
-import {map, shareReplay, tap} from 'rxjs/operators';
+import {map, shareReplay} from 'rxjs/operators';
 import {TrashCan} from '../models/trash-can';
 import {Course} from '../models/course';
 import {Observable} from 'rxjs';
@@ -14,10 +14,13 @@ import {APIResponse, responseAdapter} from '../models/api-response';
 })
 export class TrashCanService {
   private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, TrashCan[]>(({departmentSlug, courseSlug}) => {
-    return getListStreamObservable<TrashCan>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans`).pipe(
-      shareReplay(1)
-    );
-  }, 2500);
+    return getListStreamObservable<TrashCan>(
+      `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans`,
+      (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+      .pipe(
+        shareReplay(1)
+      );
+  }, -1);
 
   constructor(private http: HttpClient) {}
 

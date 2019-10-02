@@ -12,13 +12,17 @@ import {APIResponse, responseAdapter} from '../models/api-response';
   providedIn: 'root'
 })
 export class CourseService {
-  private readonly allAssociated: Observable<Course[]>;
+  private readonly allAssociated = this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
+    map((response) => responseAdapter<Course[]>(response)),
+    map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
+    shareReplay(1)
+  );
 
   private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
       shareReplay(1)
     );
-  });
+  }, -1);
 
   private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return this.http.get<APIResponse<Course>>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
@@ -30,18 +34,12 @@ export class CourseService {
   private readonly byDepartment = new RequestCache<string, Course[]>((departmentSlug: string) => {
     return this.http.get<APIResponse<Course[]>>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
       map((response) => responseAdapter<Course[]>(response)),
-      map((courses) => courses === null ? [] : courses),
+      map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
       shareReplay(1)
     );
-  });
+  }, 5000);
 
-  constructor(private http: HttpClient) {
-    this.allAssociated = this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
-      map((response) => responseAdapter<Course[]>(response)),
-      map((courses) => courses === null ? [] : courses),
-      shareReplay(1)
-    );
-  }
+  constructor(private http: HttpClient) {}
 
   public getAllAssociated(): Observable<Course[]> {
     return this.allAssociated;

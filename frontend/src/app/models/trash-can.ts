@@ -5,5 +5,5 @@ export interface TrashCan {
   courseSlug: string;
   room: string;
   active: boolean;
-  created?: number;
+  created?: string;
 }

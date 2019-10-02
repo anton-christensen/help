@@ -3,7 +3,7 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {UserService} from 'src/app/services/user.service';
 import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
-import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {debounceTime, distinctUntilChanged, first, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 @Component({

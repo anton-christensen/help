@@ -24,7 +24,7 @@ export class NotificationService {
         return getSingleStreamObservable<NotificationToken>(
           `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans/notificationtokens/${fingerprint}`
         ).pipe(shareReplay(1));
-  });
+  }, -1);
 
   constructor(private http: HttpClient,
               private afMessaging: AngularFireMessaging) {

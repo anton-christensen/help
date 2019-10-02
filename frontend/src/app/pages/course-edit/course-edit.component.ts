@@ -83,13 +83,19 @@ export class CourseEditComponent implements OnInit {
     this.departments$ = this.departmentService.getAll();
 
     // Admins can see all courses, but only by department
-    this.coursesFilterForm.controls.departmentSlug.valueChanges
-      .subscribe((departmentSlug) => {
-        this.courses$ = this.courseService.getRelevantByDepartment(departmentSlug);
-    });
-
-    // Lecturers can see all associated courses
-    this.courses$ = this.courseService.getAllAssociated();
+    this.courses$ = this.auth.isAdmin().pipe(
+      switchMap((isAdmin) => {
+        if (isAdmin) {
+          return this.coursesFilterForm.controls.departmentSlug.valueChanges.pipe(
+            switchMap((departmentSlug) => {
+              return this.courseService.getRelevantByDepartment(departmentSlug);
+            })
+          );
+        } else {
+          return this.courseService.getAllAssociated();
+        }
+      })
+    );
 
     // Validate course slug when department changes
     this.courseForm.controls.departmentSlug.valueChanges
@@ -118,7 +124,7 @@ export class CourseEditComponent implements OnInit {
       courseSlug: course.slug.toUpperCase(),
     });
     this.usersForm.reset({
-      email: ''
+      query: ''
     });
 
     this.userService.getAllByID(course.associatedUserIDs).pipe(take(1))
@@ -138,7 +144,7 @@ export class CourseEditComponent implements OnInit {
       courseSlug: '',
     });
     this.usersForm.reset({
-      email: ''
+      query: ''
     });
 
     this.courseBeingEdited = null;
@@ -167,7 +173,7 @@ export class CourseEditComponent implements OnInit {
       associatedUserIDs: this.associatedUsers.map((u) => u.id)
     };
 
-    this.courseService.createOrUpdate(course);
+    this.courseService.createOrUpdate(course).pipe(first()).subscribe();
   }
 
   private updateCourse() {
@@ -176,7 +182,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
     this.courseBeingEdited.associatedUserIDs = this.associatedUsers.map((u) => u.id);
 
-    this.courseService.createOrUpdate(this.courseBeingEdited);
+    this.courseService.createOrUpdate(this.courseBeingEdited).pipe(first()).subscribe();
   }
 
   public deleteCourse(course: Course) {

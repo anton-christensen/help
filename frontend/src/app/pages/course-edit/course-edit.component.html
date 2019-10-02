@@ -1,4 +1,4 @@
-<h1>{{ auth.isAdmin() ? '' : 'Your' }} Courses</h1>
+<h1>{{ (auth.isAdmin() | async) ? '' : 'Your' }} Courses</h1>
 
 <ng-container *ngIf="(auth.user$ | async)?.role === 'admin'">
   <h3>Select department to edit course from</h3>

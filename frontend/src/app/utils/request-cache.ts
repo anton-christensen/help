@@ -21,9 +21,11 @@ export class RequestCache<T, T2> {
       observable = this.requestFunction(query);
 
       this.cache[key] = observable;
-      setTimeout(() => {
-        delete this.cache[key];
-      }, this.timeLimit)
+      if (this.timeLimit > 0) {
+        setTimeout(() => {
+          delete this.cache[key];
+        }, this.timeLimit)
+      }
     }
 
     return observable;

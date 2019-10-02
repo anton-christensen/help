@@ -132,7 +132,7 @@
       <ng-container *ngIf="auth.previouslyAcceptedLogInConditions(); then directLink; else askPermission;"></ng-container>
 
       <ng-template #directLink>
-        <a class="menu-item" [href]="auth.getLoginURL()" (click)="auth.saveCurrentPath()">
+        <a class="menu-item" [href]="auth.generateCASURL()" (click)="auth.saveCurrentPath()">
           <div class="fl">
             <label>
               Log In

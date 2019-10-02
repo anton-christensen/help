@@ -2,7 +2,7 @@ import {DOCUMENT } from '@angular/common';
 import {Injectable, Inject} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {first, map, switchMap, tap} from 'rxjs/operators';
-import {User} from '../models/user';
+import {Token, tokenStorageKey, TokenWrapper, User, userStorageKey} from '../models/user';
 import {Course} from '../models/course';
 import {UserService} from './user.service';
 import {ModalService } from './modal.service';
@@ -27,12 +27,18 @@ export class AuthService {
               private http: HttpClient,
               private userService: UserService,
               private modalService: ModalService) {
+    //Get user object based on token in localstorage.
+    //Also emits the value to this.user$
+    this.getUserByToken().pipe(first()).subscribe();
 
-    this.getUser().pipe(first()).subscribe();
-
+    //Anytime user$ is updated, save the value in localstorage
     this.user$
       .subscribe((user) => {
-        localStorage.setItem('user', JSON.stringify(user));
+        if (user) {
+          localStorage.setItem(userStorageKey, JSON.stringify(user));
+        } else {
+          localStorage.removeItem(userStorageKey);
+        }
       });
   }
 
@@ -48,13 +54,13 @@ export class AuthService {
       .then((btn) => {
         if (btn.type === 'positive') {
           localStorage.setItem('acceptedLogInConditions', 'true');
-          this.redirectToAAU();
+          this.redirectToCAS();
         }
       })
       .catch(() => {});
   }
 
-  public getLoginURL(): string {
+  public generateCASURL(): string {
     const returnTargetUrl = `${this.document.location.origin}/auth`;
     const service = encodeURI(`${this.apiLoginUrl}?target=${returnTargetUrl}`);
 
@@ -65,22 +71,36 @@ export class AuthService {
     localStorage.setItem('preLoginPath', this.document.location.pathname);
   }
 
-  private redirectToAAU() {
+  private redirectToCAS() {
     this.saveCurrentPath();
 
-    this.document.location.href = this.getLoginURL();
+    this.document.location.href = this.generateCASURL();
   }
 
-  public getUser(): Observable<User> {
+  public getUserByToken(): Observable<User> {
+    if (!localStorage.getItem(tokenStorageKey)) {
+      return of(null);
+    }
+
     return this.http.get<APIResponse<User>>(`${environment.api}/user`).pipe(
       map((response) => responseAdapter<User>(response)),
       tap((user) => this.user$.next(user))
     );
   }
 
+  public loginAnon(): void {
+    this.http.get<APIResponse<TokenWrapper>>(`${environment.api}/anon/auth`).pipe(
+      map((response) => responseAdapter<TokenWrapper>(response).token),
+      switchMap((token) => {
+        localStorage.setItem(tokenStorageKey, token);
+        return this.getUserByToken();
+      })
+    ).pipe(first()).subscribe();
+  }
+
   public logout() {
-    localStorage.removeItem('token');
-    this.getUser().subscribe();
+    localStorage.removeItem(tokenStorageKey);
+    this.loginAnon();
   }
 
   public isAdmin(): Observable<boolean> {
