@@ -21,14 +21,15 @@ services:
   
   pushpin:
     ports:
-        - "7999:7999"
-        - "5560-5563:5560-5563"
-  
+      - "7999:7999"
+      - "5560-5563:5560-5563"
+
   api:
+    image: help/api/dev
     build: 
       dockerfile: ./dev.Dockerfile
     volumes: 
-      - ./backend:/usr/src/help/backend
+      - ./backend:/usr/src/help/api
     ports:
       - "28080:28080"
 

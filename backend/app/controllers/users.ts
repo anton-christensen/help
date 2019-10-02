@@ -151,7 +151,7 @@ export namespace UserController {
         const input = matchedData(request);
         
         got(
-            `https://signon.aau.dk/cas/samlValidate?TARGET=${request.protocol}://${request.headers.host}${request.path}?target=${encodeURI(input.target)}`, 
+            `https://signon.aau.dk/cas/samlValidate?TARGET=${request.protocol}://${process.env.API_HOST}${request.path}?target=${encodeURI(input.target)}`, 
             { 
                 method: 'post',
                 body: `<?xml version=\"1.0\" encoding=\"utf-8\"?>
@@ -169,7 +169,7 @@ export namespace UserController {
             let body = casResponse ? casResponse.body : "";
     
             if (!body.includes('saml1p:Success')) {
-                throw "authentication error";
+                throw "authentication error" + JSON.stringify(request);
             }
                  
             let extractMatch = (match: RegExpExecArray | null) => {

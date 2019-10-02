@@ -1,7 +1,7 @@
 FROM node:10
 
 # Create app directory
-WORKDIR /usr/src/help/backend
+WORKDIR /usr/src/help/api
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -15,5 +15,4 @@ RUN npm install
 # Bundle app source
 # COPY . .
 
-EXPOSE 8080
 CMD [ "npm", "run", "dev" ]
