@@ -38,6 +38,16 @@ export class Database {
     });
   }
 
+  private static ensureDatabaseExists(databaseName: string): Promise<void> {
+    return this.r.dbList().contains(databaseName).do((databaseExists: any) => {
+      return r.branch(
+        databaseExists,
+        { dbs_created: 0 },
+        r.dbCreate(databaseName)
+      );
+    }).run(this.connection);
+  }
+
   private static ensureTableExists(tableName: string): Promise<void> {
     console.log(`making sure the table ${tableName} exists`);
     return new Promise<void>((resolve, reject) => {
@@ -70,14 +80,18 @@ export class Database {
   private static makeTablesAndIndexes(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       return Promise.all([
-        this.ensureTableExists('authTokens'),
-        this.ensureTableExists('courses'),
-        this.ensureTableExists('departments'),
-        this.ensureTableExists('notificationTokens'),
-        this.ensureTableExists('posts'),
-        this.ensureTableExists('trashCans'),
-        this.ensureTableExists('users'),
+        this.ensureDatabaseExists('help'),
       ]).then(() => {
+        return Promise.all([
+          this.ensureTableExists('authTokens'),
+          this.ensureTableExists('courses'),
+          this.ensureTableExists('departments'),
+          this.ensureTableExists('notificationTokens'),
+          this.ensureTableExists('posts'),
+          this.ensureTableExists('trashCans'),
+          this.ensureTableExists('users'),
+        ]);
+      }).then(() => {
         return Promise.all([
           this.ensureIndexExists('users', 'email'),
           this.ensureIndexExists('trashCans', 'created'),

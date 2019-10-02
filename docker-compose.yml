@@ -12,22 +12,23 @@ services:
     image: my/pushpin
     volumes: 
       - ./docker/pushpin/routes:/etc/pushpin/routes
+    logging:
+      driver: "none"
   
   # REST API with pushpin integration
   api:
-    image: backend/dev
+    image: help/api/prod
     build: 
       context: ./backend 
       dockerfile: ./prod.Dockerfile
     depends_on:
       - rethinkdb
     
-    volumes: 
-      - ./backend:/usr/src/help/backend
   
   caddy:
     image: "wemakeservices/caddy-docker:latest"
     volumes:
+      - ./frontend/dist/help:/srv/
       - ./docker/caddy/certs:/root/.caddy  # to save certificates on disk
       - ./docker/caddy/Caddyfile.prod:/etc/Caddyfile  # to mount custom Caddyfile
     ports:

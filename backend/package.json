@@ -31,9 +31,9 @@
     "rethinkdb-ts": "^2.4.0-rc.16",
     "tnet": "^1.1.1",
     "typescript": "^3.6.3",
-    "zeromq": "^5.1.0"
+    "zeromq": "^5.1.0",
+    "ts-node-dev": "^1.0.0-pre.42"
   },
   "devDependencies": {
-    "ts-node-dev": "^1.0.0-pre.42"
   }
 }

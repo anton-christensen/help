@@ -94,7 +94,7 @@ export class OnUpdateWorker {
     // Handle notification token subscriptions on updates
     static onUpdatedNotificationToken(oldNotificationToken: NotificationToken, newNotificationToken: NotificationToken) {
         return admin.messaging().unsubscribeFromTopic(oldNotificationToken.token, `TrashCan-${oldNotificationToken.departmentSlug}-${oldNotificationToken.courseSlug}`).then(() => {
-            return admin.messaging().subscribeToTopic(newNotificationToken.token, `TrashCan-${newNotificationToken.departmentSlug}-${notificationToken.courseSlug}`);
+            return admin.messaging().subscribeToTopic(newNotificationToken.token, `TrashCan-${newNotificationToken.departmentSlug}-${newNotificationToken.courseSlug}`);
         });
     }
 
