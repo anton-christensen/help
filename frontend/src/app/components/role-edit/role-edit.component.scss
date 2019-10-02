@@ -1,7 +1,49 @@
+@import '~src/sass/variables';
+
 table td select {
   margin: 0;
 }
 
 th:last-child, td:last-child {
   text-align: center;
+}
+
+.pagination-buttons {
+  margin: auto;
+  width: 8rem;
+  height: 3.5rem;
+  position: relative;
+
+  span {
+    position: absolute;
+    line-height: 3.5rem;
+  }
+
+  .numbers {
+    font-size: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prev, .next {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0 1rem;
+
+    &:hover {
+      color: $bg-grey-dark-hover;
+    }
+  }
+
+  .prev {
+    left: 0;
+  }
+
+  .next {
+    right: 0;
+  }
 }

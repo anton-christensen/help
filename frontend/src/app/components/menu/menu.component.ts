@@ -19,7 +19,7 @@ import {AngularFireMessaging} from '@angular/fire/messaging';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
-  public open = false;
+  public isOpen = false;
   public notificationToken$: Observable<NotificationToken>;
   public tokenToggleBusy = true;
 
@@ -50,10 +50,10 @@ export class MenuComponent implements OnInit {
   }
 
   public openMenu() {
-    this.open = true;
+    this.isOpen = true;
   }
   public closeMenu() {
-    this.open = false;
+    this.isOpen = false;
   }
 
   public toggleCourseEnabled(course: Course) {

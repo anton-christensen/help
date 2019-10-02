@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CourseService} from 'src/app/services/course.service';
-import {Observable, timer} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, timer} from 'rxjs';
 import {Course} from 'src/app/models/course';
 import {Department} from 'src/app/models/department';
 import {FormGroup, FormControl, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
@@ -63,6 +63,8 @@ export class CourseEditComponent implements OnInit {
   public foundUsers$: Observable<User[]>;
   public pageSize = 5;
   public currentPage = 0;
+  public numPages = 0;
+  private pageSubject = new BehaviorSubject<number>(this.currentPage);
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -95,12 +97,16 @@ export class CourseEditComponent implements OnInit {
         this.courseForm.controls.courseSlug.updateValueAndValidity();
       });
 
-    this.foundUsers$ = this.usersForm.controls.query.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((val) => this.userService.searchByNameOrEmail(val ? val.trim() : '', this.pageSize, this.currentPage)),
-      tap(() => this.currentPage = 0),
-      shareReplay(1),
+    this.foundUsers$ = combineLatest([
+      this.usersForm.controls.query.valueChanges.pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => this.currentPage = 0)),
+      this.pageSubject]).pipe(
+        switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage)),
+        tap((paginatedResult) => this.numPages = paginatedResult.numPages),
+        map((paginatedResult) => paginatedResult.data),
+        shareReplay(1),
     );
   }
 
@@ -256,5 +262,15 @@ export class CourseEditComponent implements OnInit {
 
   public isUserInCourse(user: User): boolean {
     return !!this.associatedUsers.find((u) => u.id === user.id);
+  }
+
+  public prevPage() {
+    this.currentPage--;
+    this.pageSubject.next(this.currentPage);
+  }
+
+  public nextPage() {
+    this.currentPage++;
+    this.pageSubject.next(this.currentPage);
   }
 }
