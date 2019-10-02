@@ -24,8 +24,6 @@ services:
     depends_on:
       - rethinkdb
     
-    volumes: 
-      - ./backend:/usr/src/help/backend
   
   caddy:
     image: "wemakeservices/caddy-docker:latest"
