@@ -98,6 +98,11 @@ export class Database {
         ]);
       }).then(() => {
         return Promise.all([
+          this.db.wait({waitFor: 'ready_for_writes'}).run(this.connection),
+          this.db.wait({waitFor: 'ready_for_reads'}).run(this.connection),
+        ]);
+      }).then(() => {
+        return Promise.all([
           this.provision(),
           // remove user ID from inactive trashCans
           Database.trashCans.filter({active: false}).replace(r.row.without('userID')).run(Database.connection)
