@@ -38,9 +38,9 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
     let token = request.header('auth-token');
     if(token) {
         token = hash(token);
+
         const footprint = (await Database.db.table('authTokens').get(token)
         .run(Database.connection) as AuthTokenFootprint);
-
         if(!footprint) {
             let user = {
                 anon: true,

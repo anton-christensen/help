@@ -1,4 +1,14 @@
+help.aau.dk {
+  root /srv
+  rewrite {
+    to {path} {path}/ /
+  }
 
-http://* {
-    root /srv
+  tls anton.christensen9700@gmail.com
 }
+
+api.help.aau.dk {
+  proxy / pushpin:7999
+
+  tls anton.christensen9700@gmail.com
+} 

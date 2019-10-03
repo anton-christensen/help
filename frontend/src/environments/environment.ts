@@ -10,5 +10,5 @@ export const environment = {
     appId: '1:9179952640:web:d61aa7a7e86e1db1a54ae5'
   },
   // api: 'https://api.help.antonchristensen.net'
-  api: 'http://localhost:7999'
+  api: 'http://api.help'
 };

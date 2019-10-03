@@ -2,27 +2,22 @@
 version: '3'
 services:
   # fakes som domain name stuff for development
-  # dns:
-  #   image: 'jpillora/dnsmasq'
-  #   ports:
-  #     - "53:53/udp"
-  #     - "5380:8080"
-  #   volumes:
-  #     - ./docker/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
-  #   environment:
-  #     - "HTTP_USER=foo"
-  #     - "HTTP_PASS=bar"
+  dns:
+    image: 'jpillora/dnsmasq'
+    ports:
+      - "53:53/udp"
+    volumes:
+      - ./docker/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    environment:
+      - "HTTP_USER=foo"
+      - "HTTP_PASS=bar"
 
   rethinkdb:
     ports:
      - "28015:28015" # client driver connections
      - "29015" # Intracluster connection
-     - "2880:8080" # http administration interface
   
   pushpin:
-    ports:
-      - "7999:7999"
-      - "5560-5563:5560-5563"
 
   api:
     image: help/api/dev
@@ -30,8 +25,14 @@ services:
       dockerfile: ./dev.Dockerfile
     volumes: 
       - ./backend:/usr/src/help/api
-    ports:
-      - "28080:28080"
+
+  app:
+    image: help/app/dev
+    build:
+      context: ./frontend
+      dockerfile: ./dev.Dockerfile
+    volumes:
+      - ./frontend:/usr/src/help/app
 
   caddy:
     volumes:
