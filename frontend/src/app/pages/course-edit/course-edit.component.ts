@@ -237,6 +237,7 @@ export class CourseEditComponent implements OnInit {
 
     this.userService.createUserWithEmail(this.usersForm.controls.query.value.trim()).pipe(first())
       .subscribe((user) => {
+        console.log(user);
         this.addUserToCourse(user);
       });
   }
@@ -248,7 +249,7 @@ export class CourseEditComponent implements OnInit {
     } else {
       // Set role to TA if previously a student
       if (user.role === 'student') {
-        this.userService.setRole(user, 'TA');
+        this.userService.setRole(user, 'TA').pipe(first()).subscribe();
         user.role = 'TA';
       }
       this.associatedUsers.push(user);

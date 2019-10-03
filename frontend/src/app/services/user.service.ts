@@ -51,13 +51,19 @@ export class UserService {
   }
 
   public createUserWithEmail(email: string): Observable<User> {
-    return this.http.post<APIResponse<User>>(`${environment.api}/users`, {
+    const newUser = {
       email,
       anon: true,
       name: '',
       role: 'student'
-    }).pipe(
-      map((response) => responseAdapter<User>(response)),
+    } as User;
+    return this.http.post<APIResponse<{generated_keys: string[]}>>(`${environment.api}/users`, newUser).pipe(
+      map((response) => responseAdapter<{generated_keys: string[]}>(response).generated_keys),
+      map((generatedKeys) => {
+        console.log(generatedKeys);
+        newUser.id = generatedKeys[0];
+        return newUser;
+      })
     );
   }
 
