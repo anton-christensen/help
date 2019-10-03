@@ -91,6 +91,7 @@ export namespace UserController {
                 query.changes(),
                 (err, row) => row
             );
+            query.orderBy('name');
             
             HelpResponse.pagedFromPromise(response, count, query.run(Database.connection));
             // HelpResponse.fromPromise(response, query.run(Database.connection));

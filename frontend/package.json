@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "serve": "ng serve",
+    "serve": "ng serve --host=0.0.0.0 --disable-host-check",
     "deploy": "ng build --prod && firebase deploy --only hosting",
     "stats": "ng build --prod --stats-json && webpack-bundle-analyzer dist/help/stats-es2015.json"
   },

@@ -1,4 +1,21 @@
 
-http://* {
-    root /srv
+http://help {
+    proxy / app:4200
+}
+
+http://api.help {
+    proxy / pushpin:7999
+}
+
+http://db.help {
+    proxy / rethinkdb:8080
+}
+
+
+http://admin.db.help {
+    proxy / rethinkdb:8080
+}
+
+http://dns.help {
+    proxy / dns:8080
 }
