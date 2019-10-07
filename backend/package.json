@@ -34,6 +34,5 @@
     "zeromq": "^5.1.0",
     "ts-node-dev": "^1.0.0-pre.42"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

@@ -3,16 +3,6 @@ FROM node:10
 # Create app directory
 WORKDIR /usr/src/help/api
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+CMD ["./dev.start.sh"]
 
-RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
-
-# Bundle app source
-# COPY . .
-
-CMD [ "npm", "run", "dev" ]
+# CMD [ "npm" "i" "&&" "npm", "run", "dev" ]
