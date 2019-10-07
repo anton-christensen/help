@@ -35,7 +35,6 @@ export class StudentComponent implements OnInit {
   ngOnInit() {
     this.course$ = this.session.getCourse$().pipe(
       tap((course) => {
-        console.log('course updated');
         this.course = course;
         this.commonService.setTitle(`${course.slug.toUpperCase()}`);
       })
@@ -43,7 +42,6 @@ export class StudentComponent implements OnInit {
 
     this.trashCan$ = this.course$.pipe(
       switchMap((course) => {
-        console.log('course updated');
         if (course.enabled) {
           return this.trashCanService.getActiveByCourse(course);
         } else {

@@ -14,7 +14,16 @@ dotenv.config();
 
 Database.init().then(() => {
     const app = express();
-    app.use(express.json())
+    app.use(express.json());
+
+    // disable caching
+    app.use(function (req, res, next) {
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.header('Expires', '-1');
+        res.header('Pragma', 'no-cache');
+        next();
+    });
+        
     app.use((req, res, next) => {
         console.log(`${req.method}: ${req.path}`);
         res.contentType('json');
