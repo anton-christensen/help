@@ -13,9 +13,6 @@ services:
       - "HTTP_PASS=bar"
 
   rethinkdb:
-#    ports:
-#     - "28015:28015" # client driver connections
-#     - "29015" # Intracluster connection
   
   pushpin:
 
@@ -33,8 +30,6 @@ services:
       dockerfile: ./dev.Dockerfile
     volumes:
       - ./frontend:/usr/src/help/app
-    ports:
-      - "4200:4200"
 
   caddy:
     volumes:
