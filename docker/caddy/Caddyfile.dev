@@ -1,6 +1,7 @@
 
 http://app.help.dk {
     proxy / app:4200
+    gzip
 }
 
 http://api.help.dk {

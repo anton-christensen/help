@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import { AddressInfo } from "net";
 import * as dotenv from "dotenv";
 import { Database } from "./database";
@@ -8,13 +8,14 @@ import { StreamMiddleware, StreamWorker } from "./lib/stream";
 import { notificationTokensRouter } from "./routes/notificationTokens";
 import { OnUpdateWorker } from "./lib/dataChanges";
 import { HelpResponse } from "./lib/responses";
-
+import compression from "compression";
 
 dotenv.config();
 
 Database.init().then(() => {
     const app = express();
     app.use(express.json());
+    app.use(compression());
 
     // disable caching
     app.use(function (req, res, next) {
