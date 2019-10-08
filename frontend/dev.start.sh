@@ -1,3 +1,3 @@
 npm i;
-npm run start;
+npm run serve;
 
