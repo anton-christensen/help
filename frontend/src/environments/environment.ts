@@ -9,5 +9,5 @@ export const environment = {
     messagingSenderId: '9179952640',
     appId: '1:9179952640:web:d61aa7a7e86e1db1a54ae5'
   },
-  api: 'http://api.help'
+  api: 'http://api.help.dk'
 };

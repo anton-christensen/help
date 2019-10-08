@@ -1,21 +1,21 @@
 
-http://help {
+http://app.help.dk {
     proxy / app:4200
 }
 
-http://api.help {
+http://api.help.dk {
     proxy / pushpin:7999
 }
 
-http://db.help {
+http://db.help.dk {
     proxy / rethinkdb:8080
 }
 
-
-http://admin.db.help {
+http://admin.db.help.dk {
     proxy / rethinkdb:8080
 }
 
-http://dns.help {
+http://dns.help.dk {
     proxy / dns:8080
 }
+
