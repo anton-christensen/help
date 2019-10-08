@@ -6,7 +6,7 @@ import { HelpResponse } from '../lib/responses';
 export namespace DepartmentController {
     export const getAllDepartmentsValidator = checkSchema({});
     export const getAllDepartments: RequestHandler = ( request, response ) => {
-        HelpResponse.fromPromise(response, Database.departments.run(Database.connection));
+        HelpResponse.fromPromise(response, Database.departments.orderBy('title').run(Database.connection));
     }
 
     export const getDepartmentValidator = checkSchema({
