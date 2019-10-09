@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1976d2">
 
+  <meta name="description" content="Arguably the most digital and modern trashcan to ever walk the earth">
+
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/x-icon" href="favicon.ico?7">
   <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
@@ -22,7 +24,7 @@
       top:3rem;
     }
     .ldr {
-      position: relative;
+      position: absolute;
       height: 2px;
       display: block;
       box-sizing: border-box;
@@ -126,37 +128,13 @@
       z-index: 3;
       box-shadow: 0px -42px 40px 19px;
     }
-
-    .menu-bar .button {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      font-size: 1.5rem;
-      line-height: 3rem;
-      cursor: pointer;
-      padding: 0 1rem;
-      float: left;
-    }
-
-    .menu-bar .left {
-      float: left;
-    }
-
-    .menu-bar .right {
-      float: right;
-    }
   </style>
 
 </head>
 <body>
   <app-root>
     <app-menu>
-      <div class="menu-bar">
-        <div class="button left material-icons">arrow_back</div>
-      <div class="button material-icons right">menu</div>
-      </div>
-
+      <div class="menu-bar"></div>
       <div class="ldr">
         <div></div>
       </div>
