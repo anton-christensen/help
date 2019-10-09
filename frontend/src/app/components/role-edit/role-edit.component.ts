@@ -3,7 +3,7 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {UserService} from 'src/app/services/user.service';
 import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
-import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, merge, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, first, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 @Component({
@@ -17,7 +17,7 @@ export class RoleEditComponent implements OnInit {
   public currentPage = 0;
   public numPages = 0;
   private pageSubject = new BehaviorSubject<number>(this.currentPage);
-  private newUserSubject = new BehaviorSubject<User[]>([]);
+  private newUserSubject = new Subject<User[]>();
 
   public form = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
@@ -27,8 +27,7 @@ export class RoleEditComponent implements OnInit {
               private auth: AuthService) {}
 
   ngOnInit() {
-    this.foundUsers$ = combineLatest([
-      this.newUserSubject,
+    this.foundUsers$ = merge(
       combineLatest([
         this.form.controls.query.valueChanges.pipe(
           debounceTime(300),
@@ -39,9 +38,8 @@ export class RoleEditComponent implements OnInit {
           tap((paginatedResult) => this.numPages = paginatedResult.numPages),
           map((paginatedResult) => paginatedResult.data),
           shareReplay(1),
-      )]).pipe(
-        map((values: User[][]) => values[1].length > 0 ? values[1] : values[0]),
-    );
+      ),
+      this.newUserSubject);
   }
 
   public setRole(user: User, role: Role) {
