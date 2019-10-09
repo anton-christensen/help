@@ -60,7 +60,6 @@ export class UserService {
     return this.http.post<APIResponse<{generated_keys: string[]}>>(`${environment.api}/users`, newUser).pipe(
       map((response) => responseAdapter<{generated_keys: string[]}>(response).generated_keys),
       map((generatedKeys) => {
-        console.log(generatedKeys);
         newUser.id = generatedKeys[0];
         return newUser;
       })

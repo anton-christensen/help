@@ -237,7 +237,6 @@ export class CourseEditComponent implements OnInit {
 
     this.userService.createUserWithEmail(this.usersForm.controls.query.value.trim()).pipe(first())
       .subscribe((user) => {
-        console.log(user);
         this.addUserToCourse(user);
       });
   }
