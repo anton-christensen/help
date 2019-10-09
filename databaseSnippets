@@ -1,0 +1,8 @@
+# Number of cans by course and day
+r.db('help').table('trashCans').group([
+  r.row('departmentSlug'),
+  r.row('courseSlug'),
+  r.row('created').date()
+]).count();
+
+
