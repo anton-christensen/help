@@ -80,18 +80,19 @@ export namespace UserController {
                     r.row('name').downcase().match(input.q.toLowerCase()).eq(null).not(),
                     r.row('email').downcase().match(input.q.toLowerCase()).eq(null).not()
                 )
-            );
+            ).orderBy('name');
             
             const count = Math.ceil(await query.count().run(Database.connection) / limit);
             query = query.skip(page*limit).limit(limit);
     
-            createStream(
-                response,
-                `GET:/users?q=${input.q.toLowerCase()}`,
-                query.changes(),
-                (err, row) => row
-            );
-            query.orderBy('name');
+            // // Cannot make a stream of an ordered query
+            // createStream(
+            //     response,
+            //     `GET:/users?q=${input.q.toLowerCase()}`,
+            //     query.changes(),
+            //     (err, row) => row
+            // );
+           
             
             HelpResponse.pagedFromPromise(response, count, query.run(Database.connection));
             // HelpResponse.fromPromise(response, query.run(Database.connection));
