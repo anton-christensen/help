@@ -88,8 +88,41 @@ export namespace TrashCanController {
         courseSlug: { in: 'params' },
         trashcanID: { in: 'params' },
     });
-    export const retractTrashCan: RequestHandler = ( request, response ) => {
+    export const retractTrashCan: RequestHandler = async ( request, response ) => {
+        const user = getUser(request);
         const input = matchedData(request);
+        
+        let can = await Database.trashCans.get(input.trashcanID).run(Database.connection);
+
+        if(!can || can.active == false) {
+            return HelpResponse.error(response, "TrashCan does not exist", 404);
+        }
+
+        if(can.userID && can.userID == user.id) {
+            return HelpResponse.fromPromise(response, 
+                Database
+                .trashCans
+                .get(input.trashcanID)
+                .update({active: false, retractedBy: "student", retractedAt: r.now()})
+                .run(Database.connection)
+            );
+        }
+
+        if(
+            user.role == 'admin' || (
+                userRoleIn(user, ['TA', 'lecturer']) && 
+                await userIsAssociatedWithCourse(user, input.departmentSlug, input.courseSlug)
+            )
+        ) {
+            return HelpResponse.fromPromise(response, 
+                Database
+                .trashCans
+                .get(input.trashcanID)
+                .update({active: false, retractedBy: user.id, retractedAt: r.now()})
+                .run(Database.connection)
+            );
+        }
+
         Database.trashCans.filter({
             active: true,
             departmentSlug: input.departmentSlug,

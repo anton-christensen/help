@@ -80,7 +80,7 @@ export namespace UserController {
                     r.row('name').downcase().match(input.q.toLowerCase()).eq(null).not(),
                     r.row('email').downcase().match(input.q.toLowerCase()).eq(null).not()
                 )
-            ).orderBy('name');
+            ).orderBy('email').orderBy('name');
             
             const count = Math.ceil(await query.count().run(Database.connection) / limit);
             query = query.skip(page*limit).limit(limit);
@@ -185,7 +185,7 @@ export namespace UserController {
             let body = casResponse ? casResponse.body : "";
     
             if (!body.includes('saml1p:Success')) {
-                throw "authentication error" + JSON.stringify(request);
+                throw "authentication error" + JSON.stringify(body);
             }
                  
             let extractMatch = (match: RegExpExecArray | null) => {
@@ -248,7 +248,7 @@ export namespace UserController {
         })
         .then(async value => {
             const user = (value as User);
-            if(user.id == undefined) throw "Not a user"
+            if(!user || user.id == undefined) throw "Not a user, " + JSON.stringify(value);
             const authToken = generateToken();
             const tokenExpirationInDays = process.env.TOKEN_DAYS_LIFETIME ? parseInt(process.env.TOKEN_DAYS_LIFETIME) : 7;
             const tokenFootprint: AuthTokenFootprint = {

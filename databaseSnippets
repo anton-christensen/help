@@ -5,4 +5,28 @@ r.db('help').table('trashCans').group([
   r.row('created').date()
 ]).count();
 
+# Average response time 
+r.db('help').table('trashCans').filter(
+  (can) => {
+    return can('retractedBy').ne('student')
+})
+.withFields(['retractedAt', 'created'])
+  .map((can) => {
+    return can('retractedAt').sub(can('created'))
+})
+.avg();
 
+# average response time per course per day
+r.db('help').table('trashCans').group([
+  r.row('departmentSlug'),
+  r.row('courseSlug'),
+  r.row('created').date()
+]).filter(
+  (can) => {
+    return can('retractedBy').ne('student')
+})
+.withFields(['retractedAt', 'created'])
+  .map((can) => {
+    return can('retractedAt').sub(can('created'))
+})
+.avg();
