@@ -62,15 +62,10 @@ GET: /user
 	- anon: gets anon user and new auth token
 	- TA/Lecturer/admin: gets their users and their provided auth token
 
-
 POST: /users
 	- anon/TA: disallow
 	- Lecturer: allow, but role can only be set to student or TA
 	- admin: allow
-
-GET: /user/_auth
-	- the service that AAU CAS recieves which will check if the user 
-		is authorized and if- then redirects to the target given as query param
 
 GET: /users?q=achri15&l=10&p=0
 	- anon/TA: disallow
@@ -79,6 +74,19 @@ GET: /users?q=achri15&l=10&p=0
 GET: /users/{:userID}
 	- anon/TA: disallow
 	- Lect/Admin: allow
+
+PUT: /users/{:userID}
+	- anon/TA: disallow
+	- Lect: allow, but modified user role cannot be above TA
+	- Admin: allow
+
+DELETE: /users/{:userID}
+	- anon/TA/Lect: disallow
+	- Admin: allow
+
+GET: /user/_auth
+	- the service that AAU CAS recieves which will check if the user 
+		is authorized and if- then redirects to the target given as query param
 
 # notifications
 GET: /departments/{:dpslug}/courses/{:cslug}/trashcans/notificationtokens/{:deviceID}

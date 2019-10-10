@@ -9,4 +9,5 @@ userRouter.get( '/users/:userID', UserController.getUserByIDValidator, schemaErr
 userRouter.get( '/users', UserController.getUsersByQueryValidator, schemaErrorHandler, UserController.getUsersByQuery);
 userRouter.post('/users', UserController.createUserValidator, schemaErrorHandler, UserController.createUser);
 userRouter.put('/users/:userID', UserController.updateUserValidator, schemaErrorHandler, UserController.updateUser);
+userRouter.delete('/users/:userID', UserController.deleteUserValidator, schemaErrorHandler, UserController.deleteUser);
 userRouter.get( '/user/_auth', UserController.validateCASLoginValidator, schemaErrorHandler, UserController.validateCASLogin);

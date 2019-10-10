@@ -144,6 +144,20 @@ export namespace UserController {
         HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
     }
 
+    export const deleteUserValidator = checkSchema({
+        userID:{ in: ['params'] },
+    });
+    export const deleteUser: RequestHandler = (request, response) => {
+        const user = getUser(request);
+        const params = matchedData(request, {locations: ['params']});
+    
+        if(userRoleIn(user, ['student', 'TA', 'lecturer'])) {
+            return HelpResponse.disallowed(response);
+        }
+
+        HelpResponse.fromPromise(response, Database.users.get(params.userID).delete().run(Database.connection));
+    }
+
     export const validateCASLoginValidator = checkSchema({
         target: { in: ['query'], isString: true },
         ticket: { in: ['query'], isString: true },
