@@ -152,9 +152,11 @@ export namespace UserController {
         const user = getUser(request);
         const params = matchedData(request, {locations: ['params']});
     
-        if(userRoleIn(user, ['student', 'TA', 'lecturer'])) {
+        if(userRoleIn(user, ['student', 'TA', 'lecturer']) || user.id == params.userID) {
             return HelpResponse.disallowed(response);
         }
+
+
 
         HelpResponse.fromPromise(response, Database.users.get(params.userID).delete().run(Database.connection));
     }
