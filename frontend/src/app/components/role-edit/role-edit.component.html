@@ -1,5 +1,5 @@
 <h1>Roles</h1>
-<h3>Set user role</h3>
+<h3>Create users and set user roles</h3>
 <form class="no-detail inline-button"
       [formGroup]="form"
       (ngSubmit)="onSubmit()">
@@ -47,14 +47,15 @@
       <td>
         <select (change)="setRole(user, $event.target.value)"
                 [value]='user.role'
-                [disabled]='user.email == (auth.user$ | async)?.email'>
+                [disabled]='user.email === (auth.user$ | async)?.email'>
           <option value='admin'    >Admin</option>
           <option value='lecturer' >Lecturer</option>
           <option value='TA'       >TA</option>
           <option value='student'  >Student</option>
         </select>
       </td>
-      <td class="delete">
+      <td class="delete" *ngIf="user.email === (auth.user$ | async)?.email"></td>
+      <td class="delete" *ngIf="user.email !== (auth.user$ | async)?.email">
         <i (click)="deleteUser(users, user)" class="material-icons clickable">
           delete_forever
         </i>
