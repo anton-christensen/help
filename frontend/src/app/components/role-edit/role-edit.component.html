@@ -36,6 +36,7 @@
     <tr>
       <th>User</th>
       <th>Role</th>
+      <th>Delete</th>
     </tr>
     </thead>
     <tbody>
@@ -52,6 +53,11 @@
           <option value='TA'       >TA</option>
           <option value='student'  >Student</option>
         </select>
+      </td>
+      <td class="delete">
+        <i (click)="deleteUser(users, user)" class="material-icons clickable">
+          delete_forever
+        </i>
       </td>
     </tr>
     </tbody>

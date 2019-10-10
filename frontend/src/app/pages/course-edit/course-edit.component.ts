@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CourseService} from 'src/app/services/course.service';
-import {BehaviorSubject, combineLatest, Observable, timer} from 'rxjs';
+import {BehaviorSubject, combineLatest, merge, Observable, Subject, timer} from 'rxjs';
 import {Course} from 'src/app/models/course';
 import {Department} from 'src/app/models/department';
 import {FormGroup, FormControl, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
@@ -11,6 +11,7 @@ import {DepartmentService} from 'src/app/services/department.service';
 import {UserService} from 'src/app/services/user.service';
 import {switchMap, map, first, take, debounceTime, distinctUntilChanged, shareReplay, tap} from 'rxjs/operators';
 import {User} from 'src/app/models/user';
+import {PaginatedResult} from '../../utils/paginated-result';
 
 
 @Component({
@@ -65,6 +66,7 @@ export class CourseEditComponent implements OnInit {
   public currentPage = 0;
   public numPages = 0;
   private pageSubject = new BehaviorSubject<number>(this.currentPage);
+  private overrideFoundUsersSubject = new Subject<PaginatedResult<User>>();
 
   constructor(public auth: AuthService,
               private modalService: ModalService,
@@ -103,16 +105,19 @@ export class CourseEditComponent implements OnInit {
         this.courseForm.controls.courseSlug.updateValueAndValidity();
       });
 
-    this.foundUsers$ = combineLatest([
-      this.usersForm.controls.query.valueChanges.pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        tap(() => this.currentPage = 0)),
-      this.pageSubject]).pipe(
-        switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage)),
-        tap((paginatedResult) => this.numPages = paginatedResult.numPages),
-        map((paginatedResult) => paginatedResult.data),
-        shareReplay(1),
+    this.foundUsers$ = merge(
+      combineLatest([
+        this.usersForm.controls.query.valueChanges.pipe(
+          debounceTime(300),
+          distinctUntilChanged(),
+          tap(() => this.currentPage = 0)),
+        this.pageSubject]).pipe(
+        switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage))
+      ),
+      this.overrideFoundUsersSubject).pipe(
+      tap((paginatedResult) => this.numPages = paginatedResult.numPages),
+      map((paginatedResult) => paginatedResult.data),
+      shareReplay(1),
     );
   }
 
@@ -238,6 +243,11 @@ export class CourseEditComponent implements OnInit {
     this.userService.createUserWithEmail(this.usersForm.controls.query.value.trim()).pipe(first())
       .subscribe((user) => {
         this.addUserToCourse(user);
+
+        this.overrideFoundUsersSubject.next({
+          data: [user],
+          numPages: 1
+        })
       });
   }
 

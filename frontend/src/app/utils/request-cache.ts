@@ -13,14 +13,14 @@ export class RequestCache<T, T2> {
     this.cache = {};
   }
 
-  public getObservable(query: T): Observable<T2> {
+  public getObservable(query: T, force = false): Observable<T2> {
     const key = JSON.stringify(query);
-    let observable = this.cache[key];
+    let observable: Observable<T2> = this.cache[key];
 
-    if (!observable) {
+    if (force || !observable) {
       observable = this.requestFunction(query);
 
-      this.cache[key] = observable;
+      (this.cache[key] as Observable<T2>) = observable;
       if (this.timeLimit > 0) {
         setTimeout(() => {
           delete this.cache[key];

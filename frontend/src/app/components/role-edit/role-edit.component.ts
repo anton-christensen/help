@@ -5,6 +5,7 @@ import {User, Role} from 'src/app/models/user';
 import {AuthService} from 'src/app/services/auth.service';
 import {BehaviorSubject, combineLatest, merge, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, first, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {createEmptyPaginatedResult, PaginatedResult} from '../../utils/paginated-result';
 
 @Component({
   selector: 'app-role-edit',
@@ -17,7 +18,7 @@ export class RoleEditComponent implements OnInit {
   public currentPage = 0;
   public numPages = 0;
   private pageSubject = new BehaviorSubject<number>(this.currentPage);
-  private newUserSubject = new Subject<User[]>();
+  private overrideFoundUsersSubject = new Subject<PaginatedResult<User>>();
 
   public form = new FormGroup({
     query: new FormControl('', [Validators.email, Validators.pattern(/[.@]aau.dk$/)])
@@ -34,37 +35,55 @@ export class RoleEditComponent implements OnInit {
           distinctUntilChanged(),
           tap(() => this.currentPage = 0)),
         this.pageSubject]).pipe(
-          switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage)),
-          tap((paginatedResult) => this.numPages = paginatedResult.numPages),
-          map((paginatedResult) => paginatedResult.data),
-          shareReplay(1),
+          switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage))
       ),
-      this.newUserSubject);
+      this.overrideFoundUsersSubject).pipe(
+        tap((paginatedResult) => this.numPages = paginatedResult.numPages),
+        map((paginatedResult) => paginatedResult.data),
+        shareReplay(1),
+    );
   }
 
   public setRole(user: User, role: Role) {
     this.userService.setRole(user, role).pipe(first()).subscribe();
   }
 
-  onSubmit() {
+  public deleteUser(users: User[], user: User) {
+    this.userService.deleteUser(user).pipe(first())
+      .subscribe(() => {
+        this.overrideFoundUsersSubject.next({
+          data: users.filter((u) => u.id !== user.id),
+          numPages: this.numPages
+        });
+        this.userService.searchByNameOrEmail(this.form.controls.query.value.trim(), this.pageSize, this.currentPage, true).pipe(first())
+          .subscribe((result) => {
+            console.log(result);
+            this.overrideFoundUsersSubject.next(result)
+          });
+      });
+  }
+
+  public onSubmit() {
     if (this.form.invalid) {
       return;
     }
 
     this.userService.createUserWithEmail(this.form.controls.query.value.trim()).pipe(first())
-      .subscribe((user) => {
-        this.form.controls.query.setValue(user.email);
-        this.newUserSubject.next([user]);
-      });
+      .subscribe((user) => this.overrideFoundUsersSubject.next({
+        data: [user],
+        numPages: 1
+      }));
   }
 
-  nextPage() {
+  public nextPage() {
     this.currentPage++;
     this.pageSubject.next(this.currentPage)
   }
 
-  prevPage() {
+  public prevPage() {
     this.currentPage--;
     this.pageSubject.next(this.currentPage);
   }
+
+
 }

@@ -29,7 +29,7 @@ export class UserService {
     } else {
       return of(createEmptyPaginatedResult<User>());
     }
-  }, 10000);
+  }, 5000);
 
   constructor(private http: HttpClient) {}
 
@@ -46,8 +46,8 @@ export class UserService {
     return combineLatest(observables);
   }
 
-  public searchByNameOrEmail(query: string, limit: number, page: number): Observable<PaginatedResult<User>> {
-    return this.byNameOrEmail.getObservable({q: query, l: limit, p: page});
+  public searchByNameOrEmail(query: string, limit: number, page: number, force = false): Observable<PaginatedResult<User>> {
+    return this.byNameOrEmail.getObservable({q: query, l: limit, p: page}, force);
   }
 
   public createUserWithEmail(email: string): Observable<User> {
@@ -70,6 +70,12 @@ export class UserService {
     return this.http.put<APIResponse<User>>(`${environment.api}/users/${user.id}`, {
       role
     }).pipe(
+      map((response) => responseAdapter<User>(response)),
+    );
+  }
+
+  public deleteUser(user: User) {
+    return this.http.delete<APIResponse<User>>(`${environment.api}/users/${user.id}`).pipe(
       map((response) => responseAdapter<User>(response)),
     );
   }
