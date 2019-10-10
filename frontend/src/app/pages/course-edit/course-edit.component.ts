@@ -23,7 +23,6 @@ export class CourseEditComponent implements OnInit {
   /* COURSES */
   public departments$: Observable<Department[]>;
   public courses$: Observable<Course[]>;
-  private loggedInUser: User;
 
   public coursesFilterForm = new FormGroup({
     departmentSlug: new FormControl('', [
@@ -74,10 +73,6 @@ export class CourseEditComponent implements OnInit {
               private courseService: CourseService,
               private departmentService: DepartmentService,
               private userService: UserService) {
-    this.auth.user$
-      .subscribe((user) => {
-        this.loggedInUser = user;
-      });
   }
 
   ngOnInit() {
@@ -154,7 +149,14 @@ export class CourseEditComponent implements OnInit {
 
     this.courseBeingEdited = null;
     this.newCourse = true;
-    this.associatedUsers = [this.loggedInUser];
+    this.auth.user$.pipe(first())
+      .subscribe((user: User) => {
+        if (user.role === 'admin') {
+          this.associatedUsers = [];
+        } else {
+          this.associatedUsers = [user];
+        }
+      });
   }
 
   public submitCourse() {

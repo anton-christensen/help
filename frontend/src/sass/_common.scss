@@ -125,12 +125,6 @@ label.visible {
     background-color: $pri-col-active;
   }
 
-  &:disabled {
-    cursor: default;
-    color: $disabled-text;
-    background-color: $disabled;
-  }
-
   &.btn-danger {
     background-color: $bg-neg;
 
@@ -140,6 +134,20 @@ label.visible {
 
     &:active {
       background-color: $bg-neg-active;
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+    color: $disabled-text;
+    background-color: $disabled;
+
+    &:hover {
+      background-color: $disabled;
+    }
+
+    &:active {
+      background-color: $disabled;
     }
   }
 }

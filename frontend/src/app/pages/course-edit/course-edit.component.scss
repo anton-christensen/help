@@ -1,5 +1,21 @@
 @import '../../../sass/variables';
 
+form {
+  form {
+    margin-top: 4rem;
+  }
+
+  button {
+    width: initial;
+    display: inline-block;
+  }
+}
+
+
+label.visible {
+  margin-bottom: 0.4rem;
+}
+
 th:last-child, td:last-child {
   text-align: center;
 }
