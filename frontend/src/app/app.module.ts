@@ -18,7 +18,7 @@ import {PostsComponent} from './components/posts/posts.component';
 import {CourseLinkComponent} from './components/course-link/course-link.component';
 import {AdminComponent} from './pages/admin/admin.component';
 import {ModalComponent} from './components/modal/modal.component';
-import {CourseEditComponent} from './pages/course-edit/course-edit.component';
+import {CourseEditComponent} from './components/course-edit/course-edit.component';
 import {DepartmentListComponent} from './pages/department-list/department-list.component';
 import {MenuComponent} from './components/menu/menu.component';
 import {RoleEditComponent} from './components/role-edit/role-edit.component';
@@ -30,6 +30,7 @@ import {UserProvider} from './providers/user.provider';
 import {LoadingBarModule} from '@ngx-loading-bar/core';
 import {LoadingBarHttpClientModule} from '@ngx-loading-bar/http-client';
 import {NgLetDirective} from './utils/ng-let.directive';
+import { AssociatedUsersControlComponent } from './components/associated-users-control/associated-users-control.component';
 
 export function userProviderFactory(provider: UserProvider) {
   return () => provider.authenticate();
@@ -54,6 +55,7 @@ export function userProviderFactory(provider: UserProvider) {
     RoleEditComponent,
     HandleSuccessfulAuthComponent,
     NgLetDirective,
+    AssociatedUsersControlComponent,
   ],
   imports: [
     BrowserModule,

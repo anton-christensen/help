@@ -43,7 +43,11 @@ export class UserService {
       observables.push(this.getByID(id));
     }
 
-    return combineLatest(observables);
+    if (observables.length > 0) {
+      return combineLatest(observables);
+    }
+
+    return of([]);
   }
 
   public searchByNameOrEmail(query: string, limit: number, page: number, force = false): Observable<PaginatedResult<User>> {

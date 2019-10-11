@@ -45,13 +45,15 @@ export class CourseEditComponent implements OnInit {
     ], [
       this.courseSlugValidator.bind(this),
     ]),
+    associatedUsers: new FormControl([], [
+    ])
   });
   public get f() {
     return this.courseForm.controls;
   }
 
   public courseBeingEdited: Course;
-  public associatedUsers: User[];
+  // public associatedUsers: User[];
   public newCourse = true;
 
 
@@ -107,7 +109,7 @@ export class CourseEditComponent implements OnInit {
           distinctUntilChanged(),
           tap(() => this.currentPage = 0)),
         this.pageSubject]).pipe(
-        switchMap((values) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage))
+        switchMap((values: [string, number]) => this.userService.searchByNameOrEmail(values[0].trim(), this.pageSize, this.currentPage))
       ),
       this.overrideFoundUsersSubject).pipe(
       tap((paginatedResult) => this.numPages = paginatedResult.numPages),
@@ -117,45 +119,49 @@ export class CourseEditComponent implements OnInit {
   }
 
   public editCourse(course: Course) {
-    this.courseForm.setValue({
-      id: course.id,
-      title: course.title,
-      departmentSlug: course.departmentSlug,
-      courseSlug: course.slug.toUpperCase(),
-    });
-    this.usersForm.reset({
-      query: ''
-    });
-
-    this.userService.getAllByID(course.associatedUserIDs).pipe(take(1))
+    this.userService.getAllByID(course.associatedUserIDs).pipe(first())
       .subscribe((users) => {
-        this.associatedUsers = users;
-      });
+        console.log(users);
+        this.courseForm.reset({
+          id: course.id,
+          title: course.title,
+          departmentSlug: course.departmentSlug,
+          courseSlug: course.slug.toUpperCase(),
+          associatedUsers: users
+        });
 
-    this.courseBeingEdited = course;
-    this.newCourse = false;
+        this.usersForm.reset({
+          query: ''
+        });
+
+        this.courseBeingEdited = course;
+        this.newCourse = false;
+      });
   }
 
   public resetForm() {
-    this.courseForm.reset({
-      id: '',
-      title: '',
-      departmentSlug: '',
-      courseSlug: '',
-    });
-    this.usersForm.reset({
-      query: ''
-    });
-
-    this.courseBeingEdited = null;
-    this.newCourse = true;
     this.auth.user$.pipe(first())
       .subscribe((user: User) => {
+        let users;
         if (user.role === 'admin') {
-          this.associatedUsers = [];
+          users = [];
         } else {
-          this.associatedUsers = [user];
+          users = [user];
         }
+
+        this.courseForm.reset({
+          id: '',
+          title: '',
+          departmentSlug: '',
+          courseSlug: '',
+          associatedUsers: users
+        });
+        this.usersForm.reset({
+          query: ''
+        });
+
+        this.courseBeingEdited = null;
+        this.newCourse = true;
       });
   }
 
@@ -177,7 +183,7 @@ export class CourseEditComponent implements OnInit {
       slug: this.courseForm.value.courseSlug.toLowerCase(),
       enabled: false,
       numTrashCansThisSession: 0,
-      associatedUserIDs: this.associatedUsers.map((u) => u.id)
+      associatedUserIDs: this.courseForm.value.associatedUsers.map((u) => u.id)
     };
 
     this.courseService.createOrUpdate(course).pipe(first()).subscribe();
@@ -187,7 +193,7 @@ export class CourseEditComponent implements OnInit {
     this.courseBeingEdited.title = this.courseForm.value.title;
     this.courseBeingEdited.departmentSlug = this.courseForm.value.departmentSlug;
     this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
-    this.courseBeingEdited.associatedUserIDs = this.associatedUsers.map((u) => u.id);
+    this.courseBeingEdited.associatedUserIDs = this.courseForm.value.associatedUsers.map((u) => u.id);
 
     this.courseService.createOrUpdate(this.courseBeingEdited).pipe(first()).subscribe();
   }
@@ -255,7 +261,7 @@ export class CourseEditComponent implements OnInit {
 
   public addUserToCourse(user: User) {
     // Check if user is already in course
-    if (this.associatedUsers.find((u) => u.id === user.id)) {
+    if (this.courseForm.value.associatedUsers.find((u) => u.id === user.id)) {
       this.toastService.add('User is already in this course');
     } else {
       // Set role to TA if previously a student
@@ -263,23 +269,13 @@ export class CourseEditComponent implements OnInit {
         this.userService.setRole(user, 'TA').pipe(first()).subscribe();
         user.role = 'TA';
       }
-      this.associatedUsers.push(user);
-    }
-  }
-
-  public removeUserFromCourse(user: User) {
-    const newAssociatedUsers = this.associatedUsers.filter((u) => u.id !== user.id);
-
-    // Check if this removal means there are no admins og lecturers left
-    if (!newAssociatedUsers.find((u) => u.role === 'admin' || u.role === 'lecturer')) {
-      this.toastService.add('There must be at least one admin or lecturer associated with every course');
-    } else {
-      this.associatedUsers = newAssociatedUsers;
+      this.courseForm.controls.associatedUsers.markAsDirty();
+      this.courseForm.value.associatedUsers.push(user);
     }
   }
 
   public isUserInCourse(user: User): boolean {
-    return !!this.associatedUsers.find((u) => u.id === user.id);
+    return !!this.courseForm.value.associatedUsers.find((u) => u.id === user.id);
   }
 
   public prevPage() {

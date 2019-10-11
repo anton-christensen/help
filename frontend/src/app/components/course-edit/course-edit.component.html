@@ -101,33 +101,10 @@
       </div>
     </div>
 
-    <div class="tablefix-wrapper">
-      <label class="visible">Associated users</label>
-      <table class="user-list">
-        <thead>
-        <tr>
-          <th>User</th>
-          <th>Role</th>
-          <th>Remove</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let user of associatedUsers" class="user">
-          <td class="user">
-            <span class="block name">{{ user.name }}</span>
-            <span class="explanation email">{{ user.email }}</span>
-          </td>
-          <td class="role">{{ user.role }}</td>
-          <td (click)="removeUserFromCourse(user)" class="delete">
-            <i class="material-icons clickable">delete_forever</i>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <button [disabled]="courseForm.pristine" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
-    <button [disabled]="associatedUsers.length === 0 || courseForm.invalid || courseForm.pending" type="submit" class="btn fr">{{ newCourse ? 'Create' : 'Update' }}</button>
+    <app-associated-users-control formControlName="associatedUsers"></app-associated-users-control>
+    
+    <button [disabled]="(!newCourse || !courseForm.dirty) && newCourse" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
+    <button [disabled]="courseForm.pristine || courseForm.invalid || courseForm.pending" type="submit" class="btn fr">{{ newCourse ? 'Create' : 'Update' }}</button>
 
     <form class="no-detail inline-button"
           [formGroup]="usersForm"
