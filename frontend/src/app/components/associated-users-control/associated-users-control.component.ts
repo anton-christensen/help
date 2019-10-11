@@ -36,7 +36,6 @@ export class AssociatedUsersControlComponent implements OnInit, ControlValueAcce
   }
 
   writeValue(value: User[]): void {
-    console.log(value);
     this.users = value;
   }
 
