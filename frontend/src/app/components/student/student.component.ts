@@ -38,7 +38,9 @@ export class StudentComponent implements OnInit {
         this.course = course;
         this.commonService.setTitle(`${course.slug.toUpperCase()}`);
       })
-    );
+    )
+    
+    this.course$.subscribe(val => console.log("new course val: ", val), err => console.log("course error: ",err), () => console.log("course subscription closed!!!"));
 
     this.trashCan$ = this.course$.pipe(
       switchMap((course) => {
