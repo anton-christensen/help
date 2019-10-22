@@ -1,5 +1,4 @@
 <h1>{{ (auth.isAdmin() | async) ? '' : 'Your' }} Courses</h1>
-
 <ng-container *ngIf="(auth.user$ | async)?.role === 'admin'">
   <h3>Select department to edit course from</h3>
   <form [formGroup]="coursesFilterForm" (ngSubmit)="submitCourse()">
@@ -101,8 +100,13 @@
       </div>
     </div>
 
-    <app-associated-users-control formControlName="associatedUsers"></app-associated-users-control>
-    
+    <div class="form-field">
+      <app-associated-users-control formControlName="associatedUsers"></app-associated-users-control>
+      <div *ngIf="f.associatedUsers.errors" class="invalid-feedback">
+        <div>There must be at least one user associated with the course</div>
+      </div>
+    </div>
+
     <button [disabled]="(!newCourse || !courseForm.dirty) && newCourse" type="button" class="btn btn-danger fl" (click)="resetForm()">Cancel</button>
     <button [disabled]="courseForm.pristine || courseForm.invalid || courseForm.pending" type="submit" class="btn fr">{{ newCourse ? 'Create' : 'Update' }}</button>
 

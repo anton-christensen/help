@@ -2,7 +2,8 @@
 
 form {
   form {
-    margin-top: 4rem;
+    margin-top: 6rem;
+    width: 100%;
   }
 
   button {
@@ -27,7 +28,7 @@ th:last-child, td:last-child {
 
 .invalid-feedback {
   position: absolute;
-  top: 3.8rem;
+  top: 4.2rem;
   font-size: 0.8rem;
   color: #c62828;
 }

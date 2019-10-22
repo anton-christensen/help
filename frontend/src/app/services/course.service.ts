@@ -12,11 +12,13 @@ import {APIResponse, responseAdapter} from '../models/api-response';
   providedIn: 'root'
 })
 export class CourseService {
-  private readonly allAssociated = this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
-    map((response) => responseAdapter<Course[]>(response)),
-    map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
-    shareReplay(1)
-  );
+  private readonly allAssociated = new RequestCache<{}, Course[]>(() => {
+    return this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
+      map((response) => responseAdapter<Course[]>(response)),
+      map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
+      shareReplay(1)
+    )
+  });
 
   private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
@@ -41,8 +43,8 @@ export class CourseService {
 
   constructor(private http: HttpClient) {}
 
-  public getAllAssociated(): Observable<Course[]> {
-    return this.allAssociated;
+  public getAllAssociated(force = false): Observable<Course[]> {
+    return this.allAssociated.getObservable({}, force);
   }
 
   public getStreamBySlug(departmentSlug: string, courseSlug: string): Observable<Course> {
@@ -53,8 +55,8 @@ export class CourseService {
     return this.bySlug.getObservable({departmentSlug, courseSlug});
   }
 
-  public getRelevantByDepartment(departmentSlug: string): Observable<Course[]> {
-    return this.byDepartment.getObservable(departmentSlug);
+  public getRelevantByDepartment(departmentSlug: string, force = false): Observable<Course[]> {
+    return this.byDepartment.getObservable(departmentSlug, force);
   }
 
   public isActualCourse(departmentSlug: string, courseSlug: string): Observable<boolean> {
@@ -88,7 +90,7 @@ export class CourseService {
     );
   }
 
-  public createOrUpdate(course: Course): Observable<Course> {
+  public createOrUpdate(course: Course, departmentSlug = "", courseSlug = ""): Observable<Course> {
     if (!course.id) {
       // New course
       return this.http.post<APIResponse<Course>>(`${environment.api}/courses`, course).pipe(
@@ -96,7 +98,7 @@ export class CourseService {
       );
     } else {
       // Course already exists, update
-      return this.http.put<APIResponse<Course>>(`${environment.api}/departments/${course.departmentSlug}/courses/${course.slug}`, course).pipe(
+      return this.http.put<APIResponse<Course>>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`, course).pipe(
         map((response) => responseAdapter<Course>(response))
       );
     }

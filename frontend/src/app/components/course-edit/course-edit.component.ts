@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CourseService} from 'src/app/services/course.service';
-import {BehaviorSubject, combineLatest, merge, Observable, Subject, timer} from 'rxjs';
+import {BehaviorSubject, combineLatest, merge, Observable, Subject, timer, of} from 'rxjs';
 import {Course} from 'src/app/models/course';
 import {Department} from 'src/app/models/department';
 import {FormGroup, FormControl, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
@@ -29,6 +29,8 @@ export class CourseEditComponent implements OnInit {
       Validators.required
     ]),
   });
+  private courseListDirty = new BehaviorSubject<boolean>(true);
+
 
   public courseForm = new FormGroup({
     id: new FormControl(''),
@@ -46,6 +48,7 @@ export class CourseEditComponent implements OnInit {
       this.courseSlugValidator.bind(this),
     ]),
     associatedUsers: new FormControl([], [
+      (ctrl: FormControl) => ctrl.value.length > 0 ? null : {noAssociatedUsers: true}
     ])
   });
   public get f() {
@@ -77,25 +80,32 @@ export class CourseEditComponent implements OnInit {
               private userService: UserService) {
   }
 
+  public test() {
+    this.courseListDirty.next(true);
+  }
+
   ngOnInit() {
     this.resetForm();
     this.departments$ = this.departmentService.getAll();
-
+    
     // Admins can see all courses, but only by department
     this.courses$ = this.auth.isAdmin().pipe(
       switchMap((isAdmin) => {
         if (isAdmin) {
-          return this.coursesFilterForm.controls.departmentSlug.valueChanges.pipe(
-            switchMap((departmentSlug) => {
-              return this.courseService.getRelevantByDepartment(departmentSlug);
+          return combineLatest(this.coursesFilterForm.controls.departmentSlug.valueChanges, this.courseListDirty).pipe(
+            switchMap((arr) => {
+              let departmentSlug = arr[0];
+              return this.courseService.getRelevantByDepartment(departmentSlug, true);
             })
           );
         } else {
-          return this.courseService.getAllAssociated();
+          return this.courseListDirty.pipe(switchMap((data) => {
+            return this.courseService.getAllAssociated();
+          }));
         }
       })
     );
-
+    
     // Validate course slug when department changes
     this.courseForm.controls.departmentSlug.valueChanges
       .subscribe(() => {
@@ -121,7 +131,6 @@ export class CourseEditComponent implements OnInit {
   public editCourse(course: Course) {
     this.userService.getAllByID(course.associatedUserIDs).pipe(first())
       .subscribe((users) => {
-        console.log(users);
         this.courseForm.reset({
           id: course.id,
           title: course.title,
@@ -186,16 +195,25 @@ export class CourseEditComponent implements OnInit {
       associatedUserIDs: this.courseForm.value.associatedUsers.map((u) => u.id)
     };
 
-    this.courseService.createOrUpdate(course).pipe(first()).subscribe();
+    this.courseService.createOrUpdate(course).pipe(first()).subscribe(() => {
+      this.courseListDirty.next(true);
+      this.toastService.add(`Created the course ${course.slug.toUpperCase()}`);
+    });
   }
 
   private updateCourse() {
+    const oldDepSlug = this.courseBeingEdited.departmentSlug;
+    const oldCourseSlug = this.courseBeingEdited.slug;
     this.courseBeingEdited.title = this.courseForm.value.title;
     this.courseBeingEdited.departmentSlug = this.courseForm.value.departmentSlug;
     this.courseBeingEdited.slug = this.courseForm.value.courseSlug.toLowerCase();
     this.courseBeingEdited.associatedUserIDs = this.courseForm.value.associatedUsers.map((u) => u.id);
+    const slug = this.courseBeingEdited.slug.toUpperCase();
 
-    this.courseService.createOrUpdate(this.courseBeingEdited).pipe(first()).subscribe();
+    this.courseService.createOrUpdate(this.courseBeingEdited, oldDepSlug, oldCourseSlug).pipe(first()).subscribe(() => {
+      this.courseListDirty.next(true);
+      this.toastService.add(`Updated course ${slug}`);
+    });
   }
 
   public deleteCourse(course: Course) {
@@ -211,12 +229,16 @@ export class CourseEditComponent implements OnInit {
 
         this.courseService.delete(course).pipe(first())
           .subscribe(() => {
+            this.toastService.add(`Removed course ${course.slug.toUpperCase()}`);
+            this.courseListDirty.next(true);
+
             if (this.courseBeingEdited && this.courseBeingEdited.id === course.id) {
               this.resetForm();
             }
           });
       })
       .catch();
+
   }
 
   private courseSlugValidator(control: AbstractControl): Observable<ValidationErrors> {
@@ -224,6 +246,7 @@ export class CourseEditComponent implements OnInit {
       switchMap(() => {
         const departmentSlug = this.courseForm.value.departmentSlug;
         const courseSlug = control.value.toLowerCase();
+        if(!departmentSlug || !courseSlug) return of(null);
 
         return this.courseService.getBySlug(departmentSlug, courseSlug).pipe(
           map((result) => {
@@ -271,6 +294,7 @@ export class CourseEditComponent implements OnInit {
       }
       this.courseForm.controls.associatedUsers.markAsDirty();
       this.courseForm.value.associatedUsers.push(user);
+      this.courseForm.controls.associatedUsers.updateValueAndValidity();
     }
   }
 
