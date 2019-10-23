@@ -1,13 +1,12 @@
 import { r, RDatabase, RTable, Connection } from 'rethinkdb-ts';
 
 export class Database {
-
   private static _connection: Connection;
   public static get connection() { return this._connection; }
 
   public static get dbName(): string { return 'help'; } /// @todo: adjust via env
 
-  public static _r: typeof r = r
+  public static _r: typeof r = r;
   public static get r(): typeof r { return this._r; }
 
   public static get db(): RDatabase { return r.db(this.dbName); }
@@ -21,13 +20,13 @@ export class Database {
 
   public static init(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      console.log("connecting to database");
-      this.r.connect({
-        host: process.env.DB_HOST ? process.env.DB_HOST : 'localhost',
-        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 28015
-      }).then(conn => {
-        console.log("got database connection");
-        console.log("ensuring database is in valid state");
+      const host = process.env.DB_HOST ? process.env.DB_HOST : 'localhost';
+      const port = process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 28015;
+      console.log(`Connecting to database at ${host}:${port}`);
+      
+      this.r.connect({host, port}).then(conn => {
+        console.log('got database connection');
+        console.log('ensuring database is in valid state');
         conn.use(this.dbName);
         this._connection = conn;
         return Promise.all([

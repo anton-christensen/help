@@ -1,16 +1,16 @@
-import express from "express";
-import { AddressInfo } from "net";
-import * as dotenv from "dotenv";
-import { Database } from "./database";
-import { departmentRouter, courseRouter, userRouter, postRouter, trashCanRouter } from './routes';
-import { AuthMiddleware, generateToken } from "./lib/auth";
-import { StreamMiddleware, StreamWorker } from "./lib/stream";
-import { notificationTokensRouter } from "./routes/notificationTokens";
-import { OnUpdateWorker } from "./lib/dataChanges";
-import { HelpResponse } from "./lib/responses";
-import compression from "compression";
+import {AddressInfo} from 'net';
+import {Database} from './database';
+import {departmentRouter, courseRouter, userRouter, postRouter, trashCanRouter} from './routes';
+import {AuthMiddleware, generateToken} from './lib/auth';
+import {StreamMiddleware, StreamWorker} from './lib/stream';
+import {notificationTokensRouter} from './routes';
+import {OnUpdateWorker} from './lib/dataChanges';
+import {HelpResponse} from './lib/responses';
+import express from 'express';
+import * as dotEnv from 'dotenv';
+import compression from 'compression';
 
-dotenv.config();
+dotEnv.config();
 
 Database.init().then(() => {
     const app = express();
@@ -24,7 +24,7 @@ Database.init().then(() => {
         res.header('Pragma', 'no-cache');
         next();
     });
-        
+
     app.use((req, res, next) => {
         console.log(`${req.method}: ${req.path}`);
         res.contentType('json');
@@ -39,22 +39,22 @@ Database.init().then(() => {
     app.use(AuthMiddleware);
     app.use(StreamMiddleware);
 
-    app.use( '/', departmentRouter );
-    app.use( '/', courseRouter );
-    app.use( '/', postRouter );
-    app.use( '/', trashCanRouter );
-    app.use( '/', userRouter);
-    app.use( '/', notificationTokensRouter);
+    app.use('/', departmentRouter);
+    app.use('/', courseRouter);
+    app.use('/', postRouter);
+    app.use('/', trashCanRouter);
+    app.use('/', userRouter);
+    app.use('/', notificationTokensRouter);
     
     app.use((req, res, next) => {
-        console.log("finished: ", req.path);
+        console.log('finished: ', req.path);
         next();
     });
     
-    var server = app.listen(process.env.API_PORT, function() {
+    const server = app.listen(process.env.API_PORT, function() {
         try {
-            let host = (server.address() as AddressInfo).address;
-            let port = (server.address() as AddressInfo).port;
+            const host = (server.address() as AddressInfo).address;
+            const port = (server.address() as AddressInfo).port;
             console.log( 'App is listening on http://%s:%s', host, port );
         } catch {}
     } );
