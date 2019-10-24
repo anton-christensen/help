@@ -4,7 +4,7 @@
     <p>Activate it in the sidebar during exercise sessions</p>
   </div>
 
-  <ng-container *ngIf="trashCans$ | async as trashCans">
+  <ng-container *ngIf="trashCans">
     <ng-container *ngIf="trashCans.length === 0; then noTrashCans; else trashCansPresent"></ng-container>
 
     <ng-template #noTrashCans>
@@ -18,8 +18,8 @@
         <table class="trash-cans">
           <thead>
           <tr>
-            <th>Room number</th>
-            <th>Posted at</th>
+            <th>Room</th>
+            <th>Posted</th>
             <th class="text-centered">Responder</th>
             <th class="text-centered">Resolve</th>
           </tr>
@@ -30,7 +30,7 @@
               {{ trashCan.room }}
             </td>
             <td *ngIf="trashCan.created" class="created">
-              {{ trashCan.created | date : 'HH:mm on EE MMMM d' }}
+              {{ trashCan.secondsSinceCreated }} ago
             </td>
             <td class="responder text-centered">
               <i *ngIf="!trashCan.responderName" (click)="respondToTrashCan(trashCan)" class="material-icons clickable">
