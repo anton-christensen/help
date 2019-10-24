@@ -15,8 +15,7 @@ export class DepartmentService {
   constructor(private http: HttpClient) {
     this.allDepartments$ = this.http.get<APIResponse<Department[]>>(`${environment.api}/departments`).pipe(
       map((response) => responseAdapter<Department[]>(response)),
-      map((departments) => departments === null ? [] : departments),
-      shareReplay(1)
+      map((departments) => departments === null ? [] : departments)
     );
   }
 

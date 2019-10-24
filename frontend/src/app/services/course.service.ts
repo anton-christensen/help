@@ -15,21 +15,17 @@ export class CourseService {
   private readonly allAssociated = new RequestCache<{}, Course[]>(() => {
     return this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
       map((response) => responseAdapter<Course[]>(response)),
-      map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
-      shareReplay(1)
+      map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title)))
     )
   });
 
   private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
-    return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
-      shareReplay(1)
-    );
+    return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`);
   }, -1);
 
   private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return this.http.get<APIResponse<Course>>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(
-      map((response) => responseAdapter<Course>(response)),
-      shareReplay(1)
+      map((response) => responseAdapter<Course>(response))
     );
   }, 5000);
 
@@ -37,7 +33,6 @@ export class CourseService {
     return this.http.get<APIResponse<Course[]>>(`${environment.api}/departments/${departmentSlug}/courses`).pipe(
       map((response) => responseAdapter<Course[]>(response)),
       map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title))),
-      shareReplay(1)
     );
   }, 5000);
 

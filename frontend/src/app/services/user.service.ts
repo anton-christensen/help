@@ -14,8 +14,7 @@ import {createEmptyPaginatedResult, PaginatedResult} from '../utils/paginated-re
 export class UserService {
   private readonly byID = new RequestCache<string, User>((userID) => {
     return this.http.get<APIResponse<User>>(`${environment.api}/users/${userID}`).pipe(
-      map((response) => responseAdapter<User>(response)),
-      shareReplay(1)
+      map((response) => responseAdapter<User>(response))
     );
   });
 
@@ -23,8 +22,7 @@ export class UserService {
     if (q) {
       return this.http.get<APIResponse<PaginatedResult<User>>>(`${environment.api}/users`, {params: {q, l, p}}).pipe(
         map((response) => responseAdapter<PaginatedResult<User>>(response)),
-        map((users) => users === null ? createEmptyPaginatedResult<User>() : users),
-        shareReplay(1)
+        map((users) => users === null ? createEmptyPaginatedResult<User>() : users)
       );
     } else {
       return of(createEmptyPaginatedResult<User>());

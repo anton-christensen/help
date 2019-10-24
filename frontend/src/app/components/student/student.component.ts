@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
 import {TrashCan} from '../../models/trash-can';
 import {AuthService} from '../../services/auth.service';
 import {SessionService} from '../../services/session.service';
-import {Observable, of} from 'rxjs';
+import {Observable, of, BehaviorSubject, combineLatest} from 'rxjs';
 import {CommonService} from '../../services/common.service';
 import {first, map, switchMap, tap} from 'rxjs/operators';
 
@@ -14,7 +14,7 @@ import {first, map, switchMap, tap} from 'rxjs/operators';
   templateUrl: './student.component.html',
   styleUrls: ['./student.component.scss']
 })
-export class StudentComponent implements OnInit {
+export class StudentComponent implements OnInit, OnDestroy {
   public course$: Observable<Course>;
   private course: Course;
   public trashCan$: Observable<TrashCan>;
@@ -26,6 +26,9 @@ export class StudentComponent implements OnInit {
       this.roomValidator.bind(this)
     ]),
   });
+
+  private refreshTrashcans = new BehaviorSubject<boolean>(true);
+  public trashCanSending = false;
 
   constructor(private auth: AuthService,
               private commonService: CommonService,
@@ -40,18 +43,22 @@ export class StudentComponent implements OnInit {
       })
     )
     
-    this.course$.subscribe(val => console.log("new course val: ", val), err => console.log("course error: ",err), () => console.log("course subscription closed!!!"));
-
-    this.trashCan$ = this.course$.pipe(
-      switchMap((course) => {
+    this.trashCan$ = combineLatest(this.course$, this.refreshTrashcans).pipe(
+      switchMap((arr) => {
+        let course = arr[0];
         if (course.enabled) {
-          return this.trashCanService.getActiveByCourse(course);
+          return this.trashCanService.getActiveByCourse(course, true);
         } else {
           return of([]);
         }
       }),
-      map((trashcans) => trashcans[0])
+        tap(() => this.trashCanSending = false),
+        map((trashcans) => trashcans[0])
     );
+  }
+
+  ngOnDestroy() {
+    console.log("destroy students");
   }
 
   public onSubmit(): void {
@@ -60,11 +67,16 @@ export class StudentComponent implements OnInit {
       return;
     }
 
-    this.trashCanService.add(this.course, this.form.value.room).pipe(first()).subscribe();
+    this.trashCanSending = true;
+    this.trashCanService.add(this.course, this.form.value.room).pipe(first()).subscribe(() => {
+      this.refreshTrashcans.next(true);
+    });
   }
 
   public retractTrashCan(trashCan) {
-    this.trashCanService.delete(trashCan).pipe(first()).subscribe();
+    this.trashCanService.delete(trashCan).pipe(first()).subscribe(() => {
+      
+    });
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

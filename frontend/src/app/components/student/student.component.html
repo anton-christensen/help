@@ -8,7 +8,7 @@
     <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
       <h2>Your trash can is out, help is on the way</h2>
       <div class="retract-trash-can">
-        <button (click)="retractTrashCan(trashCan)" class="btn">Retract trash can</button>
+        <button (click)="retractTrashCan(trashCan)" class="btn" >Retract trash can</button>
       </div>
     </ng-container>
 
@@ -25,7 +25,7 @@
                formControlName="room"
                placeholder="Room number">
 
-        <button [disabled]="form.invalid"
+          <button [disabled]="form.invalid || trashCanSending"
                 type="submit"
                 class="btn">
           Submit

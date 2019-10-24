@@ -7,7 +7,7 @@ export function getListStreamObservable<T extends {id: string}>(url, cmp: (a: T,
     let firstTime = true;
     let results = [];
 
-    getStreamObservable<APIResponse<T[]> | {new_val: T | null, old_val: T | null}>(url)
+    let subscription = getStreamObservable<APIResponse<T[]> | {new_val: T | null, old_val: T | null}>(url)
       .subscribe((response) => {
         if (!response) {
           return;
@@ -35,6 +35,10 @@ export function getListStreamObservable<T extends {id: string}>(url, cmp: (a: T,
         subscriber.next(results);
       }
     );
+
+    return () => {
+      subscription.unsubscribe();
+    }
   });
 }
 
@@ -42,7 +46,7 @@ export function getSingleStreamObservable<T>(url): Observable<T> {
   return new Observable<T>((subscriber) => {
     let firstTime = true;
 
-    getStreamObservable<APIResponse<T> | {new_val: T | null, old_val: T | null}>(url)
+    let subscription = getStreamObservable<APIResponse<T> | {new_val: T | null, old_val: T | null}>(url)
       .subscribe((response) => {
         if (!response) {
           return;
@@ -65,7 +69,11 @@ export function getSingleStreamObservable<T>(url): Observable<T> {
             subscriber.next(newVal);
           }
         }
-      });
+      }
+    );
+    return () => {
+      subscription.unsubscribe();
+    }
   });
 }
 
@@ -106,7 +114,13 @@ function extractStream(xhr, options) {
     }
     xhr.onreadystatechange = notified;
     xhr.onprogress = notified;
-    xhr.onerror = (e) => subscriber.error(event);
+    xhr.onabort = (e) => {return subscriber.complete();}
+    xhr.onerror = (e) => {console.log("XHR ON error", e); return subscriber.error(event);}
+    xhr.ontimeout = (e) => {console.log("XHR ON timeout", e); return subscriber.error(event);}
+
+    return () => {
+      xhr.abort();
+    }
   });
 }
 

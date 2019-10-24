@@ -17,15 +17,13 @@ export class TrashCanService {
     return getListStreamObservable<TrashCan>(
       `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans`,
       (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
-      .pipe(
-        shareReplay(1)
-      );
+      
   }, -1);
 
   constructor(private http: HttpClient) {}
 
-  public getActiveByCourse(course: Course): Observable<TrashCan[]> {
-    return this.byCourse.getObservable({departmentSlug: course.departmentSlug, courseSlug: course.slug});
+  public getActiveByCourse(course: Course, force = false): Observable<TrashCan[]> {
+    return this.byCourse.getObservable({departmentSlug: course.departmentSlug, courseSlug: course.slug}, force);
   }
 
   public add(course: Course, room: string): Observable<TrashCan> {

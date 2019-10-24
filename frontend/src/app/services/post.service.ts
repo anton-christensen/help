@@ -18,10 +18,7 @@ export class PostService {
   private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, Post[]>(({departmentSlug, courseSlug}) => {
     return getListStreamObservable<Post>(
       `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/posts`,
-      (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
-    .pipe(
-      shareReplay(1)
-    );
+      (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
   }, -1);
 
   constructor(private http: HttpClient) {}

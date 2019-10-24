@@ -51,7 +51,7 @@ export class SessionService {
 
             this.currentCourseSlug = courseSlug;
             this.courseSub = this.courseService.getStreamBySlug(departmentSlug, courseSlug)
-              .subscribe((c) => this.course$.next(c));
+              .subscribe((c) => this.course$.next(c), (e) => console.log('course error', e), () => console.log('course completed'));
           }
         } else {
           this.currentCourseSlug = '';
