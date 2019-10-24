@@ -1,9 +1,10 @@
 export interface TrashCan {
-  active: boolean;
-  courseSlug: string;
-  departmentSlug: string;
-  room: string;
-  userID: string;
-  created: Date;
   id?: string;
+  userID: string;
+  departmentSlug: string;
+  courseSlug: string;
+  room: string;
+  responderName: string;
+  active: boolean;
+  created: Date;
 }

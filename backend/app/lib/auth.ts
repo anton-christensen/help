@@ -9,30 +9,30 @@ import { HelpResponse } from "./responses";
 export const getUser = (request: Request): User => {
     let _user = ((request as any)._user as User);
     return _user;
-}
+};
 
 export const userRoleIn = (user: User, roles: Role[]): boolean => {
     return roles.includes(user.role);
-}
+};
 
 export const userRole = (request: Request): Role => {
     return getUser(request).role;
-}
+};
 
 export const userIsAssociatedWithCourse = async (user: User, departmentSlug: string, courseSlug: string) => {
     return await Database.courses.filter({
         departmentSlug: departmentSlug,
         slug: courseSlug
     })('associatedUserIDs').contains(function(idList) { return idList.contains(user.id ? user.id : null) }).run(Database.connection);
-}
+};
 
 export const generateToken = ():string => {
     return crypto.randomBytes(64).toString('hex');
-}
+};
 
 export const hash = (data: string):string => {
     return crypto.createHash('sha256').update(data).digest('hex');
-}
+};
 
 export const AuthMiddleware:RequestHandler = async (request, response, next) => {
     let token = request.header('auth-token');
@@ -48,7 +48,7 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
                 email: '',
                 name: '',
                 role: 'student'
-            }
+            };
             user.id = await r.uuid(token).run(Database.connection);
             (request as any)._user = (user as any);
             return next();

@@ -16,8 +16,7 @@ export class TrashCanService {
   private readonly byCourse = new RequestCache<{departmentSlug: string, courseSlug: string}, TrashCan[]>(({departmentSlug, courseSlug}) => {
     return getListStreamObservable<TrashCan>(
       `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/trashcans`,
-      (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
-      
+      (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
   }, -1);
 
   constructor(private http: HttpClient) {}
@@ -34,8 +33,24 @@ export class TrashCanService {
     );
   }
 
+  public respond(trashCan: TrashCan): Observable<TrashCan> {
+    return this.http.put<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`, {
+      enable: true
+    }).pipe(
+      map((response) => responseAdapter<TrashCan>(response)),
+    );
+  }
+
+  public retractRespond(trashCan: TrashCan) {
+    return this.http.put<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}/responder`, {
+      enable: false
+    }).pipe(
+      map((response) => responseAdapter<TrashCan>(response)),
+    );
+  }
+
   public delete(trashCan: TrashCan) {
-    return this.http.delete<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`).pipe(
+    return this.http.delete<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}/responder`).pipe(
       map((response) => responseAdapter<TrashCan>(response)),
     );
   }

@@ -38,13 +38,21 @@ export class AssistantComponent implements OnInit {
             })
           );
         } else {
-          return of([])
+          return of([]);
         }
       })
     );
   }
 
-  public deleteTrashCan(can: TrashCan) {
-    this.trashCanService.delete(can).pipe(first()).subscribe();
+  public deleteTrashCan(trashCan: TrashCan) {
+    this.trashCanService.delete(trashCan).pipe(first()).subscribe();
+  }
+
+  public respondToTrashCan(trashCan: TrashCan) {
+    this.trashCanService.respond(trashCan).pipe(first()).subscribe();
+  }
+
+  public retractResponseToTrashCan(trashCan: TrashCan) {
+    this.trashCanService.retractRespond(trashCan).pipe(first()).subscribe();
   }
 }

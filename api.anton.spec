@@ -54,7 +54,11 @@ GET /departments/{:dpslug}/courses/{:cslug}/trashcans
 	- Admin: allowed (gets all trashcans)
 POST /departments/{:dpslug}/courses/{:cslug}/trashcans
 	- all: add a trashcan to the course, tied to your userID
-DELETE /departments/{:dpslug}/courses/{:cslug}/trashcans/{:userID}
+PUT /departments/{:dpslug}/courses/{:cslug}/trashcans/{:trashcanID}/responder
+    - anon: disallow
+    - TA/Lecturer: if associated, update trashcan.responderName with their name
+    - Admin: update trashcan.responderName with their name
+DELETE /departments/{:dpslug}/courses/{:cslug}/trashcans/{:trashcanID}
 	- all: remove your trashcan (soft delete)
 
 # users

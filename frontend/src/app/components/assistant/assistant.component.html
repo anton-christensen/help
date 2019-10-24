@@ -20,7 +20,8 @@
           <tr>
             <th>Room number</th>
             <th>Posted at</th>
-            <th>Resolve</th>
+            <th class="text-centered">Responder</th>
+            <th class="text-centered">Resolve</th>
           </tr>
           </thead>
           <tbody>
@@ -31,7 +32,21 @@
             <td *ngIf="trashCan.created" class="created">
               {{ trashCan.created | date : 'HH:mm on EE MMMM d' }}
             </td>
-            <td class="delete">
+            <td class="responder text-centered">
+              <i *ngIf="!trashCan.responderName" (click)="respondToTrashCan(trashCan)" class="material-icons clickable">
+                turned_in_not
+              </i>
+              <div *ngIf="trashCan.responderName as name">
+                <i *ngIf="name === (auth.user$ | async)?.name" (click)="retractResponseToTrashCan(trashCan)" class="material-icons clickable">
+                  turned_in
+                </i>
+                <span *ngIf="name !== (auth.user$ | async)?.name">
+                  {{ trashCan.responderName }}
+                </span>
+              </div>
+
+            </td>
+            <td class="delete text-centered">
               <i (click)="deleteTrashCan(trashCan)" class="material-icons clickable">
                 delete_forever
               </i>

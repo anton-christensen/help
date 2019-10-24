@@ -43,7 +43,8 @@ export class StudentComponent implements OnInit {
       })
     );
 
-    // This is a hacky solution to connection closing sometimes
+    // This is a hacky solution to connection closing randomly
+
     // this.trashCan$ = combineLatest([this.course$, this.refreshTrashcans]).pipe(
     //   switchMap((arr) => {
     //     const course = arr[0];
@@ -60,7 +61,7 @@ export class StudentComponent implements OnInit {
     this.trashCan$ = this.course$.pipe(
       switchMap((course) => {
         if (course.enabled) {
-          return this.trashCanService.getActiveByCourse(course, true);
+          return this.trashCanService.getActiveByCourse(course);
         } else {
           return of([]);
         }
