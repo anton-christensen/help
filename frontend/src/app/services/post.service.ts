@@ -19,7 +19,7 @@ export class PostService {
     return getListStreamObservable<Post>(
       `${environment.api}/departments/${departmentSlug}/courses/${courseSlug}/posts`,
       (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
-  }, -1);
+  });
 
   constructor(private http: HttpClient) {}
 

@@ -16,12 +16,12 @@ export class CourseService {
     return this.http.get<APIResponse<Course[]>>(`${environment.api}/courses`).pipe(
       map((response) => responseAdapter<Course[]>(response)),
       map((courses) => courses === null ? [] : courses.sort((a, b) => a.title.localeCompare(b.title)))
-    )
-  });
+    );
+  }, 5000);
 
   private readonly bySlugStream = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return getSingleStreamObservable<Course>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`);
-  }, -1);
+  });
 
   private readonly bySlug = new RequestCache<{departmentSlug: string, courseSlug: string}, Course>(({departmentSlug, courseSlug}) => {
     return this.http.get<APIResponse<Course>>(`${environment.api}/departments/${departmentSlug}/courses/${courseSlug}`).pipe(

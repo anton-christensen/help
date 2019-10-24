@@ -16,9 +16,9 @@ export class UserService {
     return this.http.get<APIResponse<User>>(`${environment.api}/users/${userID}`).pipe(
       map((response) => responseAdapter<User>(response))
     );
-  });
+  }, 10000);
 
-    private readonly byNameOrEmail = new RequestCache<{q: string, l: number, p: number}, PaginatedResult<User>>(({q, l, p}) => {
+  private readonly byNameOrEmail = new RequestCache<{q: string, l: number, p: number}, PaginatedResult<User>>(({q, l, p}) => {
     if (q) {
       return this.http.get<APIResponse<PaginatedResult<User>>>(`${environment.api}/users`, {params: {q, l, p}}).pipe(
         map((response) => responseAdapter<PaginatedResult<User>>(response)),

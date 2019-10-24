@@ -11,9 +11,9 @@ export class RequestCache<T, T2> {
     }
   };
 
-  constructor(request: (T) => Observable<T2>, timeLimit = 750) {
+  constructor(request: (T) => Observable<T2>, flushAfter = -1) {
     this.requestFunction = request;
-    this.timeLimit = timeLimit;
+    this.timeLimit = flushAfter;
     this.cache = {};
   }
 
