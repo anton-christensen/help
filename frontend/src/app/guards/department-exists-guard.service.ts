@@ -1,14 +1,7 @@
-import { Injectable } from '@angular/core';
-import {
-  CanActivate,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  UrlTree,
-  Router,
-  CanActivateChild
-} from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {ToastService} from '../services/toasts.service';
 import {DepartmentService} from '../services/department.service';
 
@@ -27,7 +20,7 @@ export class DepartmentExistsGuard implements CanActivate {
     return this.departmentService.isActualDepartment(departmentSlug).pipe(
       map((exists) => {
         if (!exists) {
-          this.toastService.add('Department not found', 5000);
+          this.toastService.add(`Department ${departmentSlug.toUpperCase()} not found`, 5000);
           return this.router.parseUrl('/departments');
         }
 

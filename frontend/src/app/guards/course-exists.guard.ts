@@ -18,12 +18,11 @@ export class CourseExistsGuard implements CanActivate {
     const departmentSlug = next.paramMap.get('department');
     const courseSlug = next.paramMap.get('course');
 
-
     return this.courseService.isActualCourse(departmentSlug, courseSlug).pipe(
       map((exists) => {
         if (!exists) {
-          this.toastService.add('Course not found', 5000);
-          return this.router.parseUrl('/courses');
+          this.toastService.add(`Course ${courseSlug.toUpperCase()} not found`, 5000);
+          return this.router.parseUrl('/departments/' + departmentSlug);
         }
 
         return true;

@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormGroup, FormControl, ValidationErrors, Validators, AbstractControl} from '@angular/forms';
 import {TrashCanService} from 'src/app/services/trash-can.service';
 import {Course} from 'src/app/models/course';
@@ -14,7 +14,7 @@ import {first, map, switchMap, tap} from 'rxjs/operators';
   templateUrl: './student.component.html',
   styleUrls: ['./student.component.scss']
 })
-export class StudentComponent implements OnInit, OnDestroy {
+export class StudentComponent implements OnInit {
   public course$: Observable<Course>;
   private course: Course;
   public trashCan$: Observable<TrashCan>;
@@ -41,11 +41,24 @@ export class StudentComponent implements OnInit, OnDestroy {
         this.course = course;
         this.commonService.setTitle(`${course.slug.toUpperCase()}`);
       })
-    )
-    
-    this.trashCan$ = combineLatest(this.course$, this.refreshTrashcans).pipe(
-      switchMap((arr) => {
-        let course = arr[0];
+    );
+
+    // This is a hacky solution to connection closing sometimes
+    // this.trashCan$ = combineLatest([this.course$, this.refreshTrashcans]).pipe(
+    //   switchMap((arr) => {
+    //     const course = arr[0];
+    //     if (course.enabled) {
+    //       return this.trashCanService.getActiveByCourse(course, true);
+    //     } else {
+    //       return of([]);
+    //     }
+    //   }),
+    //   tap(() => this.trashCanSending = false),
+    //   map((trashcans) => trashcans[0])
+    // );
+
+    this.trashCan$ = this.course$.pipe(
+      switchMap((course) => {
         if (course.enabled) {
           return this.trashCanService.getActiveByCourse(course, true);
         } else {
@@ -55,10 +68,6 @@ export class StudentComponent implements OnInit, OnDestroy {
         tap(() => this.trashCanSending = false),
         map((trashcans) => trashcans[0])
     );
-  }
-
-  ngOnDestroy() {
-    console.log("destroy students");
   }
 
   public onSubmit(): void {
@@ -74,9 +83,7 @@ export class StudentComponent implements OnInit, OnDestroy {
   }
 
   public retractTrashCan(trashCan) {
-    this.trashCanService.delete(trashCan).pipe(first()).subscribe(() => {
-      
-    });
+    this.trashCanService.delete(trashCan).pipe(first()).subscribe();
   }
 
   private roomValidator(control: AbstractControl): ValidationErrors | null {

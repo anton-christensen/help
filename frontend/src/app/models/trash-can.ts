@@ -4,6 +4,7 @@ export interface TrashCan {
   departmentSlug: string;
   courseSlug: string;
   room: string;
+  responderName?: string;
   active: boolean;
   created?: string;
 }
