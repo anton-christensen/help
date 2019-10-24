@@ -7,7 +7,7 @@ export class RequestCache<T, T2> {
   private readonly cache: {
     [key: string]: {
       subscription: Subscription,
-      observable:   Observable<T2>
+      observable: Observable<T2>
     }
   };
 
@@ -22,15 +22,15 @@ export class RequestCache<T, T2> {
     let cacheEntry = this.cache[key];
 
     if (force || !cacheEntry) {
-      if(cacheEntry && cacheEntry.subscription) {
+      if (cacheEntry && cacheEntry.subscription) {
         cacheEntry.subscription.unsubscribe();
       }
-      
-      cacheEntry = { 
-        subscription: null, 
+
+      cacheEntry = {
+        subscription: null,
         observable: null
       };
-      
+
       cacheEntry.observable = new Observable<T2>((subscriber) => {
         cacheEntry.subscription = this.requestFunction(query).subscribe(data => {
           subscriber.next(data);
@@ -39,17 +39,17 @@ export class RequestCache<T, T2> {
         return () => {
           cacheEntry.subscription.unsubscribe();
           delete this.cache[key];
-        }
+        };
       });
-      
+
       (this.cache[key] as any) = cacheEntry;
       if (this.timeLimit > 0) {
         setTimeout(() => {
-          if(this.cache[key]) {
+          if (this.cache[key]) {
             this.cache[key].subscription.unsubscribe();
             delete this.cache[key];
           }
-        }, this.timeLimit)
+        }, this.timeLimit);
       }
     }
 
