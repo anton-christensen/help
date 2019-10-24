@@ -34,7 +34,7 @@ export class TrashCanService {
   }
 
   public respond(trashCan: TrashCan): Observable<TrashCan> {
-    return this.http.put<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`, {
+    return this.http.put<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}/responder`, {
       enable: true
     }).pipe(
       map((response) => responseAdapter<TrashCan>(response))
@@ -50,7 +50,7 @@ export class TrashCanService {
   }
 
   public delete(trashCan: TrashCan) {
-    return this.http.delete<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}/responder`).pipe(
+    return this.http.delete<APIResponse<TrashCan>>(`${environment.api}/departments/${trashCan.departmentSlug}/courses/${trashCan.courseSlug}/trashcans/${trashCan.id}`).pipe(
       map((response) => responseAdapter<TrashCan>(response)),
     );
   }
