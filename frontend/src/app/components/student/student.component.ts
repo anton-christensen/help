@@ -44,31 +44,30 @@ export class StudentComponent implements OnInit {
     );
 
     // This is a hacky solution to connection closing randomly
-
-    // this.trashCan$ = combineLatest([this.course$, this.refreshTrashcans]).pipe(
-    //   switchMap((arr) => {
-    //     const course = arr[0];
-    //     if (course.enabled) {
-    //       return this.trashCanService.getActiveByCourse(course, true);
-    //     } else {
-    //       return of([]);
-    //     }
-    //   }),
-    //   tap(() => this.trashCanSending = false),
-    //   map((trashcans) => trashcans[0])
-    // );
-
-    this.trashCan$ = this.course$.pipe(
-      switchMap((course) => {
+    this.trashCan$ = combineLatest([this.course$, this.refreshTrashcans]).pipe(
+      switchMap((arr) => {
+        const course = arr[0];
         if (course.enabled) {
-          return this.trashCanService.getActiveByCourse(course);
+          return this.trashCanService.getActiveByCourse(course, true);
         } else {
           return of([]);
         }
       }),
-        tap(() => this.trashCanSending = false),
-        map((trashcans) => trashcans[0])
+      tap(() => this.trashCanSending = false),
+      map((trashcans) => trashcans[0])
     );
+
+    // this.trashCan$ = this.course$.pipe(
+    //   switchMap((course) => {
+    //     if (course.enabled) {
+    //       return this.trashCanService.getActiveByCourse(course);
+    //     } else {
+    //       return of([]);
+    //     }
+    //   }),
+    //     tap(() => this.trashCanSending = false),
+    //     map((trashcans) => trashcans[0])
+    // );
   }
 
   public onSubmit(): void {
