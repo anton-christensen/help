@@ -29,14 +29,13 @@ export class AssistantComponent implements OnInit, OnDestroy {
 
     this.trashCans$ = this.course$.pipe(
       switchMap((course) => {
+        this.commonService.setTitle(`${course.slug.toUpperCase()}`);
         if (course.enabled) {
           return this.trashCanService.getActiveByCourse(course).pipe(
             tap((trashCans) => {
               if (trashCans.length) {
                 this.commonService.setTitle(`(${trashCans.length}) ${course.slug.toUpperCase()}`);
                 this.updateSecondsSince(trashCans);
-              } else {
-                this.commonService.setTitle(`${course.slug.toUpperCase()}`);
               }
             })
           );
@@ -60,7 +59,7 @@ export class AssistantComponent implements OnInit, OnDestroy {
   private updateSecondsSince(trashCans: TrashCan[]): void {
     const leftPadOneZero = (val) => `${val < 10 ? '0' : ''}${val}`;
     const now = new Date().getTime();
-    
+
     for (const trashCan of trashCans) {
       const created = new Date(trashCan.created).getTime();
       const diffSeconds = Math.floor((now - created) / 1000);
