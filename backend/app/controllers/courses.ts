@@ -44,6 +44,9 @@ export namespace CourseController {
             return HelpResponse.disallowed(response);
         }
 
+        // make sure the schema is valid
+        input.enabled = false;
+
         // TODO: validate unique slug
 
         HelpResponse.fromPromise(response, Database.courses.insert(input).run(Database.connection));
