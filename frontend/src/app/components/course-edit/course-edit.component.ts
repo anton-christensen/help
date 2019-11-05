@@ -87,14 +87,14 @@ export class CourseEditComponent implements OnInit {
   ngOnInit() {
     this.resetForm();
     this.departments$ = this.departmentService.getAll();
-    
+
     // Admins can see all courses, but only by department
     this.courses$ = this.auth.isAdmin().pipe(
       switchMap((isAdmin) => {
         if (isAdmin) {
-          return combineLatest(this.coursesFilterForm.controls.departmentSlug.valueChanges, this.courseListDirty).pipe(
+          return combineLatest([this.coursesFilterForm.controls.departmentSlug.valueChanges, this.courseListDirty]).pipe(
             switchMap((arr) => {
-              let departmentSlug = arr[0];
+              const departmentSlug = arr[0];
               return this.courseService.getRelevantByDepartment(departmentSlug, true);
             })
           );
@@ -105,7 +105,7 @@ export class CourseEditComponent implements OnInit {
         }
       })
     );
-    
+
     // Validate course slug when department changes
     this.courseForm.controls.departmentSlug.valueChanges
       .subscribe(() => {
@@ -246,7 +246,7 @@ export class CourseEditComponent implements OnInit {
       switchMap(() => {
         const departmentSlug = this.courseForm.value.departmentSlug;
         const courseSlug = control.value.toLowerCase();
-        if(!departmentSlug || !courseSlug) return of(null);
+        if (!departmentSlug || !courseSlug) { return of(null); }
 
         return this.courseService.getBySlug(departmentSlug, courseSlug).pipe(
           map((result) => {
@@ -278,7 +278,7 @@ export class CourseEditComponent implements OnInit {
         this.overrideFoundUsersSubject.next({
           data: [user],
           numPages: 1
-        })
+        });
       });
   }
 

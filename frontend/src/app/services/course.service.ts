@@ -85,7 +85,7 @@ export class CourseService {
     );
   }
 
-  public createOrUpdate(course: Course, departmentSlug = "", courseSlug = ""): Observable<Course> {
+  public createOrUpdate(course: Course, departmentSlug = '', courseSlug = ''): Observable<Course> {
     if (!course.id) {
       // New course
       return this.http.post<APIResponse<Course>>(`${environment.api}/courses`, course).pipe(
