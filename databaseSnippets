@@ -30,3 +30,12 @@ r.db('help').table('trashCans').group([
     return can('retractedAt').sub(can('created'))
 })
 .avg();
+
+# Courses with user objects instead of userIDs
+r.db('help').table('courses').merge(
+  (u) => {
+    return {associatedUsers: u('associatedUserIDs').map(
+      (id) => r.db('help').table('users').get(id).without('anon')) 
+    }
+  }
+).without('associatedUserIDs')
