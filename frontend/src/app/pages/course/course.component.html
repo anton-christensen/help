@@ -1,0 +1,15 @@
+<ng-container *ngIf="course$ | async as course">
+  <h1 class="course-title">{{ course.title }}</h1>
+
+  <ng-container *ngIf="auth.canAssistInCourse(course) | async; then assistant; else student"></ng-container>
+
+  <ng-template #assistant>
+    <app-assistant></app-assistant>
+  </ng-template>
+
+  <ng-template #student>
+    <app-student></app-student>
+  </ng-template>
+
+  <app-posts></app-posts>
+</ng-container>

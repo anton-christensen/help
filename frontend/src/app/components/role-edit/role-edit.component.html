@@ -1,0 +1,82 @@
+<h1>Roles</h1>
+<h3>Create users and set user roles</h3>
+<form class="no-detail inline-button"
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()">
+  <label for="query">
+    AAU email
+  </label>
+  <input type="text"
+         id="query"
+         name="help-aau-user-search"
+         autocomplete="off"
+         required
+         formControlName="query"
+         placeholder="Enter a name or valid AAU email">
+  <button *ngIf="(foundUsers$ | async)?.length === 0 && form.valid"
+          type="submit"
+          class="btn">
+    Create
+  </button>
+
+  <div *ngIf="(foundUsers$ | async)?.length === 0" class="info">
+    <span *ngIf="form.invalid && (form.touched || form.dirty) && form.value.query">
+      No users found. Enter a valid AAU email (ending in '.aau.dk') to create a new user
+    </span>
+
+    <span *ngIf="(foundUsers$ | async)?.length === 0 && form.valid">
+      This user does not exist in the system yet, but can be created
+    </span>
+  </div>
+</form>
+
+<div class="tablefix-wrapper" *ngIf="foundUsers$ | async as users">
+  <table class="user-list" *ngIf="users.length">
+    <thead>
+    <tr>
+      <th>User</th>
+      <th>Role</th>
+      <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="user" *ngFor="let user of users">
+      <td class="user">
+        <span class="block name">{{ user.name }}</span>
+        <span class="explanation email">{{ user.email }}</span></td>
+      <td>
+        <select (change)="setRole(user, $event.target.value)"
+                [value]='user.role'
+                [disabled]='user.email === (auth.user$ | async)?.email'>
+          <option value='admin'    >Admin</option>
+          <option value='lecturer' >Lecturer</option>
+          <option value='TA'       >TA</option>
+          <option value='student'  >Student</option>
+        </select>
+      </td>
+      <td class="delete" *ngIf="user.email === (auth.user$ | async)?.email"></td>
+      <td class="delete" *ngIf="user.email !== (auth.user$ | async)?.email">
+        <i (click)="deleteUser(users, user)" class="material-icons clickable">
+          delete_forever
+        </i>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination-buttons" *ngIf="numPages > 1">
+  <span class="prev material-icons"
+     *ngIf="currentPage > 0"
+     (click)="prevPage()">
+    keyboard_arrow_left
+  </span>
+  <span class="numbers">
+    {{ currentPage + 1 }}/{{ numPages }}
+  </span>
+  <span class="next material-icons"
+     *ngIf="currentPage < numPages - 1"
+     (click)="nextPage()">
+    keyboard_arrow_right
+  </span>
+</div>

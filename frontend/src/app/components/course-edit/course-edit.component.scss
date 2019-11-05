@@ -1,0 +1,98 @@
+@import '../../../sass/variables';
+
+form {
+  form {
+    margin-top: 6rem;
+    width: 100%;
+  }
+
+  button {
+    width: initial;
+    display: inline-block;
+  }
+}
+
+
+label.visible {
+  margin-bottom: 0.4rem;
+}
+
+th:last-child, td:last-child {
+  text-align: center;
+}
+
+.form-field {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.invalid-feedback {
+  position: absolute;
+  top: 4.2rem;
+  font-size: 0.8rem;
+  color: #c62828;
+}
+
+.halfnhalf > * {
+  width: 49%;
+  float: left;
+  table-layout: fixed;
+}
+
+.halfnhalf {
+  overflow: hidden;
+}
+
+.halfnhalf:first-child {
+  margin-right: 2%;
+}
+
+table .icon {
+  width: 3.5rem;
+  overflow: hidden;
+  text-align: right;
+}
+
+table + table .icon {
+  text-align: left;
+}
+
+.pagination-buttons {
+  margin: auto;
+  width: 8rem;
+  height: 3.5rem;
+  position: relative;
+
+  span {
+    position: absolute;
+    line-height: 3.5rem;
+  }
+
+  .numbers {
+    font-size: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prev, .next {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0 1rem;
+
+    &:hover {
+      color: $bg-grey-dark-hover;
+    }
+  }
+
+  .prev {
+    left: 0;
+  }
+
+  .next {
+    right: 0;
+  }
+}

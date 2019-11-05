@@ -1,0 +1,39 @@
+<div class="request-help-container" *ngIf="course$ | async as course">
+  <div class="course-notice notice" *ngIf="!course.enabled">
+    <h3>Course is not currently active</h3>
+    <p>Ask a TA or your lecturer to activate it during exercise sessions</p>
+  </div>
+
+  <ng-container *ngIf="course.enabled">
+    <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
+      <h2>Your trash can is out, help is on the way</h2>
+      <div class="retract-trash-can">
+        <button (click)="retractTrashCan(trashCan)" class="btn" >Retract trash can</button>
+      </div>
+    </ng-container>
+
+    <ng-template #trashCanNotOut>
+      <h2>Enter your room number to get help</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="no-detail inline-button">
+        <label for="room">
+          Room number
+        </label>
+        <input type="text"
+               id="room"
+               name="room"
+               required
+               formControlName="room"
+               placeholder="Room number">
+
+          <button [disabled]="form.invalid || trashCanSending"
+                type="submit"
+                class="btn">
+          Submit
+        </button>
+        <div *ngIf="form.invalid && (form.touched || form.dirty) && form.value.room" class="error">
+          That's an odd room number...
+        </div>
+      </form>
+    </ng-template>
+  </ng-container>
+</div>

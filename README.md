@@ -1,7 +1,5 @@
 # Help
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.6.
-
 The primary purpose is to register rooms that need help with exercises.
 It is intended as a replacement for a trash can-based system, where students who needs help with exercises would place the rooms trash can outside the door.
 
@@ -26,14 +24,13 @@ When we talk about **a trash can being put out**, we refer to the action of a us
 ### Lecturer (or administrator)
 
 > The lecturer hires a new TA to help with exercices.
-  The TA creates a user.
-  The lecturer associates the TA with their course by searching for the users name or email.
+  The lecturer associates the TA with their course by entering the TA's email.
 
 ### Administrator
 
 > A new lecturer needs to use the system for the first time.
-  The lecturer creates a user.
-  The administrator changes the lecturers role from student (default) to lecturer.
+  An administrator enters the new lecturers email and sets the role to lecturer
+  The lecturer logs in
   The lecturer can now create new courses or modify courses they've been associated with by other lecturers (in the case of taking over a course from another lecturer).
 
 ## Development

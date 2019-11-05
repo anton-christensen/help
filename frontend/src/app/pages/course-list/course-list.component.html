@@ -1,0 +1,29 @@
+<ng-container *ngIf="courses$ | async as courses">
+  <ng-container *ngIf="auth.isAdmin() | async; then admin; else notAdmin"></ng-container>
+  <ng-template #notAdmin>
+    <ng-container *ngIf="(auth.isLecturer() | async) || (auth.isAssistant() | async); then assistant; else student"></ng-container>
+  </ng-template>
+
+  <ng-template #admin>
+    <h1>All courses</h1>
+  </ng-template>
+
+  <ng-template #assistant>
+    <h1>Your courses</h1>
+  </ng-template>
+
+  <ng-template #student>
+    <h1>Active courses</h1>
+    <ng-container *ngIf="!courses.length">
+        <h2>There are no courses with active exercise sessions</h2>
+        <h4>Please check back later or ask a TA or your lecturer to activate the course</h4>
+      </ng-container>
+  </ng-template>
+
+  <ul>
+    <li *ngFor="let course of courses">
+      <app-course-link [course]="course"></app-course-link>
+    </li>
+  </ul>
+</ng-container>
+

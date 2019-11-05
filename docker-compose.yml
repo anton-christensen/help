@@ -1,0 +1,37 @@
+version: '3'
+services:
+  # DATABASE
+  rethinkdb:
+    image: 'rethinkdb:latest'
+    volumes: # persist data
+     - ./docker/rethinkdb/data:/data
+  
+  # fancy REST -> Realtime API middleware
+  pushpin:
+    build: ./docker/pushpin
+    image: my/pushpin
+    volumes: 
+      - ./docker/pushpin/routes:/etc/pushpin/routes
+    logging:
+      driver: "none"
+  
+  # REST API with pushpin integration
+  api:
+    image: help/api/prod
+    build: 
+      context: ./backend 
+      dockerfile: ./prod.Dockerfile
+    depends_on:
+      - rethinkdb
+    
+  
+  caddy:
+    image: "wemakeservices/caddy-docker:latest"
+    volumes:
+      - ./frontend/dist/help:/srv/
+      - ./docker/caddy/certs:/root/.caddy  # to save certificates on disk
+      - ./docker/caddy/Caddyfile.prod:/etc/Caddyfile  # to mount custom Caddyfile
+    ports:
+      - "80:80"
+      - "443:443"
+

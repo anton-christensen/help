@@ -1,0 +1,70 @@
+@import '~src/sass/variables';
+
+.post-edit {
+  form {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 10rem;
+    padding: 0.5rem;
+    outline: none;
+    resize: vertical;
+    border: none;
+    box-sizing: border-box;
+    background-color: $bg-grey-light;
+
+    &:hover {
+      background-color: $bg-grey-light-hover;
+    }
+
+    &:focus {
+      background-color: $bg-grey-light-focus;
+    }
+  }
+
+  .btn.cancel.fullscreen-editor,
+  .btn.submit.fullscreen-editor {
+    position: fixed;
+    z-index: 10;
+  }
+
+  .btn.cancel {
+    position: absolute;
+    right: 6rem;
+    bottom: 0;
+
+    &:disabled {
+      background-color: #aaa;
+    }
+  }
+
+  .btn.submit {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.post {
+  margin-bottom: 4rem;
+  position: relative;
+
+  .created {
+    font-size: 0.7rem;
+    color: $txt-dark-hover;
+  }
+
+  .content {
+    overflow: hidden;
+  }
+
+  .actions {
+    position: absolute;
+    right: 0;
+    top: -0.6rem;
+  }
+}
+
+

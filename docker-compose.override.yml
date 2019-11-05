@@ -1,0 +1,38 @@
+# overrides with dev environment settings
+version: '3'
+services:
+  # fakes som domain name stuff for development
+  dns:
+    image: 'jpillora/dnsmasq'
+    ports:
+      - "53:53/udp"
+    volumes:
+      - ./docker/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    environment:
+      - "HTTP_USER=foo"
+      - "HTTP_PASS=bar"
+
+  rethinkdb:
+  
+  pushpin:
+
+  api:
+    image: help/api/dev
+    build: 
+      dockerfile: ./dev.Dockerfile
+    volumes: 
+      - ./backend:/usr/src/help/api
+
+  app:
+    image: help/app/dev
+    build:
+      context: ./frontend
+      dockerfile: ./dev.Dockerfile
+    volumes:
+      - ./frontend:/usr/src/help/app
+
+  caddy:
+    volumes:
+      - ./docker/caddy/Caddyfile.dev:/etc/Caddyfile  # to mount custom Caddyfile
+
+  

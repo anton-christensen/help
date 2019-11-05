@@ -1,0 +1,163 @@
+<div class="menu-bar">
+  <div class="button left material-icons"
+       *ngIf="commonService.currentLocation !== 'departmentList'"
+       (click)="back()">
+    arrow_back
+  </div>
+
+  <div class="button right material-icons"
+       (click)="openMenu()">
+    menu
+  </div>
+
+  <ngx-loading-bar color="#2373C8" [includeSpinner]="false" [fixed]="false"></ngx-loading-bar>
+</div>
+
+<div class="menu-bg" *ngIf="isOpen" (click)="menuClicked()"></div>
+<div class="menu" [class.open]="isOpen" *ngIf="auth.user$ | async as user">
+  <div class="top">
+    <div class="name" *ngIf="auth.isLoggedIn() | async">
+      <div class="fl">
+        <label>
+          {{ user.name }}
+        </label>
+        <label class="sublabel">
+          {{ user.role === 'TA' ? 'Teaching assistant' : user.role }}
+        </label>
+      </div>
+    </div>
+
+    <div class="close"
+         (click)="closeMenu()">
+      <div class="fr">
+        <label>
+          ×
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="sessionService.getCourse$() | async as course">
+    <ng-container *ngIf="auth.canAssistInCourse(course) | async">
+      <div class="menu-item"
+           (click)="toggleCourseEnabled(course)">
+        <div class="fl">
+          <label for="course-enable-switch">
+            Course active
+          </label>
+          <label class="sublabel">
+            Let students ask for help
+          </label>
+        </div>
+        <div class="switch">
+          <input id="course-enable-switch" type="checkbox" [checked]="course.enabled"/>
+          <span class="slider"></span>
+        </div>
+      </div>
+
+      <div class="menu-item" *ngLet="notificationToken$ | async as token"
+           (click)="toggleNotificationsEnabled(course, token)">
+        <div class="fl">
+          <label for="notifications-enable-switch">
+            Notifications
+          </label>
+          <label class="sublabel">
+            On this device, for this course
+          </label>
+        </div>
+        <div class="switch">
+          <input id="notifications-enable-switch" type="checkbox" [checked]="token" [disabled]="tokenToggleBusy"/>
+          <span class="slider"></span>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <div class="bottom">
+    <a class="menu-item"
+       *ngIf="(auth.isAdmin() | async) || (auth.isLecturer() | async)"
+       (click)="adminClicked()"
+       [routerLink]="['/admin']">
+      <div class="fl">
+        <label>
+          Admin panel
+        </label>
+        <label class="sublabel">
+          Administrate the system
+        </label>
+      </div>
+    </a>
+
+    <a class="menu-item"
+       href="/assets/help/{{ user.role !== 'student' ? 'non-' : ''}}students.pdf"
+       target="_blank">
+      <div class="fl">
+        <label>
+          Help with help.aau.dk
+        </label>
+        <label class="sublabel">
+          Guide to using the system
+        </label>
+      </div>
+    </a>
+
+    <a class="menu-item"
+       (click)="reportBugClicked()"
+       href="mailto:achri15@student.aau.dk, hsaren14@student.aau.dk?subject=[help.aau.dk][Bugs]%20"
+       [target]="isPWA() ? '' : '_blank'">
+      <div class="fl">
+        <label>
+          Report a bug
+        </label>
+        <label class="sublabel">
+          Write us if something isn't working
+        </label>
+      </div>
+    </a>
+
+    <ng-container *ngIf="auth.isLoggedIn() | async; then loggedIn; else loggedOut;"></ng-container>
+
+    <ng-template #loggedIn>
+      <div class="menu-item"
+           (click)="auth.logout()">
+        <div class="fl">
+          <label>
+            Log out
+          </label>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template #loggedOut>
+      <ng-container *ngIf="auth.previouslyAcceptedLogInConditions(); then directLink; else askPermission;"></ng-container>
+
+      <ng-template #directLink>
+        <a class="menu-item" [href]="auth.generateCASURL()" (click)="auth.saveCurrentPath()">
+          <div class="fl">
+            <label>
+              Log In
+            </label>
+            <label class="sublabel">
+              For TAs, lecturers and administrators only
+            </label>
+          </div>
+        </a>
+      </ng-template>
+
+      <ng-template #askPermission>
+        <div class="menu-item"
+             (click)="auth.showLogInConditionsAndRedirect()">
+          <div class="fl">
+            <label>
+              Log In
+            </label>
+            <label class="sublabel">
+              For TAs, lecturers and administrators only
+            </label>
+          </div>
+        </div>
+      </ng-template>
+    </ng-template>
+
+  </div>
+</div>

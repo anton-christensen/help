@@ -1,0 +1,6 @@
+<a class="course-link"
+   [class.enabled]="course.enabled"
+   [class.disabled]="!course.enabled"
+   [routerLink]="['/', course.departmentSlug, course.slug]">
+  {{ course.title }} ({{ course.slug | uppercase }})
+</a>

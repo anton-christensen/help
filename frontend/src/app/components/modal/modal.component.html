@@ -1,0 +1,17 @@
+<div class="modal-wrapper" *ngIf="modalService.modal" (click)="clicked($event)">
+  <div class="modal">
+      <p *ngFor="let paragraph of modalService.modal.message.split('\n')">
+        {{ paragraph }}
+      </p>
+      <div>
+
+        <button class="btn" [ngClass]="modalService.modal.leftSide.type" type="button" (click)="modalService.resolve(modalService.modal.leftSide)">
+            {{ modalService.modal.leftSide.text }}
+        </button>
+
+        <button class="btn" [ngClass]="modalService.modal.rightSide.type" type="button" (click)="modalService.resolve(modalService.modal.rightSide)">
+          {{ modalService.modal.rightSide.text }}
+        </button>
+      </div>
+  </div>
+</div>

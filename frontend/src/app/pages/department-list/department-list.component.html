@@ -1,0 +1,11 @@
+<div *ngIf="departments$ | async as departments">
+  <h1 class="course-title">All departments</h1>
+
+  <ul>
+    <li *ngFor="let department of departments">
+      <a [routerLink]="[department.slug]" class="department-link">
+        {{ department.title }}
+      </a>
+    </li>
+  </ul>
+</div>
