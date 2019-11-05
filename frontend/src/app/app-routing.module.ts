@@ -14,10 +14,10 @@ const routes: Routes = [
   {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
 
   // Long links
-  {path: 'departments/:department/courses/:course', component: CourseComponent, canActivate: [DepartmentExistsGuard, CourseExistsGuard]},
-  {path: 'departments/:department/courses', component: CourseListComponent, canActivate: [DepartmentExistsGuard]},
-  {path: 'departments/:department', canActivate: [DepartmentExistsGuard], redirectTo: '/departments/:department/courses'},
-  {path: 'departments', component: DepartmentListComponent},
+  {path: 'departments/:department/courses/:course', redirectTo: ':department/:course'},
+  {path: 'departments/:department/courses', redirectTo: ':department'},
+  {path: 'departments/:department', redirectTo: ':department'},
+  {path: 'departments', redirectTo: ''},
 
   // Short links
   {path: ':department/:course', component: CourseComponent, canActivate: [DepartmentExistsGuard, CourseExistsGuard]},
