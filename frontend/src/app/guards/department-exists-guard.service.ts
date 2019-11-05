@@ -21,7 +21,7 @@ export class DepartmentExistsGuard implements CanActivate {
       map((exists) => {
         if (!exists) {
           this.toastService.add(`Department ${departmentSlug.toUpperCase()} not found`, 5000);
-          return this.router.parseUrl('/departments');
+          return this.router.parseUrl('/');
         }
 
         return true;

@@ -37,7 +37,9 @@ export class RequestCache<T, T2> {
         });
 
         return () => {
-          cacheEntry.subscription.unsubscribe();
+          if (cacheEntry.subscription) {
+            cacheEntry.subscription.unsubscribe();
+          }
           delete this.cache[key];
         };
       });

@@ -3,7 +3,7 @@
 
   <ul>
     <li *ngFor="let department of departments">
-      <a [routerLink]="['/', 'departments', department.slug , 'courses']" class="department-link">
+      <a [routerLink]="[department.slug]" class="department-link">
         {{ department.title }}
       </a>
     </li>

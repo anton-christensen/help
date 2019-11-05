@@ -13,7 +13,7 @@
   <ngx-loading-bar color="#2373C8" [includeSpinner]="false" [fixed]="false"></ngx-loading-bar>
 </div>
 
-<div class="menu-bg" *ngIf="isOpen" (click)="menuClicked($event)"></div>
+<div class="menu-bg" *ngIf="isOpen" (click)="menuClicked()"></div>
 <div class="menu" [class.open]="isOpen" *ngIf="auth.user$ | async as user">
   <div class="top">
     <div class="name" *ngIf="auth.isLoggedIn() | async">

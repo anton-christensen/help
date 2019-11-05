@@ -103,14 +103,14 @@ export class MenuComponent implements OnInit {
       localStorage.removeItem('preAdminLocation');
       this.router.navigateByUrl(path || '/');
     } else if (current === 'courseList') {
-      this.router.navigateByUrl('/departments');
+      this.router.navigateByUrl('/');
     } else {
-      const departmentSlug = /\/departments\/([^\/]+)\/courses/.exec(this.document.location.pathname)[1];
-      this.router.navigateByUrl(`/departments/${departmentSlug}`);
+      const departmentSlug = /\/([^\/]+)/.exec(this.document.location.pathname)[1];
+      this.router.navigateByUrl(departmentSlug);
     }
   }
 
-  menuClicked(e: MouseEvent) {
+  public menuClicked() {
     this.closeMenu();
   }
 }

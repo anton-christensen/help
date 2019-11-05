@@ -22,7 +22,7 @@ export class CourseExistsGuard implements CanActivate {
       map((exists) => {
         if (!exists) {
           this.toastService.add(`Course ${courseSlug.toUpperCase()} not found`, 5000);
-          return this.router.parseUrl('/departments/' + departmentSlug);
+          return this.router.parseUrl(departmentSlug);
         }
 
         return true;

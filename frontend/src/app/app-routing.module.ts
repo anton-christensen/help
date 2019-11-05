@@ -12,11 +12,19 @@ import {HandleSuccessfulAuthComponent} from './components/handle-successful-auth
 const routes: Routes = [
   {path: 'auth', component: HandleSuccessfulAuthComponent},
   {path: 'admin', component: AdminComponent, canActivate: [IsLecturerGuard]},
+
+  // Long links
   {path: 'departments/:department/courses/:course', component: CourseComponent, canActivate: [DepartmentExistsGuard, CourseExistsGuard]},
   {path: 'departments/:department/courses', component: CourseListComponent, canActivate: [DepartmentExistsGuard]},
   {path: 'departments/:department', canActivate: [DepartmentExistsGuard], redirectTo: '/departments/:department/courses'},
   {path: 'departments', component: DepartmentListComponent},
-  {path: '**', redirectTo: 'departments'},
+
+  // Short links
+  {path: ':department/:course', component: CourseComponent, canActivate: [DepartmentExistsGuard, CourseExistsGuard]},
+  {path: ':department', component: CourseListComponent, canActivate: [DepartmentExistsGuard]},
+  {path: '', component: DepartmentListComponent},
+
+  {path: '**', redirectTo: ''},
 ];
 
 @NgModule({
