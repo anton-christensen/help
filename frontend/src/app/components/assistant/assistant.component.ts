@@ -30,22 +30,25 @@ export class AssistantComponent implements OnInit, OnDestroy {
     this.trashCans$ = this.course$.pipe(
       switchMap((course) => {
         this.commonService.setTitle(`${course.slug.toUpperCase()}`);
+
         if (course.enabled) {
-          return this.trashCanService.getActiveByCourse(course).pipe(
-            tap((trashCans) => {
-              if (trashCans.length) {
-                this.commonService.setTitle(`(${trashCans.length}) ${course.slug.toUpperCase()}`);
-                this.updateSecondsSince(trashCans);
-              }
-            })
-          );
+          return this.trashCanService.getActiveByCourse(course);
         } else {
           return of([]);
         }
       })
     );
 
-    this.trashCansSub = this.trashCans$.subscribe((trashCans) => this.trashCans = trashCans);
+    this.trashCansSub = this.trashCans$
+      .subscribe((trashCans) => {
+        this.trashCans = trashCans;
+        if (trashCans.length) {
+          this.updateSecondsSince(trashCans);
+          this.commonService.setTitlePre(`(${trashCans.length})`);
+        } else {
+          this.commonService.setTitlePre('');
+        }
+      });
 
     setInterval(() => {
       this.updateSecondsSince(this.trashCans);
