@@ -65,6 +65,15 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         return next();
     }
     else {
+        let user = {
+            anon: true,
+            id: '',
+            email: '',
+            name: '',
+            role: 'student'
+        };
+        user.id = await r.uuid().run(Database.connection);
+        (request as any)._user = (user as any);
         return next();
     }
 };

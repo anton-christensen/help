@@ -15,6 +15,22 @@ services:
     logging:
       driver: "none"
   
+  # http2 -> http1 proxy that gets us around a six concurrent connection limit
+  # http2:
+  #   depends_on:
+  #     - pushpin
+  #   build: ./docker/nghttp2
+  #   image: help/nghttpx
+  #   environment:
+  #     - HOST=pushpin
+  #     - PORT=7999
+ 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./docker/nginx/config:/etc/nginx/nginx.conf
+
   # REST API with pushpin integration
   api:
     image: help/api/prod

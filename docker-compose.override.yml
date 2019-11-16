@@ -13,6 +13,10 @@ services:
       - "HTTP_PASS=bar"
 
   rethinkdb:
+
+#  http2:
+#    depends_on:
+#      - pushpin
   
   pushpin:
 

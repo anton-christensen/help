@@ -1,0 +1,10 @@
+events { } 
+http {
+  server {
+    # server_name your.server.url;
+    proxy_buffering off;
+    location / {
+        proxy_pass http://pushpin:7999/;
+    }
+  }
+}
