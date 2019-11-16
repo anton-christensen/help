@@ -18,7 +18,7 @@ help.aau.dk {
 }
 
 api.help.aau.dk {
-  proxy / nginx:80
+  proxy / pushpin:7999
   
   tls anton.christensen9700@gmail.com
 } 

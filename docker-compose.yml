@@ -25,11 +25,11 @@ services:
   #     - HOST=pushpin
   #     - PORT=7999
  
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    volumes:
-      - ./docker/nginx/config:/etc/nginx/nginx.conf
+#  nginx:
+#    image: nginx:latest
+#    container_name: nginx
+#    volumes:
+#      - ./docker/nginx/config:/etc/nginx/nginx.conf
 
   # REST API with pushpin integration
   api:
