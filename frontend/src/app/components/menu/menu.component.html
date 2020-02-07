@@ -59,7 +59,7 @@
            (click)="toggleNotificationsEnabled(course, token)">
         <div class="fl">
           <label for="notifications-enable-switch">
-            Notifications
+            Notifications <div *ngIf="tokenToggleBusy" class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           </label>
           <label class="sublabel">
             On this device, for this course

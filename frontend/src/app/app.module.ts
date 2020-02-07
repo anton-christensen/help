@@ -30,7 +30,7 @@ import {UserProvider} from './providers/user.provider';
 import {LoadingBarModule} from '@ngx-loading-bar/core';
 import {LoadingBarHttpClientModule} from '@ngx-loading-bar/http-client';
 import {NgLetDirective} from './utils/ng-let.directive';
-import { AssociatedUsersControlComponent } from './components/associated-users-control/associated-users-control.component';
+import {AssociatedUsersControlComponent} from './components/associated-users-control/associated-users-control.component';
 
 export function userProviderFactory(provider: UserProvider) {
   return () => provider.authenticate();
@@ -71,6 +71,7 @@ export function userProviderFactory(provider: UserProvider) {
     LoadingBarHttpClientModule
   ],
   providers: [
+    // Only loads the app with an auth token
     UserProvider,
     {
       provide: APP_INITIALIZER,
@@ -78,6 +79,8 @@ export function userProviderFactory(provider: UserProvider) {
       deps: [UserProvider],
       multi: true
     },
+
+    // Adds auth token to all requests
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
