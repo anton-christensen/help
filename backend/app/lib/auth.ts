@@ -1,14 +1,13 @@
 import * as crypto from "crypto";
 import { Role, User } from "../models/user";
-import { Response, Request, RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
 import { r } from "rethinkdb-ts";
 import { HelpResponse } from "./responses";
 
 export const getUser = (request: Request): User => {
-    let _user = ((request as any)._user as User);
-    return _user;
+    return (request as any)._user as User;
 };
 
 export const userRoleIn = (user: User, roles: Role[]): boolean => {
@@ -37,7 +36,7 @@ export const hash = (data: string):string => {
 export const AuthMiddleware:RequestHandler = async (request, response, next) => {
     let token = request.header('auth-token');
 
-    async function failHandle(token) {
+    async function failHandle(token: string | undefined) {
         // return a null user
         let user = {
             anon: true,
@@ -46,16 +45,17 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
             name: '',
             role: 'student'
         };
-        if(token)
+        if (token) {
             user.id = await r.uuid(token).run(Database.connection);
-        else
+        } else {
             user.id = await r.uuid().run(Database.connection);
+        }
         (request as any)._user = (user as any);
         return next();
     }
 
     // if user tries to authenticate
-    if(!token) {
+    if (!token) {
         return failHandle(undefined);
     }
 
@@ -66,13 +66,13 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
     .run(Database.connection) as AuthTokenFootprint);
     
     // if we didn't find anything
-    if(!footprint) {
+    if (!footprint) {
         return failHandle(token);
     }
 
     let now = await r.now().run(Database.connection);
     // If auth token has expired
-    if(now > footprint.expiration) {
+    if (now > footprint.expiration) {
         return failHandle(token);
     }
 

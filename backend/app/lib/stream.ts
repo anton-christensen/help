@@ -1,13 +1,10 @@
-import * as crypto from "crypto";
-import { Role, User } from "../models/user";
+import { User } from "../models/user";
 import { Response, RequestHandler } from "express";
-import { AuthTokenFootprint } from "../models/authToken";
 import { Database } from "../database";
-import { r, RFeed } from "rethinkdb-ts";
+import { RFeed } from "rethinkdb-ts";
 import { socket } from "zeromq";
 import { HelpResponse } from "./responses";
 
-var Tnet = require('tnet');
 const grip = require('grip');
 const expressGrip = require('express-grip');
 expressGrip.configure({
@@ -16,7 +13,7 @@ expressGrip.configure({
 });
 
 export const StreamMiddleware:RequestHandler = async (request, response, next) => {
-    let shouldStream = (request.header('stream') ? true : false);
+    let shouldStream = !!request.header('stream');
     response.locals._shouldStream = shouldStream;
     
     next();
@@ -24,7 +21,7 @@ export const StreamMiddleware:RequestHandler = async (request, response, next) =
     
 export const shouldStream = (response: Response): User => {
     return response.locals._shouldStream;
-}
+};
 
 export const createStream = (response: Response, channel: string, dbStream :RFeed, modifier: (err: any, row: any) => string) => {
     if(!shouldStream(response)) { return; }
@@ -35,7 +32,7 @@ export const createStream = (response: Response, channel: string, dbStream :RFee
     
     let stream = new Stream(channel, dbStream, modifier);
     StreamWorker.addStream(stream);
-}
+};
 
 class Stream {
     constructor(channel: string, changestream: RFeed, mappingFunction: (err: any, row: any) => string) {
@@ -87,7 +84,7 @@ export class StreamWorker {
             switch(msg[0]) {
             case 0:
                 console.log('UNSUB: ', channel);
-                StreamWorker.onUnsubscribe(channel)
+                StreamWorker.onUnsubscribe(channel);
                 break;
             case 1:
                 console.log('SUB: ', channel);
