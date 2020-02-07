@@ -29,7 +29,7 @@ export namespace NotificationTokenController {
         if(shouldStream(response)) {
             createStream(
                 response,
-                `GET(${user.id}:${input.deviceID}):/${input.departmentSlug}/${input.departmentSlug}/notifyToken/`,
+                `GET(${user.id}:${input.deviceID}):/${input.departmentSlug}/${input.courseSlug}/notifyToken/`,
                 query.changes(),
                 (err, row) => row
             );

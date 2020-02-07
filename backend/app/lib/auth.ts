@@ -36,35 +36,9 @@ export const hash = (data: string):string => {
 
 export const AuthMiddleware:RequestHandler = async (request, response, next) => {
     let token = request.header('auth-token');
-    if(token) {
-        token = hash(token);
 
-        const footprint = (await Database.db.table('authTokens').get(token)
-        .run(Database.connection) as AuthTokenFootprint);
-        if(!footprint) {
-            let user = {
-                anon: true,
-                id: '',
-                email: '',
-                name: '',
-                role: 'student'
-            };
-            user.id = await r.uuid(token).run(Database.connection);
-            (request as any)._user = (user as any);
-            return next();
-        }
-
-        let now = await r.now().run(Database.connection);
-        if(now < footprint.expiration) {
-            (request as any)._user = await Database.users.get(footprint.userID).run(Database.connection);
-        }
-        
-        if(!userRoleIn(getUser(request), ['student', 'TA', 'lecturer', 'admin'])) {
-            return HelpResponse.error(response, "Unknown user role");
-        }
-        return next();
-    }
-    else {
+    async function failHandle() {
+        // return a null user
         let user = {
             anon: true,
             id: '',
@@ -76,4 +50,35 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
         (request as any)._user = (user as any);
         return next();
     }
+
+    // if user tries to authenticate
+    if(!token) {
+        return failHandle();
+    }
+
+    token = hash(token);
+
+    // retrieve the correct auth token from the database for comparison
+    const footprint = (await Database.db.table('authTokens').get(token)
+    .run(Database.connection) as AuthTokenFootprint);
+    
+    // if we didn't find anything
+    if(!footprint) {
+        return failHandle();
+    }
+
+    let now = await r.now().run(Database.connection);
+    // If auth token has expired
+    if(now > footprint.expiration) {
+        return failHandle();
+    }
+
+    // get user from database and save in request to pass on
+    (request as any)._user = await Database.users.get(footprint.userID).run(Database.connection);
+
+    // validate users role
+    if(!userRoleIn(getUser(request), ['student', 'TA', 'lecturer', 'admin'])) {
+        return HelpResponse.error(response, "Unknown user role");
+    }
+    return next();
 };
