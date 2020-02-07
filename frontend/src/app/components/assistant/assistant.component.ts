@@ -67,7 +67,6 @@ export class AssistantComponent implements OnInit, OnDestroy {
       const created = new Date(trashCan.created).getTime();
       const diffSeconds = Math.floor((now - created) / 1000);
 
-      console.log(diffSeconds);
       if (diffSeconds < 5) {
         trashCan.secondsSinceCreation = 'Just now';
       } else if (diffSeconds < 60) {
