@@ -27,7 +27,7 @@
     "express-grip": "^1.2.1",
     "express-validator": "^6.4.0",
     "firebase-admin": "^8.9.2",
-    "got": "^10.5.2",
+    "got": "^9.6.0",
     "grip": "^1.6.0",
     "rethinkdb": "^2.4.2",
     "rethinkdb-ts": "^2.4.2",
