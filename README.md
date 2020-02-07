@@ -37,12 +37,22 @@ When we talk about **a trash can being put out**, we refer to the action of a us
 
 ### Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+First time setup needs to copy the `backend/example.env` to `backend/.env`
+
+Run `docker-compose up` to set up the development environment.
+If you set your DNS to `127.0.0.1` you should be able to use the development site at `app.help.dk`
 
 ### Deployment
 
-Run `ng build --prod && firebase deploy --only hosting` to build the project and push it to Google firebase
-Run `firebase deploy --only functions` to deploy the Google cloud functions (found in the functions folder)
+To deploy what is on the master branch:
+- ssh into the server `ssh -J <aau-email>@sshgw.aau.dk <aau-email>@dock-help01.srv.aau.dk`
+- Navigate to `cd /srv/help`
+- `docker-compose down` to shut down the different services
+- `git pull` to pull in newest changes
+- `./up-production.sh` to up the production docker environment
+
+
+
 
 ### Database structure
 
