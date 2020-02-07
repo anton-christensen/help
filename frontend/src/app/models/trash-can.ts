@@ -7,5 +7,5 @@ export interface TrashCan {
   responderName?: string;
   active: boolean;
   created?: string;
-  secondsSinceCreated?: string;
+  secondsSinceCreation?: string;
 }

@@ -30,7 +30,7 @@
               {{ trashCan.room }}
             </td>
             <td *ngIf="trashCan.created" class="created">
-              {{ trashCan.secondsSinceCreated }} ago
+              {{ trashCan.secondsSinceCreation }}
             </td>
             <td class="responder text-centered">
               <i *ngIf="!trashCan.responderName" (click)="respondToTrashCan(trashCan)" class="material-icons clickable">
