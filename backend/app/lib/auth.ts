@@ -37,7 +37,7 @@ export const hash = (data: string):string => {
 export const AuthMiddleware:RequestHandler = async (request, response, next) => {
     let token = request.header('auth-token');
 
-    async function failHandle() {
+    async function failHandle(token) {
         // return a null user
         let user = {
             anon: true,
@@ -46,14 +46,17 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
             name: '',
             role: 'student'
         };
-        user.id = await r.uuid().run(Database.connection);
+        if(token)
+            user.id = await r.uuid(token).run(Database.connection);
+        else
+            user.id = await r.uuid().run(Database.connection);
         (request as any)._user = (user as any);
         return next();
     }
 
     // if user tries to authenticate
     if(!token) {
-        return failHandle();
+        return failHandle(undefined);
     }
 
     token = hash(token);
@@ -64,13 +67,13 @@ export const AuthMiddleware:RequestHandler = async (request, response, next) => 
     
     // if we didn't find anything
     if(!footprint) {
-        return failHandle();
+        return failHandle(token);
     }
 
     let now = await r.now().run(Database.connection);
     // If auth token has expired
     if(now > footprint.expiration) {
-        return failHandle();
+        return failHandle(token);
     }
 
     // get user from database and save in request to pass on
