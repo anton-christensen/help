@@ -9,11 +9,11 @@ help.aau.dk {
   tls anton.christensen9700@gmail.com
 
   header /js {
-    Cache-Control “public, max-age=31536000”
+    Cache-Control "public, max-age=31536000"
   }
 
   header /css {
-    Cache-Control “public, max-age=31536000”
+    Cache-Control "public, max-age=31536000"
   }
 }
 
