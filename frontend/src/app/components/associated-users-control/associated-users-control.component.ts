@@ -1,6 +1,6 @@
 import {Component, forwardRef, OnInit} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
-import {User} from '../../models/user';
+import {Role, showRole, User} from '../../models/user';
 import {ToastService} from '../../services/toasts.service';
 
 @Component({
@@ -49,5 +49,9 @@ export class AssociatedUsersControlComponent implements OnInit, ControlValueAcce
       this.users = newUsers;
       this.propagateChange(this.users);
     }
+  }
+
+  public showRole(role: Role) {
+    return showRole(role);
   }
 }

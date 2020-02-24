@@ -1,4 +1,11 @@
 export type Role = 'admin' | 'lecturer' | 'TA' | 'student';
+export function showRole(role: Role): string {
+  if (role === 'TA') {
+    return role;
+  } else {
+    return role[0].toUpperCase() + role.slice(1);
+  }
+}
 
 export interface User {
   id: string;

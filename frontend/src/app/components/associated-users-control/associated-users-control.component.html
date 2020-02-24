@@ -14,7 +14,7 @@
         <span class="block name">{{ user.name }}</span>
         <span class="explanation email">{{ user.email }}</span>
       </td>
-      <td class="role">{{ user.role }}</td>
+      <td class="role">{{ showRole(user.role) }}</td>
       <td (click)="removeUser(user)" class="delete">
         <i class="material-icons clickable">delete_forever</i>
       </td>
