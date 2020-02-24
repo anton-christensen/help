@@ -66,6 +66,7 @@ export class CourseEditComponent implements OnInit {
   });
 
   public foundUsers$: Observable<User[]>;
+  public addingUser = false;
   public pageSize = 5;
   public currentPage = 0;
   public numPages = 0;
@@ -270,6 +271,7 @@ export class CourseEditComponent implements OnInit {
     if (this.usersForm.invalid) {
       return;
     }
+    this.addingUser = true;
 
     this.userService.createUserWithEmail(this.usersForm.controls.query.value.trim()).pipe(first())
       .subscribe((user) => {
@@ -279,6 +281,7 @@ export class CourseEditComponent implements OnInit {
           data: [user],
           numPages: 1
         });
+        this.addingUser = false;
       });
   }
 

@@ -57,7 +57,6 @@ export class RoleEditComponent implements OnInit {
         });
         this.userService.searchByNameOrEmail(this.form.controls.query.value.trim(), this.pageSize, this.currentPage, true).pipe(first())
           .subscribe((result) => {
-            console.log(result);
             this.overrideFoundUsersSubject.next(result)
           });
       });

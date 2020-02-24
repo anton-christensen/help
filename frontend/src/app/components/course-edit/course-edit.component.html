@@ -113,20 +113,21 @@
     <form class="no-detail inline-button"
           [formGroup]="usersForm"
           (ngSubmit)="onUserFormSubmit()">
-      <label for="query" class="visible">
+      <label for="course-add-user-query" class="visible">
         Find users to associate with course
       </label>
       <input type="text"
-             id="query"
+             id="course-add-user-query"
              name="help-aau-user-search"
              autocomplete="off"
              required
              formControlName="query"
              placeholder="Enter a name or valid AAU email">
       <button *ngIf="(foundUsers$ | async)?.length === 0 && usersForm.valid"
+              [disabled]="addingUser"
               type="submit"
               class="btn">
-        Create and add
+        {{ addingUser ? 'Adding...' : 'Create and add' }}
       </button>
 
       <div *ngIf="(foundUsers$ | async)?.length === 0" class="info">
