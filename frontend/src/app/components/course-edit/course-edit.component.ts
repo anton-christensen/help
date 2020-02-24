@@ -137,7 +137,7 @@ export class CourseEditComponent implements OnInit {
           title: course.title,
           departmentSlug: course.departmentSlug,
           courseSlug: course.slug.toUpperCase(),
-          associatedUsers: users
+          associatedUsers: users.filter((u) => !!u) // If we somehow get a non-existing user, don't attempt to show it
         });
 
         this.usersForm.reset({
