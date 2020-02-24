@@ -128,7 +128,7 @@ export namespace UserController {
         role:  { in: ['body'], optional: true, isIn: { options: [['TA', 'student', 'lecturer', 'admin']] } },
         name:  { in: ['body'], optional: true, isString: true },
     });
-    export const updateUser: RequestHandler = (request, response) => {
+    export const updateUser: RequestHandler = async (request, response) => {
         const user = getUser(request);
         const input = matchedData(request, {locations: ['body']});
         const params = matchedData(request, {locations: ['params']});
@@ -146,17 +146,13 @@ export namespace UserController {
 
         // Check that user email is unique
         if (input.email) {
-            Database.users.filter({email: input.email}).run(Database.connection)
-                .then((existingUsers: User[]) => {
-                    if (existingUsers.length) {
-                        return HelpResponse.error(response, 'Email already in use', 406);
-                    } else {
-                        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
-                    }
-                });
-        } else {
-            HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
+            const existingUsers = await Database.users.filter({email: input.email}).run(Database.connection);
+            if (existingUsers.length) {
+                return HelpResponse.error(response, 'Email already in use', 406);
+            }
         }
+
+        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
     };
 
     export const deleteUserValidator = checkSchema({
