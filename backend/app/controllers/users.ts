@@ -8,15 +8,16 @@ import { User } from "../models/user";
 import { AuthTokenFootprint } from "../models/authToken";
 import got = require("got");
 import { checkSchema, matchedData } from "express-validator";
+import {Course} from "../models/course";
 
 export namespace UserController {
     export const getAuthedUserValidator = checkSchema({});
     export const getAuthedUser: RequestHandler = async (request, response) => {
         const user = getUser(request);
         console.log(user);
-        let query;
-        if(user.anon === false) {
-            query = Database.users.get(user.id);
+
+        if (!user.anon) {
+            const query = Database.users.get(user.id);
             createStream(
                 response,
                 `GET(${user.id}):/user`,
@@ -25,7 +26,7 @@ export namespace UserController {
             );
         }
         HelpResponse.success(response, user);
-    }
+    };
 
 
     export const getUserByIDValidator = checkSchema({
@@ -33,13 +34,14 @@ export namespace UserController {
     });
     export const getUserByID: RequestHandler = async (request, response) => {
         let user = getUser(request);
-        if(userRoleIn(user, ['student', 'TA'])) {
+
+        if (userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        else if(userRoleIn(user, ['lecturer', 'admin'])) {
-            let query = Database.users.get(request.params.userID);
+        else if (userRoleIn(user, ['lecturer', 'admin'])) {
+            const query = Database.users.get(request.params.userID);
             
-            if(shouldStream(response)) {
+            if (shouldStream(response)) {
                 createStream(
                     response,
                     `GET:/users/${request.params.userID}`,
@@ -50,7 +52,7 @@ export namespace UserController {
     
             HelpResponse.fromPromise(response, query.run(Database.connection));
         }
-    }
+    };
     
     export const getUsersByQueryValidator = checkSchema({
         q: { in: ['query'], isString: true},
@@ -59,22 +61,23 @@ export namespace UserController {
         _user: { in: ['params'] }
     });
     export const getUsersByQuery: RequestHandler = async (request, response) => {
-        let user = getUser(request);
+        const user = getUser(request);
         const input = matchedData(request);
-        let page = (input.p ? input.p : 0);
-        let limit = (input.l ? input.l : 10);
-        
-        if(limit > 25 || limit < 1) {
+
+        const limit = (input.l ? input.l : 10);
+        if (limit > 25 || limit < 1) {
             HelpResponse.error(response, 'limit must be in range [1..25]')
         }
-        if(page < 0) {
+
+        const page = (input.p ? input.p : 0);
+        if (page < 0) {
             HelpResponse.error(response, 'page cannot be negative');
         }
     
-        if(userRoleIn(user, ['student', 'TA'])) {
+        if (userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        else if(userRoleIn(user, ['lecturer', 'admin'])) {
+        else if (userRoleIn(user, ['lecturer', 'admin'])) {
             let query = Database.users.filter((user: RDatum) =>
                 r.or(
                     r.row('name').downcase().match(input.q.toLowerCase()).eq(null).not(),
@@ -84,20 +87,10 @@ export namespace UserController {
             
             const count = Math.ceil(await query.count().run(Database.connection) / limit);
             query = query.skip(page*limit).limit(limit);
-    
-            // // Cannot make a stream of an ordered query
-            // createStream(
-            //     response,
-            //     `GET:/users?q=${input.q.toLowerCase()}`,
-            //     query.changes(),
-            //     (err, row) => row
-            // );
-           
-            
+
             HelpResponse.pagedFromPromise(response, count, query.run(Database.connection));
-            // HelpResponse.fromPromise(response, query.run(Database.connection));
         }
-    }
+    };
 
     export const createUserValidator = checkSchema({
         email: { in: ['body'], isEmail:  true },
@@ -108,18 +101,26 @@ export namespace UserController {
         const user = getUser(request);
         const input = matchedData(request);
         input.anon = false;
-    
-        if(userRoleIn(user, ['student', 'TA'])) {
+
+        // Students and TAs can't create users
+        if (userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+        // Lecturers can only create students and TAs
+        else if (user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
             return HelpResponse.disallowed(response);
         }
 
-        // TODO: Check that user email is unique
-    
-        HelpResponse.fromPromise(response, Database.users.insert(input).run(Database.connection));
-    }
+        // Check that user email is unique
+        Database.users.filter({email: input.email}).run(Database.connection)
+            .then((existingUsers: User[]) => {
+                if (existingUsers.length) {
+                    return HelpResponse.error(response, 'Email already in use', 406);
+                } else {
+                    return HelpResponse.fromPromise(response, Database.users.insert(input).run(Database.connection));
+                }
+            });
+    };
 
     export const updateUserValidator = checkSchema({
         userID:{ in: ['params'] },
@@ -132,18 +133,31 @@ export namespace UserController {
         const input = matchedData(request, {locations: ['body']});
         const params = matchedData(request, {locations: ['params']});
         input.anon = false;
-    
-        if(userRoleIn(user, ['student', 'TA'])) {
-            return HelpResponse.disallowed(response);
-        }
-        else if(user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+
+        // Students and TAs cannot make any changes to their user
+        if (userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
 
-        // TODO: Check that user email is unique
-    
-        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
-    }
+        // Lecturers cannot promote anyone to lecturer or admin
+        else if (user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+            return HelpResponse.disallowed(response);
+        }
+
+        // Check that user email is unique
+        if (input.email) {
+            Database.users.filter({email: input.email}).run(Database.connection)
+                .then((existingUsers: User[]) => {
+                    if (existingUsers.length) {
+                        return HelpResponse.error(response, 'Email already in use', 406);
+                    } else {
+                        HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
+                    }
+                });
+        } else {
+            HelpResponse.fromPromise(response, Database.users.get(params.userID).update(input).run(Database.connection));
+        }
+    };
 
     export const deleteUserValidator = checkSchema({
         userID:{ in: ['params'] },
@@ -151,15 +165,22 @@ export namespace UserController {
     export const deleteUser: RequestHandler = (request, response) => {
         const user = getUser(request);
         const params = matchedData(request, {locations: ['params']});
-    
-        if(userRoleIn(user, ['student', 'TA', 'lecturer']) || user.id == params.userID) {
+
+        // Only admins can delete users
+        if (userRoleIn(user, ['student', 'TA', 'lecturer']) || user.id == params.userID) {
             return HelpResponse.disallowed(response);
         }
 
-
+        // Remove user from all courses
+        Database.courses.filter((course: RDatum<Course>) => course('associatedUserIDs').contains(params.userID))
+            .update((course: RDatum<Course>) => {
+                return {
+                    associatedUserIDs: course('associatedUserIDs').filter((id) => id !== params.userID)
+                }
+            });
 
         HelpResponse.fromPromise(response, Database.users.get(params.userID).delete().run(Database.connection));
-    }
+    };
 
     export const validateCASLoginValidator = checkSchema({
         target: { in: ['query'], isString: true },
