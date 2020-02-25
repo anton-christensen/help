@@ -8,65 +8,98 @@ import {r, RDatum} from 'rethinkdb-ts';
 
 export class OnUpdateWorker {
     public static start() {
-        console.log("loading service account");
-        var serviceAccount = require("../../serviceAccountKey.json");
+        console.log('Loading service account...');
+        const serviceAccount = require('../../serviceAccountKey.json');
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            databaseURL: "https://aau-help.firebaseio.com"
+            databaseURL: 'https://aau-help.firebaseio.com'
         });
+        console.log('Service account loaded!');
 
-        console.log("setting up database listeners");
-        Database.trashCans.changes({includeTypes: true}).run(Database.connection).then(cursor => {
-            cursor.each((err, row) => {
-                if(row.type == "add") {
-                    OnUpdateWorker.onNewTrashCan(row['new_val'])
-                }
-                if(row.type == "change") {
-                    OnUpdateWorker.onUpdateTrashCan(row['old_val'], row['new_val']);
-                }
-            });
-        });
+        const listenerPromises = [];
+        console.log('Setting up database listeners...');
 
-        Database.notificationTokens.changes({includeTypes: true}).run(Database.connection).then(cursor => {
-            cursor.each((err, row) => {
-                if(row.type == "add") {
-                    OnUpdateWorker.onNewNotificationToken(row['new_val'])
-                }
-                if(row.type == "remove") {
-                    OnUpdateWorker.onDeleteNotificationToken(row['old_val'])
-                }
-                if(row.type == "change") {
-                    OnUpdateWorker.onUpdatedNotificationToken(row['old_val'], row['new_val'])
-                }
-            });
-        });
+        listenerPromises.push(
+            Database.trashCans
+                .changes({includeTypes: true})
+                .run(Database.connection)
+                .then((cursor) => {
+                    return cursor.each((err, row) => {
+                        if (row.type === 'add') {
+                            OnUpdateWorker.onNewTrashCan(row['new_val'])
+                        }
+                        if (row.type === 'change') {
+                            OnUpdateWorker.onUpdateTrashCan(row['old_val'], row['new_val']);
+                        }
+                    });
+                })
+                .catch(() => console.error('Failed to set up trashcan listeners'))
+        );
 
-        Database.courses.changes({includeTypes: true}).run(Database.connection).then(cursor => {
-            cursor.each((err, row) => {
-                if(row.type == "remove") {
-                    OnUpdateWorker.onDeleteCourse(row['old_val'])
-                }
-                if(row.type == "change") {
-                    OnUpdateWorker.onUpdateCourse(row['old_val'], row['new_val'])
-                }
-            });
-        });
+        listenerPromises.push(
+            Database.notificationTokens
+                .changes({includeTypes: true})
+                .run(Database.connection)
+                .then((cursor) => {
+                    return cursor.each((err, row) => {
+                        if (row.type === 'add') {
+                            OnUpdateWorker.onNewNotificationToken(row['new_val'])
+                        }
+                        if (row.type === 'remove') {
+                            OnUpdateWorker.onDeleteNotificationToken(row['old_val'])
+                        }
+                        if (row.type === 'change') {
+                            OnUpdateWorker.onUpdatedNotificationToken(row['old_val'], row['new_val'])
+                        }
+                    });
+                })
+                .catch(() => console.error('Failed to set up notification token listeners'))
+        );
 
-        Database.users.changes({includeTypes: true}).run(Database.connection).then(cursor => {
-            cursor.each((err, row) => {
-                if(row.type == "remove") {
-                    OnUpdateWorker.onUserDelete(row['old_val'])
-                }
-                if(row.type == "change") {
-                    OnUpdateWorker.onUserUpdate(row['old_val'], row['new_val'])
-                }
-            });
-        });
+        listenerPromises.push(
+            Database.courses
+                .changes({includeTypes: true})
+                .run(Database.connection)
+                .then((cursor) => {
+                    return cursor.each((err, row) => {
+                        if (row.type === 'remove') {
+                            OnUpdateWorker.onDeleteCourse(row['old_val'])
+                        }
+                        if (row.type === 'change') {
+                            OnUpdateWorker.onUpdateCourse(row['old_val'], row['new_val'])
+                        }
+                    });
+                })
+                .catch(() => console.error('Failed to set up course listeners'))
+        );
+
+        listenerPromises.push(
+            Database.users
+                .changes({includeTypes: true})
+                .run(Database.connection)
+                .then((cursor) => {
+                    return cursor.each((err, row) => {
+                        if (row.type === 'remove') {
+                            OnUpdateWorker.onUserDelete(row['old_val'])
+                        }
+                        if (row.type === 'change') {
+                            OnUpdateWorker.onUserUpdate(row['old_val'], row['new_val'])
+                        }
+                    });
+                })
+                .catch(() => console.error('Failed to set up user listeners'))
+        );
+
+        return Promise.all(listenerPromises)
+            .then(() => console.log('Succesfully set up database listeners...'))
     }
 
-    // Send notification to proper topic when a trashcan appears
+
     static onNewTrashCan(can: TrashCan) {
-        admin.messaging().sendToTopic(`TrashCan-${can.departmentSlug}-${can.courseSlug}`, {
+        // Send notification to proper topic when a trashcan is created
+        const topic = `TrashCan-${can.departmentSlug}-${can.courseSlug}`;
+        return admin.messaging()
+            .sendToTopic(topic, {
             notification: {
               title: `A ${can.courseSlug.toUpperCase()} student needs help!`,
               body: `Room no. ${can.room}`,
@@ -76,53 +109,69 @@ export class OnUpdateWorker {
           });
     }
 
-
     static onUpdateTrashCan(oldCan: TrashCan, newCan: TrashCan) {
+        const promises = [];
+
         // Remove userID from trashcans when they are removed
         if (oldCan.active && !newCan.active) {
-            Database.trashCans
+            promises.push(
+                Database.trashCans
                 .get(newCan.id)
                 .replace(r.row.without('userID'))
-                .run(Database.connection);
+                .run(Database.connection)
+            )
         }
 
         // Move all earlier trashcans up in line when a trashcan is removed
         if (oldCan.active && !newCan.active) {
-            Database.trashCans
-                .filter((trashCan: RDatum<TrashCan>) => {
-                    return  trashCan('departmentSlug').eq(oldCan.departmentSlug).and(
-                            trashCan('courseSlug').eq(oldCan.courseSlug)).and(
-                            trashCan('active').eq(true)).and(
-                            trashCan('created').gt(oldCan.created)
-                    );
-                })
-                .update({
-                    numInLine: r.row('numInLine').sub(1)
-                })
-                .run(Database.connection)
+            promises.push(
+                Database.trashCans
+                    .filter((trashCan: RDatum<TrashCan>) => {
+                        return  trashCan('departmentSlug').eq(oldCan.departmentSlug).and(
+                                trashCan('courseSlug').eq(oldCan.courseSlug)).and(
+                                trashCan('active').eq(true)).and(
+                                trashCan('created').gt(oldCan.created)
+                        );
+                    })
+                    .update({
+                        numInLine: r.row('numInLine').sub(1)
+                    })
+                    .run(Database.connection)
+            )
         }
+
+        return Promise.all(promises);
     }
 
-    // Subscribe notification tokens to trash cans from their course
     static onNewNotificationToken(notificationToken: NotificationToken) {
-        return admin.messaging().subscribeToTopic(notificationToken.token, `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`);
+        // Subscribe notification tokens when they are created
+        const topic = `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`;
+        return admin.messaging()
+            .subscribeToTopic(notificationToken.token, topic);
     }
 
-    // Handle notification token subscriptions on updates
+
     static onUpdatedNotificationToken(oldNotificationToken: NotificationToken, newNotificationToken: NotificationToken) {
-        return admin.messaging().unsubscribeFromTopic(oldNotificationToken.token, `TrashCan-${oldNotificationToken.departmentSlug}-${oldNotificationToken.courseSlug}`).then(() => {
-            return admin.messaging().subscribeToTopic(newNotificationToken.token, `TrashCan-${newNotificationToken.departmentSlug}-${newNotificationToken.courseSlug}`);
-        });
+        // Handle subscriptions whenever a notification token is updated
+        const oldTopic = `TrashCan-${oldNotificationToken.departmentSlug}-${oldNotificationToken.courseSlug}`;
+        const newTopic = `TrashCan-${newNotificationToken.departmentSlug}-${newNotificationToken.courseSlug}`;
+
+        return admin.messaging()
+            .unsubscribeFromTopic(oldNotificationToken.token, oldTopic)
+            .then(() => admin.messaging().subscribeToTopic(newNotificationToken.token, newTopic));
     }
 
-    // Unsubscribe when tokens are removed
     static onDeleteNotificationToken(notificationToken: NotificationToken) {
-        return admin.messaging().unsubscribeFromTopic(notificationToken.token, `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`);
+        // Unsubscribe tokens when they are deleted
+        const topic = `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`;
+        return admin.messaging()
+            .unsubscribeFromTopic(notificationToken.token, topic);
     }
 
-    // Remove notification tokens from users if the are removed from a course
     static onUpdateCourse(oldCourse: Course, newCourse: Course) {
-        // Check if there was a change to associated users
+        // Remove notification tokens from users if the are removed from a course
+
+        // Make a list of all removed userIDs
         const removedUsers = [];
         for (const oldUser of oldCourse.associatedUserIDs) {
             if (!newCourse.associatedUserIDs.includes(oldUser)) {
@@ -135,9 +184,9 @@ export class OnUpdateWorker {
         }
 
         // Remove notification tokens for each removed user and this course
-        const removedUsersPromises = [];
+        const promises = [];
         for (const removedUser of removedUsers) {
-            removedUsersPromises.push(
+            promises.push(
                 Database.notificationTokens.filter({
                     departmentSlug: oldCourse.departmentSlug,
                     courseSlug: oldCourse.slug,
@@ -146,51 +195,65 @@ export class OnUpdateWorker {
             );
         }
 
-        return Promise.all(removedUsersPromises);
+        return Promise.all(promises);
     };
 
-
-
-    // Remove all notification tokens related to a deleted course
     static onDeleteCourse(oldCourse: Course) {
+        const promises = [];
+
         // Remove all notification tokens related to the course
-        Database.notificationTokens.filter(
-            {
+        promises.push(
+            Database.notificationTokens
+            .filter({
                 departmentSlug: oldCourse.departmentSlug,
                 courseSlug: oldCourse.slug
-            }
-        ).delete().run(Database.connection)
+            })
+            .delete()
+            .run(Database.connection)
+        );
+
         // Remove all posts related to the course
-        .then(() => {
-            return Database.posts.filter(
-                {
+        promises.push(
+            Database.posts
+                .filter({
                     departmentSlug: oldCourse.departmentSlug,
                     courseSlug: oldCourse.slug
-                }
-            ).delete().run(Database.connection);
-        });
+                })
+                .delete()
+                .run(Database.connection)
+        );
+
+        return Promise.all(promises);
     }
 
-    // Remove all notification tokens from users if they are demoted to students
     static onUserUpdate(oldUser: User, newUser: User) {
-        if (newUser.role !== 'student') {
-            return null;
+        const promises = [];
+
+        // Remove all notification tokens from users if they are demoted to students
+        if (newUser.role === 'student') {
+            promises.push(
+                Database.notificationTokens
+                    .filter({userID: oldUser.id})
+                    .delete()
+                    .run(Database.connection)
+            );
         }
 
-        // If the new role is 'student', delete all notification tokens related to this user
-        return Database.notificationTokens.filter(
-            {
-                userID: oldUser.id
-            }
-        ).delete().run(Database.connection);
+        return Promise.all(promises);
     }
 
-    // Remove all notification tokens from users when they are deleted
+
     static onUserDelete(user: User) {
-        return Database.notificationTokens.filter(
-            {
-                userID: user.id
-            }
-        ).delete().run(Database.connection);
+        const promises = [];
+
+        // Remove all notification tokens from users when they are deleted
+        promises.push(
+            Database.notificationTokens
+                .filter({userID: user.id})
+                .delete()
+                .run(Database.connection)
+        );
+
+        return Promise.all(promises);
     }
 }
