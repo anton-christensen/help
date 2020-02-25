@@ -7,4 +7,5 @@ export interface TrashCan {
   responderName: string;
   active: boolean;
   created: Date;
+  numInLine: number;
 }

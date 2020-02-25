@@ -98,4 +98,11 @@ export class StudentComponent implements OnInit {
 
     return null;
   }
+
+  public formatQueueText(num: number): string {
+    const ordinals: string[] = ['th','st','nd','rd'];
+    const v = num % 100;
+
+    return `You are ${num}<sup>${ordinals[(v-20)%10]||ordinals[v]||ordinals[0]}</sup> in line`;
+  }
 }

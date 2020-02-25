@@ -4,7 +4,7 @@ import { TrashCan } from '../models/trashCan';
 import { NotificationToken } from '../models/notificationToken';
 import { Course } from '../models/course';
 import { User } from '../models/user';
-import { r } from 'rethinkdb-ts';
+import {r, RDatum} from 'rethinkdb-ts';
 
 export class OnUpdateWorker {
     public static start() {
@@ -76,15 +76,32 @@ export class OnUpdateWorker {
           });
     }
 
-    // Send notification to proper topic when a trashcan appears
+
     static onUpdateTrashCan(oldCan: TrashCan, newCan: TrashCan) {
-        if(newCan.active == false)
-            Database.trashCans.get(newCan.id).replace(r.row.without('userID')).run(Database.connection);
+        // Remove userID from trashcans when they are removed
+        if (oldCan.active && !newCan.active) {
+            Database.trashCans
+                .get(newCan.id)
+                .replace(r.row.without('userID'))
+                .run(Database.connection);
+        }
+
+        // Move all earlier trashcans up in line when a trashcan is removed
+        if (oldCan.active && !newCan.active) {
+            Database.trashCans
+                .filter((trashCan: RDatum<TrashCan>) => {
+                    return  trashCan('departmentSlug').eq(oldCan.departmentSlug).and(
+                            trashCan('courseSlug').eq(oldCan.courseSlug)).and(
+                            trashCan('active').eq(true)).and(
+                            trashCan('created').gt(oldCan.created)
+                    );
+                })
+                .update({
+                    numInLine: r.row('numInLine').sub(1)
+                })
+                .run(Database.connection)
+        }
     }
-
-
-
-
 
     // Subscribe notification tokens to trash cans from their course
     static onNewNotificationToken(notificationToken: NotificationToken) {

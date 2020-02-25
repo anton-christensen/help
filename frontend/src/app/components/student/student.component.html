@@ -6,7 +6,8 @@
 
   <ng-container *ngIf="course.enabled">
     <ng-container *ngIf="trashCan$ | async as trashCan; else trashCanNotOut">
-      <h2>Your trash can is out, help is on the way</h2>
+      <h2>Your trash can is out!</h2>
+      <h4 [innerHTML] = "formatQueueText(trashCan.numInLine + 1)"></h4>
       <div class="retract-trash-can">
         <button (click)="retractTrashCan(trashCan)" class="btn" >Retract trash can</button>
       </div>

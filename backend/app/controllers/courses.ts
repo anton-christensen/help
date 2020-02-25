@@ -4,7 +4,7 @@ import { Database } from '../database';
 import { checkSchema, matchedData } from 'express-validator';
 import { HelpResponse } from '../lib/responses';
 import { getUser, userRoleIn, userIsAssociatedWithCourse } from '../lib/auth';
-import { shouldStream, createStream } from '../lib/stream';
+import { createStream } from '../lib/stream';
 
 export namespace CourseController {
     export const getAssociatedCoursesValidator = checkSchema({});
@@ -29,7 +29,7 @@ export namespace CourseController {
         );
     
         HelpResponse.fromPromise(response, query.run(Database.connection));
-    }
+    };
 
     export const createCourseValidator = checkSchema({
         title: { in: 'body', isString: true },
@@ -50,7 +50,7 @@ export namespace CourseController {
         // TODO: validate unique slug
 
         HelpResponse.fromPromise(response, Database.courses.insert(input).run(Database.connection));
-    }
+    };
 
     export const getCoursesByDepartmentValidator = checkSchema({
         departmentSlug: { in: 'params', isString: true },

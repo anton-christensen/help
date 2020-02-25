@@ -61,5 +61,4 @@ Database.init().then(() => {
 
     StreamWorker.start();
     OnUpdateWorker.start();
-
 });

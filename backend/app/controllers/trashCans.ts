@@ -80,7 +80,22 @@ export namespace TrashCanController {
         if (!user) {
             return HelpResponse.disallowed(response);
         }
-    
+
+        // Get the number of active trashcans in the course
+        const existingTrashCans: TrashCan[] = await Database.trashCans
+            .filter({
+                active: true,
+                departmentSlug: input.departmentSlug,
+                courseSlug: input.ccourseSlug}
+            )
+            .run(Database.connection);
+
+        // Check if user has a trashcan already
+        const userHasTrashCan = existingTrashCans.some((can) => can.userID === user.id);
+        if (user.id && userHasTrashCan) {
+            return HelpResponse.error(response, 'You already have a trash can out in this course!', 406);
+        }
+
         const can: TrashCan = {
             userID: user.id ? user.id : '',
             departmentSlug: input.departmentSlug,
@@ -88,16 +103,15 @@ export namespace TrashCanController {
             room: input.room,
             responderName: '',
             active: true,
-            created: await r.now().run(Database.connection)
+            created: await r.now().run(Database.connection),
+            numInLine: existingTrashCans.length
         };
-    
-        // TODO: check user doesn't already have a can out
-        Database.trashCans.insert(can)
-        .run(Database.connection)
-        .then((result) => {
-            HelpResponse.success(response, result);
-        })
-        .catch( error => HelpResponse.error(response, error) );
+
+        Database.trashCans
+            .insert(can)
+            .run(Database.connection)
+                .then((result) => HelpResponse.success(response, result))
+                .catch((error) => HelpResponse.error(response, error));
     };
 
     export const respondToTrashCanValidator = checkSchema({
@@ -168,6 +182,7 @@ export namespace TrashCanController {
             return HelpResponse.error(response, 'TrashCan does not exist', 404);
         }
 
+        // Retracted by the student
         if(can.userID && can.userID == user.id) {
             return HelpResponse.fromPromise(response, 
                 Database
@@ -178,6 +193,7 @@ export namespace TrashCanController {
             );
         }
 
+        // Removed by a TA/lecturer/admin
         if (await adminOrAssociated(user, input.departmentSlug, input.courseSlug)) {
             return HelpResponse.fromPromise(response, 
                 Database
