@@ -5,8 +5,6 @@ http://app.help.dk {
 }
 
 http://api.help.dk {
-    # proxy / pushpin:7999
-    # proxy / http2:3000
     proxy / pushpin:7999
 }
 
