@@ -34,6 +34,8 @@ services:
       dockerfile: ./dev.Dockerfile
     volumes:
       - ./frontend:/usr/src/help/app
+    ports:
+      - 4200:4200
 
   caddy:
     volumes:
