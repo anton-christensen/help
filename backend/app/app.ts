@@ -17,7 +17,8 @@ Database.init().then(() => {
     const app = express();
     app.use(express.json());
     app.use(compression());
-    app.use(cors())
+    app.use(cors());
+    app.options('*', cors);
 
     // disable caching
     app.use(function (req, res, next) {

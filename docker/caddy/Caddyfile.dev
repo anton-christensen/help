@@ -6,22 +6,22 @@
 
 
 http://app.help.dk {
-    reverse_proxy / app:4200
+    reverse_proxy app:4200
     encode gzip
 }
 
 http://api.help.dk {
-    reverse_proxy / pushpin:7999
+    reverse_proxy pushpin:7999
 }
 
 http://db.help.dk {
-    reverse_proxy / rethinkdb:8080
+    reverse_proxy rethinkdb:8080
 }
 
 http://admin.db.help.dk {
-    reverse_proxy / rethinkdb:8080
+    reverse_proxy rethinkdb:8080
 }
 
 http://dns.help.dk {
-    reverse_proxy / dns:8080
+    reverse_proxy dns:8080
 }
