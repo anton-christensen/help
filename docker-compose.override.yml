@@ -13,10 +13,6 @@ services:
       - "HTTP_PASS=bar"
 
   rethinkdb:
-
-#  http2:
-#    depends_on:
-#      - pushpin
   
   pushpin:
 
@@ -37,8 +33,8 @@ services:
     ports:
       - 4200:4200
 
-  caddy:
+  caddy2:
     volumes:
-      - ./docker/caddy/Caddyfile.dev:/etc/Caddyfile  # to mount custom Caddyfile
+      - ./docker/caddy/Caddyfile.dev:/etc/caddy/Caddyfile # to mount custom Caddyfile
 
   

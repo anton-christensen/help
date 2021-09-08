@@ -8,29 +8,12 @@ services:
   
   # fancy REST -> Realtime API middleware
   pushpin:
-    build: ./docker/pushpin
-    image: my/pushpin
+    image: fanout/pushpin
     volumes: 
       - ./docker/pushpin/routes:/etc/pushpin/routes
     logging:
       driver: "none"
   
-  # http2 -> http1 proxy that gets us around a six concurrent connection limit
-  # http2:
-  #   depends_on:
-  #     - pushpin
-  #   build: ./docker/nghttp2
-  #   image: help/nghttpx
-  #   environment:
-  #     - HOST=pushpin
-  #     - PORT=7999
- 
-#  nginx:
-#    image: nginx:latest
-#    container_name: nginx
-#    volumes:
-#      - ./docker/nginx/config:/etc/nginx/nginx.conf
-
   # REST API with pushpin integration
   api:
     image: help/api/prod
@@ -40,13 +23,12 @@ services:
     depends_on:
       - rethinkdb
     
-  
-  caddy:
-    image: "wemakeservices/caddy-docker:latest"
+  caddy2:
+    image: "caddy:2.4.5-alpine"
     volumes:
       - ./frontend/dist/help:/srv/
-      - ./docker/caddy/certs:/root/.caddy  # to save certificates on disk
-      - ./docker/caddy/Caddyfile.prod:/etc/Caddyfile  # to mount custom Caddyfile
+      - ./docker/caddy/Caddyfile.prod:/etc/caddy/Caddyfile
+      - ./docker/caddy/data:/data
     ports:
       - "80:80"
       - "443:443"

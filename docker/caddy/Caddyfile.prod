@@ -1,24 +1,24 @@
+{
+    log {
+        format console
+    }
+}
+
 help.aau.dk {
-  root /srv
-  rewrite {
-    to {path} {path}/ /
-  }
+  root * /srv
+  try_files {path} {path}/ /
 
-  gzip
-
-  tls anton.christensen9700@gmail.com
+  encode gzip
 
   header /js {
-    Cache-Control "public, max-age=31536000"
+    Cache-Control "public, max-age=86400"
   }
 
   header /css {
-    Cache-Control "public, max-age=31536000"
+    Cache-Control "public, max-age=86400"
   }
 }
 
 api.help.aau.dk {
-  proxy / pushpin:7999
-  
-  tls anton.christensen9700@gmail.com
+  reverse_proxy / pushpin:7999
 } 
