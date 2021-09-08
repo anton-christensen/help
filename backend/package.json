@@ -24,6 +24,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "cors": "^2.8.5",
     "express-grip": "^1.2.1",
     "express-validator": "^6.4.0",
     "firebase-admin": "^8.9.2",

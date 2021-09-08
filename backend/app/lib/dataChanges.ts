@@ -7,14 +7,22 @@ import { User } from '../models/user';
 import {r, RDatum} from 'rethinkdb-ts';
 
 export class OnUpdateWorker {
+    private static hasFirebaseAccess = true;
     public static start() {
         console.log('Loading service account...');
-        const serviceAccount = require('../../serviceAccountKey.json');
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-            databaseURL: 'https://aau-help.firebaseio.com'
-        });
-        console.log('Service account loaded!');
+        try {
+            const serviceAccount = require('../../serviceAccountKey.json');
+            const fbOptions = {
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: 'https://aau-help.firebaseio.com'
+            }
+            admin.initializeApp(fbOptions);
+        } catch {
+            this.hasFirebaseAccess = false;
+            console.log('service account failed to load. Notification service is unavailable')
+        }
+        if(this.hasFirebaseAccess)
+            console.log('Service account loaded!');
 
         const listenerPromises = [];
         console.log('Setting up database listeners...');
@@ -96,6 +104,8 @@ export class OnUpdateWorker {
 
 
     static onNewTrashCan(can: TrashCan) {
+        if(!this.hasFirebaseAccess) return;
+        
         // Send notification to proper topic when a trashcan is created
         const topic = `TrashCan-${can.departmentSlug}-${can.courseSlug}`;
         return admin.messaging()
@@ -144,6 +154,8 @@ export class OnUpdateWorker {
     }
 
     static onNewNotificationToken(notificationToken: NotificationToken) {
+        if(!this.hasFirebaseAccess) return;
+
         // Subscribe notification tokens when they are created
         const topic = `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`;
         return admin.messaging()
@@ -152,6 +164,8 @@ export class OnUpdateWorker {
 
 
     static onUpdatedNotificationToken(oldNotificationToken: NotificationToken, newNotificationToken: NotificationToken) {
+        if(!this.hasFirebaseAccess) return;
+
         // Handle subscriptions whenever a notification token is updated
         const oldTopic = `TrashCan-${oldNotificationToken.departmentSlug}-${oldNotificationToken.courseSlug}`;
         const newTopic = `TrashCan-${newNotificationToken.departmentSlug}-${newNotificationToken.courseSlug}`;
@@ -162,6 +176,8 @@ export class OnUpdateWorker {
     }
 
     static onDeleteNotificationToken(notificationToken: NotificationToken) {
+        if(!this.hasFirebaseAccess) return;
+
         // Unsubscribe tokens when they are deleted
         const topic = `TrashCan-${notificationToken.departmentSlug}-${notificationToken.courseSlug}`;
         return admin.messaging()

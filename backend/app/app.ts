@@ -9,6 +9,7 @@ import {HelpResponse} from './lib/responses';
 import express from 'express';
 import * as dotEnv from 'dotenv';
 import compression from 'compression';
+import cors from 'cors';
 
 dotEnv.config();
 
@@ -16,6 +17,7 @@ Database.init().then(() => {
     const app = express();
     app.use(express.json());
     app.use(compression());
+    app.use(cors())
 
     // disable caching
     app.use(function (req, res, next) {
