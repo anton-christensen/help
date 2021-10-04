@@ -134,6 +134,15 @@ export class Database {
           isEmpty, 
           this.departments.insert([
             {
+              faculty: "Aalborg University" ,
+              faculty_da: "Aalborg Universitet" ,
+              faculty_en: "Aalborg University" ,
+              numCourses: 0 ,
+              slug: "ak" ,
+              title: "Adgangskursus" ,
+              title_da: "Adgangskursus" ,
+              title_en: "Adgangskursus"
+            },{
               faculty: "The Technical Faculty of IT and Design" ,
               faculty_da: "Det Tekniske Fakultet for IT og Design" ,
               faculty_en: "The Technical Faculty of IT and Design" ,
