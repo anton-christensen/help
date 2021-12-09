@@ -106,8 +106,8 @@ export namespace UserController {
         if (userRoleIn(user, ['student', 'TA'])) {
             return HelpResponse.disallowed(response);
         }
-        // Lecturers can only create students and TAs
-        else if (user.role == 'lecturer' && (input.role == 'admin' || input.role == 'lecturer')) {
+        // Lecturers can't elevate privileges
+        else if (user.role == 'lecturer' && input.role == 'admin') {
             return HelpResponse.disallowed(response);
         }
 
@@ -217,6 +217,12 @@ export namespace UserController {
             const firstName = extractMatch(new RegExp('<saml1:Attribute AttributeName="givenName" AttributeNamespace="http://www.ja-sig.org/products/cas/"><saml1:AttributeValue xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">([^<]+)</saml1:AttributeValue></saml1:Attribute>').exec(body));
             const lastName = extractMatch(new RegExp('<saml1:Attribute AttributeName="sn" AttributeNamespace="http://www.ja-sig.org/products/cas/"><saml1:AttributeValue xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">([^<]+)</saml1:AttributeValue></saml1:Attribute>').exec(body));
             
+            let getRole = (email : string) => {
+                if(/student.aau.dk$/.test(email)) return 'student';
+                if(/staff.aau.dk$|its.aau.dk$/.test(email)) return 'admin';
+                return 'lecturer'
+            }
+
             return Database.users.filter({email: email})
             .run(Database.connection)
             .then(queryResult => {
@@ -226,7 +232,7 @@ export namespace UserController {
                         email,
                         anon: false,
                         name: `${firstName} ${lastName}`,
-                        role: 'student',
+                        role: getRole(email),
                     };
     
                     return Database.users.insert(user, {returnChanges: true})

@@ -4,6 +4,29 @@ r.db('help').table('trashCans').group([
   r.row('courseSlug'),
   r.row('created').date()
 ]).count();
+# ordered by date
+r.db('help').table('trashCans').group(
+  (can) => {
+    return {
+      departmentSlug: can('departmentSlug'), 
+      courseSlug: can('courseSlug'), 
+      date: can('created').date()
+    }
+  }  
+).count().ungroup().orderBy(r.desc(r.row('group')('date')));
+# number of cans per course per semester with more than 12 cans (remove small tests)
+r.db('help').table('trashCans').group(
+  (can) => {
+    return {
+      departmentSlug: can('departmentSlug'),
+      courseSlug: can('courseSlug'),
+        year: can('created').year(),
+        spring: can('created').month().lt(8)
+    }
+  }
+).count().ungroup().filter(r.row("reduction").gt(12)).orderBy(r.desc(r.row('group')('year')), r.asc(r.row('group')('spring')), r.desc('reduction'));
+
+
 
 # Average response time 
 r.db('help').table('trashCans').filter(
